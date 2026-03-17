@@ -1,6 +1,8 @@
 """
 AgentOrchestrator: Coordinates the multi-agent pipeline.
 Runs agents sequentially, manages shared memory, collects outputs.
+Ablation-aware: disabled agents inject neutral/empty values so that
+downstream agents observe a meaningful change in information flow.
 """
 
 from __future__ import annotations
@@ -15,9 +17,37 @@ from finvl.agents.event_analyst import EventAnalystAgent
 from finvl.agents.pattern_reasoner import PatternReasonerAgent
 from finvl.agents.risk_controller import RiskControllerAgent
 from finvl.core.memory import SharedMemory
-from finvl.core.types import DecisionOutput
+from finvl.core.types import ChartGeometry, DecisionOutput, Implication, RegimeState
 
 logger = logging.getLogger(__name__)
+
+# Default neutral values that disabled agents write to memory so that
+# downstream agents see explicit signals rather than relying on fallback
+# defaults which would mask the effect of removing a component.
+_DISABLED_DEFAULTS: Dict[str, Dict[str, Any]] = {
+    "ChartAnalyst": {
+        "chart_geometry": ChartGeometry(
+            overall_bias=Implication.NEUTRAL, confidence=0.0,
+            narrative="Visual analysis disabled",
+        ),
+        "chart_narrative": "Visual analysis disabled",
+        "chart_bias": "neutral",
+    },
+    "PatternReasoner": {
+        "pattern_bias": "neutral",
+        "pattern_assessments": [],
+        "pattern_confidence": 0.0,
+    },
+    "EventAnalyst": {
+        "event_bias": "neutral",
+        "event_impact": 0.0,
+    },
+    "RiskController": {
+        "risk_level": "moderate",
+        "risk_assessment": {"recommendation": "proceed", "risk_factors": []},
+        "position_size_pct": 0.05,
+    },
+}
 
 
 class AgentOrchestrator:
@@ -26,19 +56,37 @@ class AgentOrchestrator:
     ChartAnalyst -> PatternReasoner -> EventAnalyst -> RiskController -> DecisionPM
 
     Manages SharedMemory with confidence-weighted writes and disagreement detection.
+    Disabled agents inject neutral values so ablation experiments produce
+    meaningfully different behaviour.
     """
 
     def __init__(self, config: Dict[str, Any] | None = None):
         config = config or {}
         agents_cfg = config.get("agents", {})
 
-        self.agents: List[BaseFinAgent] = [
-            ChartAnalystAgent(agents_cfg.get("chart_analyst", {})),
-            PatternReasonerAgent(agents_cfg.get("pattern_reasoner", {})),
-            EventAnalystAgent(agents_cfg.get("event_analyst", {})),
-            RiskControllerAgent(agents_cfg.get("risk_controller", {})),
-            DecisionPMAgent(agents_cfg.get("decision_pm", {})),
-        ]
+        self._agent_configs: Dict[str, Dict[str, Any]] = {
+            "ChartAnalyst": agents_cfg.get("chart_analyst", {}),
+            "PatternReasoner": agents_cfg.get("pattern_reasoner", {}),
+            "EventAnalyst": agents_cfg.get("event_analyst", {}),
+            "RiskController": agents_cfg.get("risk_controller", {}),
+            "DecisionPM": agents_cfg.get("decision_pm", {}),
+        }
+
+        self.agents: List[BaseFinAgent] = []
+        self._disabled_agents: List[str] = []
+
+        for name, acfg in [
+            ("ChartAnalyst", ChartAnalystAgent),
+            ("PatternReasoner", PatternReasonerAgent),
+            ("EventAnalyst", EventAnalystAgent),
+            ("RiskController", RiskControllerAgent),
+            ("DecisionPM", DecisionPMAgent),
+        ]:
+            cfg = self._agent_configs[name]
+            if cfg.get("enabled", True):
+                self.agents.append(acfg(cfg))
+            else:
+                self._disabled_agents.append(name)
 
         self.memory = SharedMemory()
         self.agent_outputs: List[AgentOutput] = []
@@ -57,13 +105,22 @@ class AgentOrchestrator:
         self.memory.clear()
         self.agent_outputs.clear()
 
+        # Write neutral defaults for disabled agents so downstream
+        # agents observe the absence explicitly.
+        for name in self._disabled_agents:
+            defaults = _DISABLED_DEFAULTS.get(name, {})
+            for key, value in defaults.items():
+                self.memory.write(
+                    key=key, value=value, confidence=0.0, source=f"{name}(disabled)",
+                )
+            self.memory.advance_step()
+
         for agent in self.agents:
             try:
                 mem_dict = self.memory.as_dict()
                 output = await agent.process(inputs, mem_dict)
                 self.agent_outputs.append(output)
 
-                # Apply memory writes via structured SharedMemory
                 writes = agent.flush_memory_writes()
                 for entry in writes:
                     self.memory.write(
@@ -99,6 +156,8 @@ class AgentOrchestrator:
 
     def get_reasoning_trace(self) -> str:
         lines = []
+        for name in self._disabled_agents:
+            lines.append(f"[{name}] (DISABLED)")
         for output in self.agent_outputs:
             status = "OK" if output.success else "FAIL"
             lines.append(

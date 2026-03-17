@@ -2,22 +2,132 @@
 \label{app:details}
 
 \subsection{Hyperparameters}
-\begin{itemize}
-    \item Lookback window: $L = 60$ trading days
-    \item Chart resolution: $1024 \times 768$ pixels at 150 DPI
-    \item VLM: GPT-4o with temperature $= 0.1$
-    \item Transaction costs: 15 bps round-trip
-    \item Slippage: 5 bps
-    \item Execution delay: 1 trading day
-    \item Maximum position size: 10\% of portfolio
-    \item Default stop-loss: $2 \times$ ATR(14)
-\end{itemize}
 
-\subsection{Chart Geometry Extraction Details}
-% Details on trendline detection, S/R clustering, candlestick classification
+Table~\ref{tab:hyperparams} lists all hyperparameters used in the experiments. Unless otherwise noted, these values are held constant across all ablation configurations.
 
-\subsection{Prompt Templates}
-% Selected prompt templates for each agent
+\begin{table}[h]
+\centering
+\caption{Hyperparameter settings.}
+\label{tab:hyperparams}
+\begin{tabular}{lll}
+\toprule
+Category & Parameter & Value \\
+\midrule
+Chart rendering & Lookback window ($L$) & 60 trading days \\
+                & Resolution & $1024 \times 768$ px at 150 DPI \\
+                & Overlays & SMA(5, 20, 60), Bollinger(20, 2) \\
+\midrule
+Geometry extraction & Trendline extrema order & 5 \\
+                    & Trendline min.\ touches & 2 \\
+                    & Trendline $R^2$ threshold & 0.3 \\
+                    & S/R tolerance & 2\% of price range \\
+                    & S/R min.\ touches & 2 \\
+                    & Candlestick lookback & 10 bars \\
+\midrule
+VLM & Model & GPT-4o \\
+    & Temperature & 0.1 \\
+    & Max tokens & 2048 \\
+    & Max retries & 3 \\
+\midrule
+Memory & Confidence threshold & 0.3 \\
+       & Gated attention dim.\ ($d_{\text{model}}$) & 512 \\
+\midrule
+Backtesting & Transaction cost & 15 bps round-trip \\
+            & Slippage & 5 bps \\
+            & Execution delay & 1 trading day \\
+            & Initial capital & \$1{,}000{,}000 \\
+\midrule
+Risk control & Max position & 10\% of portfolio \\
+             & Default stop-loss & $2 \times$ ATR(14) \\
+             & ATR period & 14 days \\
+\midrule
+R\&D loop & Max iterations ($K$) & 5 \\
+           & Convergence threshold ($\epsilon$) & 0.01 (Sharpe) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection{Additional Results}
-% Extended tables, cross-market results, additional ablations
+\subsection{Chart Geometry Extraction Algorithms}
+\label{app:geometry}
+
+\paragraph{Trendline detection.}
+Local extrema are identified as bars whose value is the maximum (or minimum) within a window of $\pm 5$ bars. Consecutive plateau values (equal-valued extrema within the window) are deduplicated by retaining only the first occurrence. A least-squares line is fitted to the extrema positions, and lines with $R^2 \leq 0.3$ are discarded. The system fits trendlines over multiple sub-windows (full lookback, half-lookback) to detect both long-range and short-range trends. A trendline is tagged as ``broken'' if the current price exceeds the extrapolated line value by more than 1\%.
+
+\paragraph{Support and resistance.}
+Pivot prices are extracted from local highs and lows (order 3). These pivots are clustered by proximity, with the tolerance set to 2\% of the full price range to adapt across different asset price scales. Clusters with fewer than 2 touches are discarded. Each resulting level is classified as support (below current price) or resistance (above current price), with levels that have been recently broken reclassified as ``broken support'' or ``broken resistance''.
+
+\paragraph{Candlestick patterns.}
+The system classifies individual bars and two-bar combinations within the most recent configurable window (default 10 bars). Classification uses body-to-range ratios and shadow proportions: doji (body ratio $< 0.1$), hammer (lower shadow $> 2 \times$ body, bullish close), shooting star (upper shadow $> 2 \times$ body, bearish close), and engulfing patterns (current body envelops previous bar with opposite direction).
+
+\paragraph{Market regime classification.}
+The regime classifier uses two features computed from the most recent 20 bars: annualised volatility (standard deviation of daily returns $\times \sqrt{252}$) and trend strength (the relative gap between SMA(5) and SMA(20)). The volatility is normalised against the full-sample standard deviation to obtain a percentile. Regimes are assigned as: volatile (volatility percentile $> 0.7$), trending up (trend strength $> 0.02$), trending down (trend strength $< -0.02$), ranging ($|$trend strength$|$ $< 0.01$), or quiet (otherwise).
+
+\subsection{Agent Prompt Templates}
+\label{app:prompts}
+
+Below we provide representative prompt excerpts for the ChartAnalyst and DecisionPM agents. Full prompt templates are available in the code repository.
+
+\paragraph{ChartAnalyst system prompt (excerpt).}
+\begin{quote}
+\small
+You are a professional chart analyst specialising in technical analysis of financial candlestick charts. Analyse the provided chart image and identify: (1) overall trend direction and strength, (2) key support and resistance levels, (3) notable chart formations (double top/bottom, triangles, head-and-shoulders), (4) candlestick patterns at the current price, (5) volume patterns and any divergences. Provide your assessment as structured JSON.
+\end{quote}
+
+\paragraph{DecisionPM system prompt (excerpt).}
+\begin{quote}
+\small
+You are a portfolio manager synthesising inputs from multiple specialist analysts. Given chart analysis, pattern assessment, event context, and risk evaluation, produce a final trading decision (buy/sell/hold) with conviction level, position size recommendation, and a concise rationale that addresses any disagreements between analysts.
+\end{quote}
+
+\subsection{Extended Results}
+\label{app:extended}
+
+% S\&P500 ablation results table (to be filled after experiments)
+
+\begin{table}[h]
+\centering
+\caption{Ablation study on S\&P500 test set (2019--2023).}
+\label{tab:ablation_sp500}
+\begin{tabular}{llcccc}
+\toprule
+ID & Configuration & Sharpe & Sharpe (TC) & IC & MaxDD \\
+\midrule
+A1 & Full \textsc{FinVL-MAS}            & --- & --- & --- & --- \\
+A2 & No visual reasoning                & --- & --- & --- & --- \\
+A3 & Raw chart image (no geometry)       & --- & --- & --- & --- \\
+A4 & Single agent                        & --- & --- & --- & --- \\
+A5 & No gated memory                     & --- & --- & --- & --- \\
+A6 & No event context                    & --- & --- & --- & --- \\
+A7 & No risk controller                  & --- & --- & --- & --- \\
+A8 & Rule-based only (no VLM)            & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Runtime and Cost Analysis}
+\label{app:runtime}
+
+\begin{table}[h]
+\centering
+\caption{Per-decision runtime and API cost breakdown.}
+\label{tab:runtime}
+\begin{tabular}{lcc}
+\toprule
+Component & Avg.\ Runtime (ms) & Avg.\ Cost (USD) \\
+\midrule
+Chart rendering & --- & --- \\
+Geometry extraction (rule-based) & --- & --- \\
+VLM analysis & --- & --- \\
+Agent pipeline (5 agents) & --- & --- \\
+Total per decision & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Qualitative Examples}
+\label{app:qualitative}
+
+% To be filled with annotated decision traces and figures showing:
+% 1. A successful buy signal with confirming geometry
+% 2. A correctly avoided trade due to inter-agent disagreement
+% 3. A failure case where the system missed a reversal

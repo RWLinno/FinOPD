@@ -5,64 +5,81 @@
 
 Given a target asset with historical OHLCV (open, high, low, close, volume) data up to time $t$, \textsc{FinVL-MAS} produces a trading decision $d_t \in \{\texttt{buy}, \texttt{sell}, \texttt{hold}\}$ with position size, stop-loss levels, and an interpretable rationale. The system processes data through a pipeline that mirrors the stages of expert trader cognition: perception, pattern recognition, contextual integration, risk assessment, and decision formation (Figure~\ref{fig:architecture}).
 
-Formally, let $\mathbf{X}_{t-L:t} \in \mathbb{R}^{L \times 5}$ denote the lookback window of $L$ OHLCV bars. The pipeline is:
+Formally, let $\mathbf{X}_{t-L:t} \in \mathbb{R}^{L \times 5}$ denote the lookback window of $L$ OHLCV bars. The pipeline produces:
 \begin{equation}
     d_t = \text{DecisionPM}\Big(\mathcal{M}_t\Big), \quad \mathcal{M}_t = \bigoplus_{a \in \mathcal{A}} \text{GatedCom}\big(\mathcal{M}, h_a(\mathbf{X}_{t-L:t})\big)
 \end{equation}
-where $\mathcal{A} = \{\text{ChartAnalyst}, \text{PatternReasoner}, \text{EventAnalyst}, \text{RiskController}\}$ are specialist agents, $\mathcal{M}$ is shared memory, $h_a(\cdot)$ is agent $a$'s hidden state, and GatedCom is the gated cross-attention communication mechanism.
+where $\mathcal{A} = \{\text{ChartAnalyst}, \text{PatternReasoner}, \text{EventAnalyst}, \text{RiskController}\}$ are specialist agents, $\mathcal{M}$ is the shared memory, $h_a(\cdot)$ denotes agent $a$'s output representation, and $\text{GatedCom}$ is the gated cross-attention communication mechanism adapted from MAS4TS~\cite{mas4ts2025}. The full pipeline is summarised in Algorithm~\ref{alg:pipeline}.
+
+\begin{algorithm}[t]
+\caption{FinVL-MAS Decision Pipeline}
+\label{alg:pipeline}
+\begin{algorithmic}[1]
+\REQUIRE OHLCV window $\mathbf{X}_{t-L:t}$, optional chart image $I_t$, optional event context $E_t$
+\ENSURE Trading decision $d_t$ with rationale
+\STATE $\mathcal{M} \leftarrow \emptyset$ \hfill \COMMENT{Initialise shared memory}
+\STATE $I_t \leftarrow \text{Render}(\mathbf{X}_{t-L:t})$ \hfill \COMMENT{Candlestick chart with overlays}
+\STATE $\mathcal{G}_t^{\text{rule}} \leftarrow \text{ExtractGeometry}(\mathbf{X}_{t-L:t})$ \hfill \COMMENT{Rule-based geometry}
+\IF{VLM available}
+    \STATE $\mathcal{G}_t^{\text{vlm}} \leftarrow \text{VLMAnalyze}(I_t, \mathcal{G}_t^{\text{rule}})$
+    \STATE $\mathcal{G}_t \leftarrow \text{Merge}(\mathcal{G}_t^{\text{rule}}, \mathcal{G}_t^{\text{vlm}})$
+\ELSE
+    \STATE $\mathcal{G}_t \leftarrow \mathcal{G}_t^{\text{rule}}$
+\ENDIF
+\STATE $\mathcal{M} \leftarrow \text{GatedWrite}(\mathcal{M}, \text{ChartAnalyst}(\mathcal{G}_t))$
+\STATE $\mathcal{M} \leftarrow \text{GatedWrite}(\mathcal{M}, \text{PatternReasoner}(\mathcal{M}))$
+\STATE $\mathcal{M} \leftarrow \text{GatedWrite}(\mathcal{M}, \text{EventAnalyst}(E_t, \mathcal{M}))$
+\STATE $\mathcal{M} \leftarrow \text{GatedWrite}(\mathcal{M}, \text{RiskController}(\mathbf{X}_{t-L:t}, \mathcal{M}))$
+\STATE $d_t \leftarrow \text{DecisionPM}(\mathcal{M})$ \hfill \COMMENT{Confidence-weighted fusion}
+\RETURN $d_t$
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Visual Chart Analysis}
 \label{sec:visual}
 
 \paragraph{Chart rendering.}
-We render $\mathbf{X}_{t-L:t}$ as a standardized candlestick chart with volume bars and optional technical indicator overlays (moving averages, Bollinger bands). The rendering uses \texttt{mplfinance} with consistent axes, color coding, and resolution ($1024 \times 768$ at 150 DPI).
+The system renders $\mathbf{X}_{t-L:t}$ as a standardised candlestick chart with volume bars and configurable technical indicator overlays (moving averages, Bollinger bands). Rendering uses \texttt{mplfinance} with consistent axis scaling, colour coding, and resolution ($1024 \times 768$ at 150 DPI) to ensure visual consistency across assets and time periods.
 
-\paragraph{Chart geometry extraction.}
-We extract structured chart geometry $\mathcal{G}_t$ via a hybrid pipeline:
-\begin{itemize}
-    \item \textbf{Rule-based}: Trendlines (linear regression on local extrema), support/resistance levels (price clustering), candlestick patterns (body/shadow ratio classification), volume signals (divergence detection).
-    \item \textbf{VLM-based}: The rendered chart image is analyzed by a vision-language model (GPT-4o) with structured prompts to identify formations (double top/bottom, triangles), regime assessment, and holistic bias.
-    \item \textbf{Fusion}: Rule-based features provide precise geometric values; VLM provides holistic interpretation. Disagreements are surfaced as uncertainty signals.
-\end{itemize}
+\paragraph{Hybrid chart geometry extraction.}
+We extract structured chart geometry $\mathcal{G}_t$ via a hybrid pipeline that combines rule-based precision with VLM-based holistic interpretation. The rule-based path applies well-defined algorithms: trendline detection via linear regression on local extrema (retaining fits with $R^2 > 0.3$), support and resistance identification through adaptive price clustering (tolerance scaled to the price range), candlestick pattern classification based on body-to-shadow ratios, and volume signal detection including climax and divergence patterns. The VLM path sends the rendered chart image to a vision-language model (GPT-4o) with structured prompts that request formation identification (double top/bottom, triangles, head-and-shoulders), regime assessment, and overall directional bias. The rule-based channel provides numerically precise geometric features, while the VLM captures complex spatial patterns that resist simple algorithmic description. Disagreements between the two channels are surfaced as uncertainty signals to downstream agents.
 
-The geometry is represented as a typed structure:
+The complete geometry is represented as a typed structure:
 \begin{equation}
     \mathcal{G}_t = \big(\{\ell_i\}, \{s_j\}, \{c_k\}, \{f_m\}, \{v_n\}, r_t\big)
 \end{equation}
-where $\ell_i$ are trendlines, $s_j$ support/resistance levels, $c_k$ candlestick patterns, $f_m$ chart formations, $v_n$ volume signals, and $r_t$ the regime state.
+where $\ell_i$ are trendlines (direction, slope, $R^2$, breakout status), $s_j$ are support and resistance levels (price, strength, touch count), $c_k$ are candlestick patterns (type, significance, implication), $f_m$ are chart formations (type, stage, target price), $v_n$ are volume signals (type, implication), and $r_t$ is the classified market regime (trending, volatile, ranging, quiet).
 
 \subsection{Multi-Agent Reasoning Architecture}
 \label{sec:agents}
 
-\paragraph{Cognitive decomposition.}
-We decompose the trader's decision process into five specialist agents, each corresponding to a recognizable stage of expert reasoning:
+We decompose the trader decision process into five specialist agents, each corresponding to a recognisable stage of expert reasoning. The \textbf{ChartAnalystAgent} perceives chart geometry $\mathcal{G}_t$ and produces a visual summary with directional bias and confidence. The \textbf{PatternReasonerAgent} interprets detected patterns using historical base rates drawn from technical analysis literature~\cite{bulkowski2005encyclopedia} and regime context to form a directional hypothesis with associated probability estimates. The \textbf{EventAnalystAgent} integrates non-visual context (news sentiment, fundamental data) when available and provides a neutral assessment otherwise, allowing the system to operate with or without textual data. The \textbf{RiskControllerAgent} assesses downside risk by computing stop-loss levels from ATR(14), adjusting for nearby support zones, and determining position size based on volatility regime and risk classification. The \textbf{DecisionPMAgent} integrates all upstream evidence via confidence-weighted scoring, applies risk filtering, detects and reports inter-agent contradictions, and produces the final trading decision.
 
-\begin{enumerate}
-    \item \textbf{ChartAnalystAgent}: Perceives chart geometry $\mathcal{G}_t$ and produces a visual summary with directional bias and confidence.
-    \item \textbf{PatternReasonerAgent}: Interprets detected patterns using historical base rates and regime context to form a directional hypothesis.
-    \item \textbf{EventAnalystAgent}: Integrates non-visual context (events, fundamentals) when available; provides neutral assessment when event data is absent.
-    \item \textbf{RiskControllerAgent}: Assesses downside risk, computes stop-loss/take-profit levels based on ATR and support levels, recommends position sizing.
-    \item \textbf{DecisionPMAgent}: Integrates all evidence via confidence-weighted scoring, resolves contradictions, and produces the final trading decision.
-\end{enumerate}
+Agents execute sequentially (ChartAnalyst $\rightarrow$ PatternReasoner $\rightarrow$ EventAnalyst $\rightarrow$ RiskController $\rightarrow$ DecisionPM), with each agent reading the current shared memory snapshot and writing its outputs back with associated confidence scores.
 
 \subsection{Shared Memory and Gated Communication}
 \label{sec:memory}
 
-Following MAS4TS~\cite{mas4ts2025}, agents communicate through a shared memory $\mathcal{M}$ updated via gated cross-attention:
+Agents communicate through a shared memory $\mathcal{M}$ that supports confidence-weighted writes. When agent $a$ writes to memory, the update proceeds in two stages. First, a gated cross-attention mechanism adapted from MAS4TS~\cite{mas4ts2025} computes the candidate update:
 \begin{equation}
-    \mathcal{M} \leftarrow \mathcal{M} + \sigma\big(\text{Gate}(h_a)\big) \odot \text{Attn}(Q{=}\mathcal{M},\; K{=}h_a,\; V{=}h_a)
+    \hat{\mathcal{M}} = \mathcal{M} + \sigma\big(\text{Gate}(h_a)\big) \odot \text{Attn}(Q{=}\mathcal{M},\; K{=}h_a,\; V{=}h_a)
 \end{equation}
-where $\sigma(\cdot)$ is a sigmoid gate that controls information flow from agent $a$. Each agent writes to memory with an associated confidence score $\alpha_a \in [0,1]$, and the memory update is weighted:
+where $\sigma(\cdot)$ is a sigmoid gate and $h_a$ is the writing agent's hidden state. The gate learns to suppress noisy or irrelevant contributions. Second, the actual memory state is updated via confidence-weighted interpolation:
 \begin{equation}
-    \mathcal{M} \leftarrow (1 - \alpha_a) \cdot \mathcal{M}_{\text{prev}} + \alpha_a \cdot \mathcal{M}_{\text{updated}}
+    \mathcal{M} \leftarrow (1 - \alpha_a) \cdot \mathcal{M}_{\text{prev}} + \alpha_a \cdot \hat{\mathcal{M}}
 \end{equation}
-Contradictions between agents (e.g., Chart bullish vs.~Risk bearish) are explicitly detected and surfaced to the DecisionPM agent.
+where $\alpha_a \in [0,1]$ is agent $a$'s self-assessed confidence. High-confidence agents exert greater influence on the shared state. The memory system additionally tracks the history of each key and performs automatic disagreement detection when bias-related entries (e.g., chart bullish vs.\ pattern bearish) conflict across agents. These contradictions are explicitly surfaced to the DecisionPM agent as uncertainty signals.
 
 \subsection{Iterative Refinement Loop}
 \label{sec:loop}
 
-Inspired by R\&D-Agent~\cite{rdagent2025}, the system operates within a closed-loop workflow:
+Inspired by R\&D-Agent~\cite{rdagent2025}, the system supports a closed-loop iterative workflow that progressively improves decision quality across episodes:
 \begin{equation}
     \text{Hypothesis} \xrightarrow{\text{configure}} \text{Experiment} \xrightarrow{\text{backtest}} \text{Feedback} \xrightarrow{\text{reflect}} \text{Trace}
 \end{equation}
-Each iteration generates hypotheses about which visual patterns are most predictive (e.g., ``trendline breaks in volatile regimes''), configures the system accordingly, runs a backtest, analyzes results, and updates the trace for the next iteration.
+Each iteration begins with hypothesis generation, where the system formulates testable claims about which visual patterns are most predictive under specific market conditions (e.g., trendline breaks during volatile regimes, or volume divergence preceding reversals). The hypothesis is operationalised as a configuration adjustment (modifying geometry extraction parameters, agent weights, or pattern confidence thresholds), and validated through a walk-forward backtest. The resulting performance metrics are compared against the previous iteration, and a reflection step analyses which changes contributed to improvement or degradation. Accumulated insights are recorded in a persistent trace that informs future hypothesis generation. The loop terminates after a fixed budget of $K$ iterations (default $K{=}5$) or when the improvement in Sharpe ratio between consecutive iterations falls below a threshold $\epsilon{=}0.01$.
+
+\subsection{Computational Considerations}
+\label{sec:compute}
+
+The per-decision computational cost is dominated by the VLM call, which requires one API invocation per decision point. Rule-based geometry extraction, agent reasoning, and backtesting are computationally inexpensive (collectively under 50ms per decision on a single CPU core). The system is designed to degrade gracefully when the VLM is unavailable: the rule-based geometry path alone provides a structured, if less holistic, chart representation. In our experiments, the VLM backend processes one chart in approximately 3--5 seconds, making the system practical for end-of-day trading decisions but not for intraday high-frequency applications.

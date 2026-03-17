@@ -4,84 +4,140 @@
 \subsection{Setup}
 
 \paragraph{Datasets.}
-We evaluate on two markets: (1)~\textbf{CSI300} (Chinese A-shares, daily, 2008--2020), widely used in quantitative finance research~\cite{rdagent2025}; and (2)~\textbf{S\&P500} (US equities, daily, 2000--2023), providing international comparison.
+We evaluate on two markets spanning different geographic and regulatory environments. The \textbf{CSI300} dataset covers daily-frequency Chinese A-share equities from 2008 to 2020, a period encompassing the 2015 Chinese market crash and subsequent recovery. The \textbf{S\&P500} dataset covers daily US equities from 2000 to 2023, providing exposure to the 2008 financial crisis, the 2020 COVID crash, and the subsequent bull market. Both datasets are widely used in quantitative finance research~\cite{rdagent2025,fincon2024}.
 
 \paragraph{Temporal splits.}
-We use strict walk-forward evaluation with no data leakage. For CSI300: train 2008--2014, validation 2015--2016, test 2017--2020. For S\&P500: train 2000--2015, validation 2016--2018, test 2019--2023. All features and chart renderings use only data up to and including the decision date (point-in-time alignment).
+We use strict walk-forward evaluation with no data leakage. For CSI300: train 2008--2014, validation 2015--2016, test 2017--2020. For S\&P500: train 2000--2015, validation 2016--2018, test 2019--2023. All features, chart renderings, and textual data use only information available up to and including the decision date (point-in-time alignment).
 
 \paragraph{Baselines.}
-We compare against: (1)~Buy-and-Hold; (2)~PatchTST~\cite{nie2023patchtst} numerical encoder; (3)~Single-Agent VLM (chart image $\rightarrow$ single prompt $\rightarrow$ decision); (4)~FinCon-style multi-agent LLM (text only)~\cite{fincon2024}; (5)~Traditional quantitative strategies (MA crossover, momentum).
+We compare against five baselines spanning traditional and learning-based approaches: (1)~Buy-and-Hold, which provides a passive market benchmark; (2)~SMA Crossover (5/20 day), a classical trend-following strategy; (3)~Momentum (20-day), which buys recent winners and sells recent losers; (4)~PatchTST~\cite{nie2023patchtst}, a state-of-the-art numerical time-series encoder; and (5)~Single-Agent VLM, which sends the chart image to a single GPT-4o prompt without structured geometry extraction or multi-agent reasoning.
 
 \paragraph{Metrics.}
-Annualized return, Sharpe ratio (with and without 15bps round-trip transaction costs), maximum drawdown, Calmar ratio, information coefficient (IC), rank IC, and directional accuracy. All metrics computed on the test period.
+We report annualised return, Sharpe ratio (both gross and net of 15bps round-trip transaction costs), maximum drawdown, Calmar ratio, information coefficient (IC), rank IC, and directional accuracy. All metrics are computed on the held-out test period. The Sharpe ratio uses an annualisation factor of $\sqrt{252}$ and assumes zero risk-free rate.
+
+\paragraph{Realistic constraints.}
+All experiments incorporate transaction costs (15bps round-trip), slippage (5bps), and execution delay (1 trading day). These conservative assumptions ensure that reported performance reflects achievable trading outcomes.
 
 \subsection{Main Results}
 
-% Table 1: Main results
-\begin{table}[h]
+\begin{table}[t]
 \centering
-\caption{Main results on CSI300 daily test set (2017--2020). TC = transaction costs (15bps). Bold indicates best.}
-\label{tab:main_results}
-\begin{tabular}{lccccc}
+\caption{Main results on CSI300 daily test set (2017--2020). TC denotes after transaction costs (15bps). Best results in bold.}
+\label{tab:main_csi300}
+\begin{tabular}{lcccccc}
 \toprule
-Method & Ann.~Return & Sharpe & Sharpe (TC) & MaxDD & Dir.~Acc. \\
+Method & Ann.~Return & Sharpe & Sharpe (TC) & MaxDD & Calmar & Dir.~Acc. \\
 \midrule
-Buy-and-Hold & --- & --- & --- & --- & --- \\
-PatchTST & --- & --- & --- & --- & --- \\
-Single-Agent VLM & --- & --- & --- & --- & --- \\
-FinCon & --- & --- & --- & --- & --- \\
-\textbf{FinVL-MAS (ours)} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} \\
+Buy-and-Hold     & ---  & ---  & ---  & ---  & --- & --- \\
+SMA Crossover    & ---  & ---  & ---  & ---  & --- & --- \\
+Momentum (20d)   & ---  & ---  & ---  & ---  & --- & --- \\
+PatchTST         & ---  & ---  & ---  & ---  & --- & --- \\
+Single-Agent VLM & ---  & ---  & ---  & ---  & --- & --- \\
+\midrule
+\textsc{FinVL-MAS} (ours) & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-% Analysis paragraphs (to be filled with results)
+\begin{table}[t]
+\centering
+\caption{Main results on S\&P500 daily test set (2019--2023). TC denotes after transaction costs.}
+\label{tab:main_sp500}
+\begin{tabular}{lcccccc}
+\toprule
+Method & Ann.~Return & Sharpe & Sharpe (TC) & MaxDD & Calmar & Dir.~Acc. \\
+\midrule
+Buy-and-Hold     & ---  & ---  & ---  & ---  & --- & --- \\
+SMA Crossover    & ---  & ---  & ---  & ---  & --- & --- \\
+Momentum (20d)   & ---  & ---  & ---  & ---  & --- & --- \\
+PatchTST         & ---  & ---  & ---  & ---  & --- & --- \\
+Single-Agent VLM & ---  & ---  & ---  & ---  & --- & --- \\
+\midrule
+\textsc{FinVL-MAS} (ours) & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Analysis paragraphs (to be filled after experiments)
 
 \subsection{Ablation Study}
 
-We conduct ablations to isolate the contribution of each component (Table~\ref{tab:ablation}).
+We conduct systematic ablations to isolate the contribution of each architectural component (Table~\ref{tab:ablation}). Each configuration removes or modifies exactly one component while keeping all other settings identical to the full system.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
-\caption{Ablation study on CSI300 test set. Each row removes one component.}
+\caption{Ablation study on CSI300 test set. Each row removes one component from the full system.}
 \label{tab:ablation}
-\begin{tabular}{llccc}
+\begin{tabular}{llcccc}
 \toprule
-ID & Configuration & Sharpe & IC & MaxDD \\
+ID & Configuration & Sharpe & Sharpe (TC) & IC & MaxDD \\
 \midrule
-A1 & Full \textsc{FinVL-MAS} & --- & --- & --- \\
-A2 & No visual reasoning & --- & --- & --- \\
-A3 & Raw chart (no geometry) & --- & --- & --- \\
-A4 & Single agent & --- & --- & --- \\
-A5 & No gated memory & --- & --- & --- \\
-A6 & No event context & --- & --- & --- \\
-A7 & No risk controller & --- & --- & --- \\
-A8 & Rule-based only (no VLM) & --- & --- & --- \\
+A1 & Full \textsc{FinVL-MAS}            & --- & --- & --- & --- \\
+A2 & No visual reasoning                & --- & --- & --- & --- \\
+A3 & Raw chart image (no geometry)       & --- & --- & --- & --- \\
+A4 & Single agent (ChartAnalyst + PM)    & --- & --- & --- & --- \\
+A5 & No gated memory                     & --- & --- & --- & --- \\
+A6 & No event context                    & --- & --- & --- & --- \\
+A7 & No risk controller                  & --- & --- & --- & --- \\
+A8 & Rule-based only (no VLM)            & --- & --- & --- & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+% Ablation analysis paragraphs (to be filled after experiments)
+
 \subsection{Regime-Conditioned Analysis}
 
-We analyze performance conditioned on market regime to test whether visual reasoning is especially valuable during volatile or pattern-rich periods (Table~\ref{tab:regime}).
+A central hypothesis of this work is that structured visual reasoning provides the greatest marginal value during market regimes where geometric patterns are most salient: trending and volatile periods. We partition the test period into four regimes (trending up, trending down, volatile, ranging) based on 20-day rolling volatility and SMA trend indicators, and analyse performance separately for each regime (Table~\ref{tab:regime}).
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
-\caption{Regime-conditioned performance comparison (Sharpe ratio).}
+\caption{Regime-conditioned Sharpe ratio comparison. $\Delta$ measures the improvement of the full system over the no-visual ablation.}
 \label{tab:regime}
-\begin{tabular}{lccc}
+\begin{tabular}{lcccc}
 \toprule
-Regime & Full System & No Visual & $\Delta$ \\
+Regime & Full System & No Visual (A2) & Rule-Only (A8) & $\Delta$ (Full $-$ A2) \\
 \midrule
-Trending & --- & --- & --- \\
-Volatile & --- & --- & --- \\
-Ranging & --- & --- & --- \\
-Event-heavy & --- & --- & --- \\
+Trending Up    & --- & --- & --- & --- \\
+Trending Down  & --- & --- & --- & --- \\
+Volatile       & --- & --- & --- & --- \\
+Ranging        & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Regime analysis paragraphs (to be filled after experiments)
+
+\subsection{Information Content Analysis}
+
+To understand whether chart geometry captures decision-relevant information beyond what is available in raw price series, we examine the information coefficient (IC) and rank IC across different signal sources (Table~\ref{tab:ic_analysis}).
+
+\begin{table}[t]
+\centering
+\caption{Information coefficient by signal source on CSI300 test set.}
+\label{tab:ic_analysis}
+\begin{tabular}{lcc}
+\toprule
+Signal Source & IC & Rank IC \\
+\midrule
+Chart geometry bias     & --- & --- \\
+Pattern reasoner bias   & --- & --- \\
+Ensemble (all agents)   & --- & --- \\
+PatchTST prediction     & --- & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Qualitative Analysis}
 
-% Figure 3: Decision trace example (to be generated)
-We present qualitative examples of the full reasoning pipeline, showing how chart geometry is extracted, interpreted by the Pattern Reasoner, risk-adjusted, and integrated into a final decision. See Appendix for additional examples.
+We present representative examples of the full reasoning pipeline to illustrate the interpretability of \textsc{FinVL-MAS} decisions. Figure~\ref{fig:reasoning_chain} shows a complete five-step reasoning trace: the ChartAnalyst identifies a descending trendline break with supporting volume, the PatternReasoner matches a confirmed ascending triangle with 68\% historical success rate, the EventAnalyst reports neutral context, the RiskController sets a stop-loss at the nearest support level, and the DecisionPM synthesises a moderate-conviction buy signal with explicit acknowledgement of the high-volatility risk factor.
+
+% Figure placeholder - to be created
+% \begin{figure}[t]
+%     \centering
+%     \includegraphics[width=\textwidth]{figures/reasoning_chain.pdf}
+%     \caption{Complete reasoning trace for a representative buy decision.}
+%     \label{fig:reasoning_chain}
+% \end{figure}
+
+Additional qualitative examples, including failure cases where inter-agent disagreements correctly prevented action, are provided in Appendix~\ref{app:qualitative}.

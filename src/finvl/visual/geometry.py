@@ -37,6 +37,7 @@ class GeometryExtractor:
         self.tl_window = config.get("trendline", {}).get("window", 60)
         self.sr_tol_pct = config.get("support_resistance", {}).get("tolerance_pct", 0.02)
         self.sr_min_touches = config.get("support_resistance", {}).get("min_touches", 2)
+        self.candle_lookback = config.get("candlestick", {}).get("lookback", 10)
 
     def extract(self, df: pd.DataFrame) -> ChartGeometry:
         """Full geometry extraction pipeline."""
@@ -71,27 +72,55 @@ class GeometryExtractor:
         if n < 10:
             return lines
 
-        hi_idx = self._local_extrema(highs, order=5, mode="max")
-        lo_idx = self._local_extrema(lows, order=5, mode="min")
+        # Use multiple sub-windows so that short- and long-range
+        # trendlines are both detected.
+        windows = [n]
+        if self.tl_window < n:
+            windows.append(self.tl_window)
+        half_win = self.tl_window // 2
+        if half_win >= 10 and half_win < n:
+            windows.append(half_win)
 
-        if len(hi_idx) >= self.tl_min_touches:
-            slope, intercept, r2 = self._fit_line(hi_idx, highs[hi_idx])
-            if r2 > 0.3:
-                direction = TrendDirection.DOWN if slope < -1e-6 else TrendDirection.UP
-                lines.append(TrendLine(
-                    direction=direction, slope=float(slope), intercept=float(intercept),
-                    r_squared=float(r2), start_idx=int(hi_idx[0]), end_idx=int(hi_idx[-1]),
-                    status="intact", confidence=min(float(r2), 1.0),
-                ))
+        seen_spans: set = set()
+        for win in windows:
+            start = max(0, n - win)
+            h_slice = highs[start:]
+            l_slice = lows[start:]
 
-        if len(lo_idx) >= self.tl_min_touches:
-            slope, intercept, r2 = self._fit_line(lo_idx, lows[lo_idx])
-            if r2 > 0.3:
-                direction = TrendDirection.UP if slope > 1e-6 else TrendDirection.DOWN
+            hi_idx = self._local_extrema(h_slice, order=5, mode="max")
+            lo_idx = self._local_extrema(l_slice, order=5, mode="min")
+
+            for idx_arr, vals, is_high in [
+                (hi_idx, h_slice, True), (lo_idx, l_slice, False),
+            ]:
+                if len(idx_arr) < self.tl_min_touches:
+                    continue
+                slope, intercept, r2 = self._fit_line(idx_arr, vals[idx_arr])
+                if r2 <= 0.3:
+                    continue
+                abs_start = int(idx_arr[0]) + start
+                abs_end = int(idx_arr[-1]) + start
+                span_key = (abs_start, abs_end, is_high)
+                if span_key in seen_spans:
+                    continue
+                seen_spans.add(span_key)
+                if is_high:
+                    direction = TrendDirection.DOWN if slope < -1e-6 else TrendDirection.UP
+                else:
+                    direction = TrendDirection.UP if slope > 1e-6 else TrendDirection.DOWN
+                last_price = highs[-1] if is_high else lows[-1]
+                expected = slope * (n - 1 - start) + intercept
+                status = "broken" if (
+                    (is_high and last_price > expected * 1.01) or
+                    (not is_high and last_price < expected * 0.99)
+                ) else "intact"
                 lines.append(TrendLine(
-                    direction=direction, slope=float(slope), intercept=float(intercept),
-                    r_squared=float(r2), start_idx=int(lo_idx[0]), end_idx=int(lo_idx[-1]),
-                    status="intact", confidence=min(float(r2), 1.0),
+                    direction=direction, slope=float(slope),
+                    intercept=float(intercept),
+                    r_squared=float(r2),
+                    start_idx=abs_start, end_idx=abs_end,
+                    status=status,
+                    confidence=min(float(r2), 1.0),
                 ))
         return lines
 
@@ -140,6 +169,12 @@ class GeometryExtractor:
                 price=level_price, level_type=ltype,
                 strength=strength, touch_count=len(cluster),
             ))
+        # Tag levels that have been broken by recent price action
+        for level in levels:
+            if level.level_type == "resistance" and current_price > level.price * 1.005:
+                level.level_type = "broken_resistance"
+            elif level.level_type == "support" and current_price < level.price * 0.995:
+                level.level_type = "broken_support"
         return sorted(levels, key=lambda l: abs(l.price - current_price))
 
     # ------------------------------------------------------------------
@@ -153,7 +188,7 @@ class GeometryExtractor:
         if n < 3:
             return patterns
 
-        for i in range(max(0, n - 10), n):
+        for i in range(max(0, n - self.candle_lookback), n):
             body = abs(c[i] - o[i])
             full_range = h[i] - l[i]
             if full_range < 1e-8:
@@ -293,16 +328,21 @@ class GeometryExtractor:
 
     @staticmethod
     def _local_extrema(arr: np.ndarray, order: int = 5, mode: str = "max") -> np.ndarray:
-        """Find local maxima or minima indices."""
+        """Find local maxima or minima indices, keeping only the first
+        index in any consecutive run of equal-valued extrema."""
         n = len(arr)
         if n < 2 * order + 1:
             return np.array([], dtype=int)
         indices = []
         for i in range(order, n - order):
             window = arr[i - order: i + order + 1]
-            if mode == "max" and arr[i] == window.max():
-                indices.append(i)
-            elif mode == "min" and arr[i] == window.min():
+            is_extremum = (
+                (mode == "max" and arr[i] == window.max()) or
+                (mode == "min" and arr[i] == window.min())
+            )
+            if is_extremum:
+                if indices and arr[indices[-1]] == arr[i] and i - indices[-1] <= order:
+                    continue
                 indices.append(i)
         return np.array(indices, dtype=int)
 

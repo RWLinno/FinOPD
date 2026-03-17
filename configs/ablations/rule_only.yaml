@@ -1,0 +1,10 @@
+# Ablation A8: Rule-based only (no VLM)
+# Tests the value of VLM-based visual analysis vs. pure rule-based geometry.
+agents:
+  chart_analyst:
+    enabled: true
+    use_vlm: false
+    use_rule_based: true
+
+vlm:
+  backend: "none"

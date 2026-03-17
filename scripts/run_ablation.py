@@ -34,9 +34,12 @@ logger = logging.getLogger("finvl.ablation")
 ABLATION_CONFIGS = {
     "A1_full": None,  # Use default config as-is
     "A2_no_visual": "configs/ablations/no_visual.yaml",
+    "A3_raw_chart": "configs/ablations/raw_chart.yaml",
     "A4_single_agent": "configs/ablations/single_agent.yaml",
     "A5_no_gating": "configs/ablations/no_gating.yaml",
     "A6_no_event": "configs/ablations/no_event.yaml",
+    "A7_no_risk": "configs/ablations/no_risk.yaml",
+    "A8_rule_only": "configs/ablations/rule_only.yaml",
 }
 
 

@@ -56,23 +56,27 @@ class ChartAnalystAgent(BaseFinAgent):
         if self.use_vlm and inputs.get("chart_image_path"):
             vlm_client = inputs.get("vlm_client")
             if vlm_client:
-                from finvl.utils.prompts import get_system_prompt, render_prompt
-                sys_prompt = get_system_prompt("chart_analyst", "chart_analysis")
-                user_prompt = render_prompt(
-                    "chart_analyst", "chart_analysis", "user_template",
-                    {
-                        "asset": inputs.get("asset", "ASSET"),
-                        "timeframe": inputs.get("timeframe", "daily"),
-                        "start_date": inputs.get("start_date", ""),
-                        "end_date": inputs.get("end_date", ""),
-                        "current_price": inputs.get("current_price", 0),
-                        "rule_based_geometry": rule_geometry.summary(),
-                    },
-                )
-                vlm_result = await vlm_client.analyze_chart(
-                    inputs["chart_image_path"], sys_prompt, user_prompt
-                )
-                vlm_geometry = parse_vlm_chart_analysis(vlm_result)
+                try:
+                    from finvl.utils.prompts import get_system_prompt, render_prompt
+                    sys_prompt = get_system_prompt("chart_analyst", "chart_analysis")
+                    user_prompt = render_prompt(
+                        "chart_analyst", "chart_analysis", "user_template",
+                        {
+                            "asset": inputs.get("asset", "ASSET"),
+                            "timeframe": inputs.get("timeframe", "daily"),
+                            "start_date": inputs.get("start_date", ""),
+                            "end_date": inputs.get("end_date", ""),
+                            "current_price": inputs.get("current_price", 0),
+                            "rule_based_geometry": rule_geometry.summary(),
+                        },
+                    )
+                    vlm_result = await vlm_client.analyze_chart(
+                        inputs["chart_image_path"], sys_prompt, user_prompt
+                    )
+                    vlm_geometry = parse_vlm_chart_analysis(vlm_result)
+                except Exception as e:
+                    logger.warning(f"VLM analysis failed, using rule-based only: {e}")
+                    vlm_geometry = None
 
         # Merge: prefer rule-based for precise values, VLM for narrative and formations
         final = self._merge_geometries(rule_geometry, vlm_geometry)
@@ -104,22 +108,24 @@ class ChartAnalystAgent(BaseFinAgent):
         if vlm is None:
             return rule
 
+        # Start with rule-based formations as the base, then add
+        # VLM-discovered formations that the rule system did not detect.
+        merged_formations = list(rule.formations)
+        rule_types = {f.formation_type for f in rule.formations}
+        for f in vlm.formations:
+            if f.formation_type not in rule_types:
+                merged_formations.append(f)
+
         merged = ChartGeometry(
             trendlines=rule.trendlines,
             support_resistance=rule.support_resistance,
             candlestick_patterns=rule.candlestick_patterns,
-            formations=rule.formations if rule.formations else vlm.formations,
+            formations=merged_formations,
             volume_signals=rule.volume_signals,
             regime=rule.regime,
             overall_bias=vlm.overall_bias if vlm.confidence > 0.3 else rule.overall_bias,
             confidence=max(rule.confidence, vlm.confidence),
             narrative=vlm.narrative if vlm.narrative else rule.narrative,
         )
-
-        # Add VLM-unique formations not in rule-based
-        rule_types = {f.formation_type for f in rule.formations}
-        for f in vlm.formations:
-            if f.formation_type not in rule_types:
-                merged.formations.append(f)
 
         return merged

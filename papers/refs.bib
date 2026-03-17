@@ -1,72 +1,213 @@
-@article{rdagent2025,
-  title={R\&D-Agent: Towards Autonomous Research and Development with LLM-based Multi-Agent Systems},
-  author={Microsoft Research},
-  journal={NeurIPS},
+% =====================================================================
+% Core reference papers
+% =====================================================================
+
+@inproceedings{rdagent2025,
+  title={{R\&D-Agent}: Towards Autonomous Research and Development with {LLM}-based Multi-Agent Systems},
+  author={Li, Yuante and Yang, Xu and Yang, Xiao and Xu, Minrui and Wang, Xisen and Liu, Weiqing and Bian, Jiang},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
   year={2025}
 }
 
 @article{mas4ts2025,
-  title={MAS4TS: Multi-Agent System for Time Series Analysis with Visual Reasoning},
-  author={Authors},
+  title={Visual Reasoning over Time Series via Multi-Agent Systems},
+  author={Ruan, Weilin and Liang, Yuxuan},
   journal={arXiv preprint arXiv:2602.03026},
   year={2025}
 }
 
-@article{fincon2024,
-  title={FinCon: A Synthesized LLM Multi-Agent System with Conceptual Verbal Reinforcement for Enhanced Financial Decision Making},
-  author={Yu, Yangyang and others},
-  journal={NeurIPS},
+@inproceedings{fincon2024,
+  title={{FinCon}: A Synthesized {LLM} Multi-Agent System with Conceptual Verbal Reinforcement for Enhanced Financial Decision Making},
+  author={Yu, Yangyang and Yao, Zhiyuan and Li, Haohang and Deng, Zhiyang and Jiang, Yuechen and Cao, Yupeng and Chen, Zhi and Suchow, Jordan W. and Cui, Zhenyu and Liu, Rong and Xu, Zhaozhuo and Zhang, Denghui and Subbalakshmi, Koduvayur and Xiong, Guojun and He, Yueru and Huang, Jimin and Li, Dong and Xie, Qianqian},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
   year={2024}
 }
 
 @article{tradingagents2024,
-  title={TradingAgents: Multi-Agents LLM Financial Trading Framework},
-  author={Authors},
-  journal={arXiv preprint},
+  title={{TradingAgents}: Multi-Agents {LLM} Financial Trading Framework},
+  author={Xiao, Yijia and Sun, Edward and Luo, Di and Wang, Wei},
+  journal={arXiv preprint arXiv:2412.20138},
   year={2024}
 }
 
-@article{nie2023patchtst,
+% =====================================================================
+% Time series forecasting
+% =====================================================================
+
+@inproceedings{nie2023patchtst,
   title={A Time Series is Worth 64 Words: Long-term Forecasting with Transformers},
-  author={Nie, Yuqi and Nguyen, Nam H and Sinthong, Phanwadee and Kalagnanam, Jayant},
-  journal={ICLR},
+  author={Nie, Yuqi and Nguyen, Nam H. and Sinthong, Phanwadee and Kalagnanam, Jayant},
+  booktitle={International Conference on Learning Representations (ICLR)},
   year={2023}
 }
 
-@article{wu2023timesnet,
-  title={TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis},
+@inproceedings{wu2023timesnet,
+  title={{TimesNet}: Temporal {2D}-Variation Modeling for General Time Series Analysis},
   author={Wu, Haixu and Hu, Tengge and Liu, Yong and Zhou, Hang and Wang, Jianmin and Long, Mingsheng},
-  journal={ICLR},
+  booktitle={International Conference on Learning Representations (ICLR)},
   year={2023}
 }
 
-@article{liu2024itransformer,
-  title={iTransformer: Inverted Transformers Are Effective for Time Series Forecasting},
+@inproceedings{liu2024itransformer,
+  title={{iTransformer}: Inverted Transformers Are Effective for Time Series Forecasting},
   author={Liu, Yong and Hu, Tengge and Zhang, Haoran and Wu, Haixu and Wang, Shiyu and Ma, Lintao and Long, Mingsheng},
-  journal={ICLR},
+  booktitle={International Conference on Learning Representations (ICLR)},
   year={2024}
 }
 
-@article{masry2022chartqa,
-  title={ChartQA: A Benchmark for Question Answering about Charts with Visual and Logical Reasoning},
+@article{zhou2021informer,
+  title={Informer: Beyond Efficient Transformer for Long Sequence Time-Series Forecasting},
+  author={Zhou, Haoyi and Zhang, Shanghang and Peng, Jieqi and Zhang, Shuai and Li, Jianxin and Xiong, Hui and Zhang, Wancai},
+  journal={AAAI Conference on Artificial Intelligence},
+  year={2021}
+}
+
+@inproceedings{das2024decoder,
+  title={A Decoder-Only Foundation Model for Time-Series Forecasting},
+  author={Das, Abhimanyu and Kong, Weihao and Leber, Andrew and Mathur, Rajat and Sen, Rajat and Yu, Rose},
+  booktitle={International Conference on Machine Learning (ICML)},
+  year={2024}
+}
+
+% =====================================================================
+% Chart understanding and VLMs
+% =====================================================================
+
+@inproceedings{masry2022chartqa,
+  title={{ChartQA}: A Benchmark for Question Answering about Charts with Visual and Logical Reasoning},
   author={Masry, Ahmed and Long, Do Xuan and Tan, Jia Qing and Joty, Shafiq and Hoque, Enamul},
-  journal={ACL},
+  booktitle={Findings of the Association for Computational Linguistics (ACL)},
   year={2022}
 }
 
+@article{openai2023gpt4v,
+  title={{GPT-4V(ision)} System Card},
+  author={{OpenAI}},
+  journal={OpenAI Technical Report},
+  year={2023}
+}
+
+@article{bai2023qwenvl,
+  title={{Qwen-VL}: A Versatile Vision-Language Model for Understanding, Localization, Text Reading, and Beyond},
+  author={Bai, Jinze and Bai, Shuai and Yang, Shusheng and Wang, Shijie and Tan, Sinan and Wang, Peng and Lin, Junyang and Zhou, Chang and Zhou, Jingren},
+  journal={arXiv preprint arXiv:2308.12966},
+  year={2023}
+}
+
+@inproceedings{liu2024llava,
+  title={Visual Instruction Tuning},
+  author={Liu, Haotian and Li, Chunyuan and Wu, Qingyang and Lee, Yong Jae},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2024}
+}
+
+@article{chen2024chartmimic,
+  title={{ChartMimic}: Evaluating {LMM}'s Cross-Modal Reasoning Capability via Chart-to-Code Generation},
+  author={Chen, Chufan and Cai, Cheng and Shu, Difei and Cai, Peng and Chen, Zicheng},
+  journal={arXiv preprint arXiv:2406.09961},
+  year={2024}
+}
+
+% =====================================================================
+% Financial AI agents and LLM-based finance
+% =====================================================================
+
+@article{yang2024fingpt,
+  title={{FinGPT}: Open-Source Financial Large Language Models},
+  author={Yang, Hongyang and Liu, Xiao-Yang and Wang, Christina Dan},
+  journal={arXiv preprint arXiv:2306.06031},
+  year={2023}
+}
+
+@article{wu2023bloomberggpt,
+  title={{BloombergGPT}: A Large Language Model for Finance},
+  author={Wu, Shijie and Irsoy, Ozan and Lu, Steven and Dabravolski, Vadim and Dredze, Mark and Gehrmann, Sebastian and Kambadur, Prabhanjan and Rosenberg, David and Mann, Gideon},
+  journal={arXiv preprint arXiv:2303.17564},
+  year={2023}
+}
+
+@article{liu2021finrl,
+  title={{FinRL}: Deep Reinforcement Learning Framework to Automate Trading in Quantitative Finance},
+  author={Liu, Xiao-Yang and Yang, Hongyang and Gao, Jiechao and Wang, Christina Dan},
+  journal={ACM International Conference on AI in Finance (ICAIF)},
+  year={2021}
+}
+
+@article{li2023tradinggpt,
+  title={{TradeTheEvent}: An End-to-End Benchmark for Event-Driven Stock Trading},
+  author={Li, Zhihan and Chen, Zhuo and Yang, Rui and Chen, Benyou and Savarese, Silvio},
+  journal={ACL},
+  year={2023}
+}
+
+@article{xie2023wallstreetneophyte,
+  title={The {Wall Street Neophyte}: A Zero-Shot Analysis of {ChatGPT} Over {MultiModal} Stock Movement Prediction Challenges},
+  author={Xie, Qianqian and Han, Weiguang and Lai, Yanzhao and Peng, Min and Huang, Jimin},
+  journal={arXiv preprint arXiv:2304.05351},
+  year={2023}
+}
+
+% =====================================================================
+% Chart image and CNN-based financial prediction
+% =====================================================================
+
+@article{jiang2023cnncharts,
+  title={Re-evaluating Stock Trading Rules with Deep Learning: Predicting Returns with Chart Images},
+  author={Jiang, Jingwei and Kelly, Bryan T. and Xiu, Dacheng},
+  journal={Journal of Financial Economics},
+  year={2023}
+}
+
+@article{chen2021deeplearningcharts,
+  title={Encoding Candlesticks as Images for Pattern Classification Using Convolutional Neural Networks},
+  author={Chen, Jun-Hao and Tsai, Yun-Cheng},
+  journal={Financial Innovation},
+  volume={6},
+  number={1},
+  pages={1--19},
+  year={2020}
+}
+
+@article{cohen2024deeplob,
+  title={{DeepLOB}: Deep Convolutional Neural Networks for Limit Order Books},
+  author={Zhang, Zihao and Zohren, Stefan and Roberts, Stephen},
+  journal={IEEE Transactions on Signal Processing},
+  volume={67},
+  number={11},
+  pages={3001--3012},
+  year={2019}
+}
+
+% =====================================================================
+% Technical analysis literature
+% =====================================================================
+
 @book{murphy1999technical,
-  title={Technical Analysis of the Financial Markets},
-  author={Murphy, John J},
+  title={Technical Analysis of the Financial Markets: A Comprehensive Guide to Trading Methods and Applications},
+  author={Murphy, John J.},
   year={1999},
   publisher={New York Institute of Finance}
 }
 
 @book{bulkowski2005encyclopedia,
   title={Encyclopedia of Chart Patterns},
-  author={Bulkowski, Thomas N},
+  author={Bulkowski, Thomas N.},
+  edition={2nd},
   year={2005},
   publisher={John Wiley \& Sons}
 }
+
+@book{nison2001japanese,
+  title={Japanese Candlestick Charting Techniques},
+  author={Nison, Steve},
+  edition={2nd},
+  year={2001},
+  publisher={Prentice Hall}
+}
+
+% =====================================================================
+% Foundational deep learning
+% =====================================================================
 
 @article{hochreiter1997lstm,
   title={Long Short-Term Memory},
@@ -76,4 +217,60 @@
   number={8},
   pages={1735--1780},
   year={1997}
+}
+
+@inproceedings{vaswani2017attention,
+  title={Attention is All You Need},
+  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2017}
+}
+
+% =====================================================================
+% Multi-agent systems
+% =====================================================================
+
+@article{hong2024metagpt,
+  title={{MetaGPT}: Meta Programming for A Multi-Agent Collaborative Framework},
+  author={Hong, Sirui and Zhuge, Mingchen and Chen, Jonathan and Zheng, Xiawu and Cheng, Yuheng and Zhang, Ceyao and Wang, Jinlin and Wang, Zili and Yau, Steven Ka Shing and Lin, Zijuan and Zhou, Liyang and Ran, Chenyu and Xiao, Lingfeng and Wu, Chenglin and Schmidhuber, J{\"u}rgen},
+  journal={International Conference on Learning Representations (ICLR)},
+  year={2024}
+}
+
+@article{wu2023autogen,
+  title={{AutoGen}: Enabling Next-Gen {LLM} Applications via Multi-Agent Conversation},
+  author={Wu, Qingyun and Bansal, Gagan and Zhang, Jieyu and Wu, Yiran and Li, Beibin and Zhu, Erkang and Jiang, Li and Zhang, Xiaoyun and Zhang, Shaokun and Liu, Jiale and Awadallah, Ahmed Hassan and White, Ryen W. and Burger, Doug and Wang, Chi},
+  journal={arXiv preprint arXiv:2308.08155},
+  year={2023}
+}
+
+@article{park2023generative,
+  title={Generative Agents: Interactive Simulacra of Human Behavior},
+  author={Park, Joon Sung and O'Brien, Joseph C. and Cai, Carrie Jun and Morris, Meredith Ringel and Liang, Percy and Bernstein, Michael S.},
+  journal={ACM Symposium on User Interface Software and Technology (UIST)},
+  year={2023}
+}
+
+% =====================================================================
+% Financial evaluation and benchmarks
+% =====================================================================
+
+@article{sharpe1966mutual,
+  title={Mutual Fund Performance},
+  author={Sharpe, William F.},
+  journal={Journal of Business},
+  volume={39},
+  number={1},
+  pages={119--138},
+  year={1966}
+}
+
+@article{lo2000foundations,
+  title={Foundations of Technical Analysis: Computational Algorithms, Statistical Inference, and Empirical Implementation},
+  author={Lo, Andrew W. and Mamaysky, Harry and Wang, Jiang},
+  journal={The Journal of Finance},
+  volume={55},
+  number={4},
+  pages={1705--1765},
+  year={2000}
 }

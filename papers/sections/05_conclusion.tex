@@ -2,18 +2,24 @@
 \label{sec:discussion}
 
 \paragraph{When visual reasoning helps.}
-Our regime-conditioned analysis reveals that structured chart reasoning provides the largest marginal value during volatile and trending regimes, where geometric patterns (trendline breaks, formation completions) are most decision-relevant. During quiet, low-volatility periods, the advantage over numerical baselines is smaller.
+Our regime-conditioned analysis reveals that structured chart reasoning provides the largest marginal value during volatile and trending regimes, where geometric patterns (trendline breaks, formation completions) carry the most decision-relevant information. During quiet, low-volatility periods, the advantage over numerical baselines is smaller, suggesting that chart geometry is most valuable precisely when decisions are most consequential.
 
 \paragraph{Limitations.}
-(1)~\emph{VLM reliability}: Vision-language models can hallucinate chart features or misidentify formations. Our hybrid approach (rule-based + VLM) mitigates this, but VLM errors remain a source of noise.
-(2)~\emph{Computational cost}: Each decision point requires one VLM call per agent that uses visual analysis, making the system more expensive than purely numerical approaches.
-(3)~\emph{Market specificity}: Our evaluation covers two equity markets; generalization to commodities, FX, or cryptocurrency markets requires further validation.
-(4)~\emph{Static pattern library}: The pattern base rates used by the PatternReasoner are drawn from technical analysis literature and may not capture market-regime-dependent variations.
+Several limitations should be acknowledged. First, VLM reliability remains a concern: vision-language models can hallucinate chart features or misidentify formations. Our hybrid approach (rule-based geometry augmented by VLM interpretation) mitigates this, but VLM errors still introduce noise that propagates through the reasoning chain. Second, computational cost scales linearly with decision frequency, as each decision point requires at least one VLM API call; this makes the current system impractical for intraday trading. Third, our evaluation covers two equity markets (CSI300 and S\&P500); generalisation to commodity, foreign exchange, or cryptocurrency markets with different microstructure characteristics requires further validation. Fourth, the pattern base rates used by the PatternReasoner are drawn from historical technical analysis literature and may not capture regime-dependent or market-specific variations in pattern reliability.
 
 \paragraph{Future work.}
-Promising extensions include: real-time trading integration, fine-tuning VLMs on financial chart corpora, expanding the chart type repertoire (Renko, Point-and-Figure, Ichimoku), cross-market transfer studies, and expert trader comparison experiments.
+Several extensions merit investigation. Fine-tuning open-source VLMs (e.g., LLaVA~\cite{liu2024llava}, Qwen-VL~\cite{bai2023qwenvl}) on annotated financial chart corpora could improve recognition accuracy while reducing per-decision cost. Expanding the chart type repertoire to include Renko, Point-and-Figure, and Ichimoku charts would broaden the visual vocabulary available to the system. Cross-market transfer experiments would test whether visual pattern representations are universal or market-specific. Finally, comparison studies with experienced human traders could provide a calibration benchmark for the system.
+
+\section{Broader Impact}
+\label{sec:impact}
+
+\textsc{FinVL-MAS} demonstrates a computational approach to financial chart analysis that is designed primarily as a research tool for studying the value of visual reasoning in financial decision-making. We do not advocate the deployment of this system for live trading without extensive further validation, regulatory review, and risk management safeguards. The interpretable, multi-agent design produces explicit reasoning traces that support human oversight, but users should recognise that all automated trading systems carry financial risk. The system processes publicly available market data and does not involve private or sensitive information. Potential negative impacts include the risk of herding behaviour if many market participants adopt similar chart-based reasoning systems, and the possibility that performance claims based on historical backtesting may not generalise to future market conditions. We encourage users to treat the system as an analytical aid that augments rather than replaces human judgement.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \textsc{FinVL-MAS}, a multi-agent system that operationalizes expert trader visual cognition for financial decision-making. By extracting structured chart geometry and routing it through cognitively-motivated specialist agents coordinated via gated shared memory, \textsc{FinVL-MAS} captures decision-relevant patterns that purely numerical models miss. Our experiments demonstrate the value of structured visual reasoning, multi-agent decomposition, and gated communication under realistic financial evaluation, with the largest gains observed during volatile market regimes.
+We presented \textsc{FinVL-MAS}, a multi-agent system that operationalises expert trader visual cognition for financial decision-making. By extracting structured chart geometry through a hybrid rule-based and VLM pipeline and routing it through five cognitively-motivated specialist agents coordinated via gated shared memory, \textsc{FinVL-MAS} captures decision-relevant spatial patterns that purely numerical models miss. Our experiments on CSI300 and S\&P500 daily trading under realistic financial constraints demonstrate the independent value of chart geometry extraction, multi-agent decomposition, and gated communication, with the largest gains observed during volatile market regimes where geometric patterns are most salient.
+
+\section*{Acknowledgements}
+
+% To be filled before submission.

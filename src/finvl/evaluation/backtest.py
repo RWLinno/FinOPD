@@ -74,8 +74,14 @@ class VectorizedBacktester:
         decision_signals: Dict[str, float] = {}
         decision_sizes: Dict[str, float] = {}
         for d in decisions:
+            if "date" not in d or "decision" not in d:
+                logger.warning(f"Skipping malformed decision entry: {d}")
+                continue
             date = d["date"]
             dec: DecisionOutput = d["decision"]
+            if not isinstance(dec, DecisionOutput):
+                logger.warning(f"Skipping non-DecisionOutput for {date}")
+                continue
             signal = {Action.BUY: 1.0, Action.SELL: -1.0, Action.HOLD: 0.0}.get(dec.action, 0.0)
             decision_signals[date] = signal
             decision_sizes[date] = dec.position_size_pct
@@ -89,10 +95,14 @@ class VectorizedBacktester:
         current_pos = 0.0
         delay = self.config.execution_delay_days
 
+        def _date_to_str(idx_val) -> str:
+            if hasattr(idx_val, "strftime"):
+                return idx_val.strftime("%Y-%m-%d")
+            return str(idx_val)[:10]
+
         for i in range(n):
-            date_str = dates[i].strftime("%Y-%m-%d")
             if i >= delay:
-                signal_date = dates[i - delay].strftime("%Y-%m-%d")
+                signal_date = _date_to_str(dates[i - delay])
                 if signal_date in decision_signals:
                     sig = decision_signals[signal_date]
                     size = decision_sizes.get(signal_date, 0.05)
@@ -114,9 +124,10 @@ class VectorizedBacktester:
 
         net_returns = strategy_returns - costs
 
-        # Equity curve
+        # Equity curve (starting from initial capital)
         equity = self.config.initial_capital * np.cumprod(1 + net_returns)
-        equity_series = pd.Series(equity, index=dates[1:])
+        equity = np.concatenate([[self.config.initial_capital], equity])
+        equity_series = pd.Series(equity, index=dates)
 
         # Prediction signals for IC calculation
         preds = np.array([positions[i] for i in range(n - 1)])

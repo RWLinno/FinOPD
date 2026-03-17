@@ -1,0 +1,9 @@
+# Ablation A3: Raw chart image (VLM on raw chart, no structured geometry extraction)
+# Tests the value of structured geometry vs. passing raw chart screenshots to VLM.
+agents:
+  chart_analyst:
+    enabled: true
+    use_vlm: true
+    use_rule_based: false  # No rule-based geometry extraction
+  pattern_reasoner:
+    enabled: false  # No structured patterns to reason about

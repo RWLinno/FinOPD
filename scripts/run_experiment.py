@@ -16,6 +16,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
+import platform
+import subprocess
+
 import numpy as np
 import pandas as pd
 
@@ -82,6 +85,10 @@ def main():
     parser.add_argument("--data", default=None, help="Override data path")
     parser.add_argument("--output-dir", default="outputs/experiments", help="Output directory")
     parser.add_argument("--max-dates", type=int, default=None, help="Limit number of dates")
+    parser.add_argument(
+        "--ablation-suite", action="store_true",
+        help="Run all ablation configs after the main experiment",
+    )
     args = parser.parse_args()
 
     cfg = load_config(args.config)
@@ -94,6 +101,31 @@ def main():
     # Save config snapshot
     with open(output_dir / "config.json", "w") as f:
         json.dump(cfg, f, indent=2)
+
+    # Save reproducibility metadata
+    repro = {
+        "timestamp": exp_id,
+        "python_version": platform.python_version(),
+        "platform": platform.platform(),
+        "config_path": args.config,
+        "data_path": str(args.data or "default"),
+    }
+    try:
+        git_hash = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=str(Path(__file__).parent.parent),
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+        git_branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=str(Path(__file__).parent.parent),
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+        repro["git_commit"] = git_hash
+        repro["git_branch"] = git_branch
+    except Exception:
+        pass
+    with open(output_dir / "reproducibility.json", "w") as f:
+        json.dump(repro, f, indent=2)
 
     # Load data
     data_path = args.data or os.path.join(
@@ -169,6 +201,19 @@ def main():
 
     logger.info(f"Results saved to {output_dir}")
     print(f"\nResults saved to: {output_dir}")
+
+    # Optionally run all ablation configs
+    if args.ablation_suite:
+        logger.info("Running ablation suite...")
+        ablation_cmd = [
+            sys.executable, str(Path(__file__).parent / "run_ablation.py"),
+            "--config", args.config,
+            "--data", data_path,
+            "--max-dates", str(args.max_dates or 50),
+            "--output-dir", str(Path(args.output_dir)),
+        ]
+        import subprocess as sp
+        sp.run(ablation_cmd)
 
 
 if __name__ == "__main__":

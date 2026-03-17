@@ -1,0 +1,5 @@
+# Ablation A7: No risk controller
+# Tests the value of the risk assessment and position sizing agent.
+agents:
+  risk_controller:
+    enabled: false

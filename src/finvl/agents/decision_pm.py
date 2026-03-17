@@ -102,12 +102,16 @@ class DecisionPMAgent(BaseFinAgent):
             rationale_parts.append(f"Disagreements: {'; '.join(disagreements)}")
         rationale = " | ".join(rationale_parts)
 
-        confidence = min(abs_score + 0.2, 0.95)
+        # Scale confidence proportionally to signal strength.
+        # A HOLD with abs_score near 0 should yield low confidence.
+        confidence = min(abs_score * 0.8 + 0.1, 0.95) if abs_score > 0.05 else 0.1
 
         decision = DecisionOutput(
             action=action,
             conviction=conviction,
-            position_size_pct=float(position_pct) if action != Action.HOLD else 0.0,
+            position_size_pct=self._adjust_position_size(
+                float(position_pct), conviction, risk_level
+            ) if action != Action.HOLD else 0.0,
             stop_loss=risk_assessment.get("stop_loss"),
             take_profit=risk_assessment.get("take_profit"),
             confidence=confidence,
@@ -138,6 +142,15 @@ class DecisionPMAgent(BaseFinAgent):
             confidence=confidence,
             reasoning_trace=rationale,
         )
+
+    @staticmethod
+    def _adjust_position_size(
+        base_pct: float, conviction: Conviction, risk_level: str,
+    ) -> float:
+        """Scale position size by conviction and risk level."""
+        conviction_mult = {Conviction.HIGH: 1.0, Conviction.MODERATE: 0.6, Conviction.LOW: 0.3}
+        risk_mult = {"low": 1.0, "moderate": 0.8, "high": 0.4, "extreme": 0.1}
+        return base_pct * conviction_mult.get(conviction, 0.5) * risk_mult.get(risk_level, 0.5)
 
     def _detect_disagreements(
         self, signals: List[tuple[str, float, float]]
