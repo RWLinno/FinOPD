@@ -1,0 +1,38 @@
+\definecolor{FBest}{RGB}{4,130,53}
+
+\begin{table*}[htbp]
+\renewcommand{\arraystretch}{0.9}
+\footnotesize
+\caption{Performance comparison across all methods using four evaluation metrics. Results highlighted in \textbf{\textcolor{FBest}{green}} represent the best-performing statistic for each model. The improvement row illustrates \model's performance gains over the top-performing baselines.}
+
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\begin{threeparttable}
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\linewidth}{!}{ 
+\begin{tabular}{clcccclcccclcccc}
+\toprule
+\multirow{3}{*}{Categories} & \multirow{3}{*}{Models} & \multicolumn{4}{c}{AAPL} & & \multicolumn{4}{c}{GOOGL} & & \multicolumn{4}{c}{AMZN} \\ 
+\cmidrule{3-6}\cmidrule{8-11}\cmidrule{13-16}
+&& CR\%$\uparrow$ & ARR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & & CR\%$\uparrow$ & ARR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & & CR\%$\uparrow$ & ARR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ \\ 
+\midrule
+Market 
+& B\&H& -5.23& -5.09 & -1.29 & 11.90 && 7.78 & 8.09 & 1.35 & 13.04  && 17.1 & 17.6 & 3.53 & 3.80\\
+\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Rule-based\end{tabular}}
+& MACD& -1.49 & -1.48 & -0.81 & 4.53 && 6.20 & 6.26 & 2.31 & \textbf{\textcolor{FBest}{1.22}}  && - & - & - & -\\
+& KDJ\&RSI& 2.05 & 2.07 & 1.64 & 1.09 && 0.4 & 0.4 & 0.02 & 1.58  && -0.77 & -0.76 &-2.25 & 1.08\\
+& ZMR& 0.57 & 0.57 & 0.17 & \textbf{\textcolor{FBest}{0.86}} && -0.58 & 0.58 & 2.12 & 2.34  && -0.77 & -0.77 & -2.45 & \textbf{\textcolor{FBest}{0.82}}\\
+& SMA & -3.2 & -2.97 & -1.72 & 3.67 && 6.23 & 6.43 & 2.12 & 2.34 && 11.01 & 11.6 & 2.22 & 3.97\\
+\midrule
+\multirow{1}{*}{\begin{tabular}[c]{@{}c@{}} Ours\end{tabular}}
+& \textbf{\texttt{\model}}& \textbf{\textcolor{FBest}{26.62}} & \textbf{\textcolor{FBest}{30.5}} & \textbf{\textcolor{FBest}{8.21}} & 0.91 && \textbf{\textcolor{FBest}{24.36}} & \textbf{\textcolor{FBest}{27.58}} & \textbf{\textcolor{FBest}{6.39}} & 1.69  && \textbf{\textcolor{FBest}{23.21}} & \textbf{\textcolor{FBest}{24.90}} & \textbf{\textcolor{FBest}{5.60}} & 2.11\\
+\midrule
+\multicolumn{2}{c}{Improvement(\%)} 
+& 24.57 & 28.43 & 6.57 & - && 16.58  & 19.49 & 4.26 & - && 6.10 & 7.30 & 2.07 & -\\
+\bottomrule
+\end{tabular}
+}
+\end{threeparttable}
+\label{tab:performance}
+\end{table*}

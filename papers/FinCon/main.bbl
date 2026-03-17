@@ -1,0 +1,527 @@
+\begin{thebibliography}{100}
+
+\bibitem{markowitz1952portfolio}
+Harry Markowitz.
+\newblock Portfolio selection.
+\newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
+
+\bibitem{dang2019squawk}
+Xuan-Hong Dang, Syed~Yousaf Shah, and Petros Zerfos.
+\newblock " the squawk bot": Joint learning of time series and text data modalities for automated financial information filtering.
+\newblock {\em arXiv preprint arXiv:1912.10858}, 2019.
+
+\bibitem{maginn2007managing}
+John~L Maginn, Donald~L Tuttle, Dennis~W McLeavey, and Jerald~E Pinto.
+\newblock {\em Managing investment portfolios: a dynamic process}, volume~3.
+\newblock John Wiley \& Sons, 2007.
+
+\bibitem{radner1993organization}
+Roy Radner.
+\newblock The organization of decentralized information processing.
+\newblock {\em Econometrica: Journal of the Econometric Society}, pages 1109--1146, 1993.
+
+\bibitem{miller1956magical}
+George~A Miller.
+\newblock The magical number seven, plus or minus two: Some limits on our capacity for processing information.
+\newblock {\em Psychological review}, 63(2):81, 1956.
+
+\bibitem{wang2021commission}
+Rundong Wang, Hongxin Wei, Bo~An, Zhouyan Feng, and Jun Yao.
+\newblock Commission fee is not enough: A hierarchical reinforced framework for portfolio management.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial Intelligence}, volume~35, pages 626--633, 2021.
+
+\bibitem{han2023select}
+Weiguang Han, Boyi Zhang, Qianqian Xie, Min Peng, Yanzhao Lai, and Jimin Huang.
+\newblock Select and trade: Towards unified pair trading with hierarchical reinforcement learning.
+\newblock In {\em Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining}, pages 4123--4134, 2023.
+
+\bibitem{qin2024earnhft}
+Molei Qin, Shuo Sun, Wentao Zhang, Haochong Xia, Xinrun Wang, and Bo~An.
+\newblock Earnhft: Efficient hierarchical reinforcement learning for high frequency trading.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial Intelligence}, volume~38, pages 14669--14676, 2024.
+
+\bibitem{huang2022towards}
+Jie Huang and Kevin Chen-Chuan Chang.
+\newblock Towards reasoning in large language models: A survey.
+\newblock {\em arXiv preprint arXiv:2212.10403}, 2022.
+
+\bibitem{jin2024impact}
+Mingyu Jin, Qinkai Yu, Haiyan Zhao, Wenyue Hua, Yanda Meng, Yongfeng Zhang, Mengnan Du, et~al.
+\newblock The impact of reasoning step length on large language models.
+\newblock {\em arXiv preprint arXiv:2401.04925}, 2024.
+
+\bibitem{cai2023large}
+Tianle Cai, Xuezhi Wang, Tengyu Ma, Xinyun Chen, and Denny Zhou.
+\newblock Large language models as tool makers.
+\newblock {\em arXiv preprint arXiv:2305.17126}, 2023.
+
+\bibitem{ruan2023tptu}
+Jingqing Ruan, Yihong Chen, Bin Zhang, Zhiwei Xu, Tianpeng Bao, Hangyu Mao, Ziyue Li, Xingyu Zeng, Rui Zhao, et~al.
+\newblock Tptu: Task planning and tool usage of large language model-based ai agents.
+\newblock In {\em NeurIPS 2023 Foundation Models for Decision Making Workshop}, 2023.
+
+\bibitem{song2023llm}
+Chan~Hee Song, Jiaman Wu, Clayton Washington, Brian~M Sadler, Wei-Lun Chao, and Yu~Su.
+\newblock Llm-planner: Few-shot grounded planning for embodied agents with large language models.
+\newblock In {\em Proceedings of the IEEE/CVF International Conference on Computer Vision}, pages 2998--3009, 2023.
+
+\bibitem{paranjape2023art}
+Bhargavi Paranjape, Scott Lundberg, Sameer Singh, Hannaneh Hajishirzi, Luke Zettlemoyer, and Marco~Tulio Ribeiro.
+\newblock Art: Automatic multi-step reasoning and tool-use for large language models.
+\newblock {\em arXiv preprint arXiv:2303.09014}, 2023.
+
+\bibitem{NEURIPS2023_6a386d70}
+Qianqian Xie, Weiguang Han, Xiao Zhang, Yanzhao Lai, Min Peng, Alejandro Lopez-Lira, and Jimin Huang.
+\newblock Pixiu: A comprehensive benchmark, instruction dataset and large language model for finance.
+\newblock In A.~Oh, T.~Naumann, A.~Globerson, K.~Saenko, M.~Hardt, and S.~Levine, editors, {\em Advances in Neural Information Processing Systems}, volume~36, pages 33469--33484. Curran Associates, Inc., 2023.
+
+\bibitem{10.1145/3637528.3671554}
+Xiao Zhang, Ruoyu Xiang, Chenhan Yuan, Duanyu Feng, Weiguang Han, Alejandro Lopez-Lira, Xiao-Yang Liu, Meikang Qiu, Sophia Ananiadou, Min Peng, Jimin Huang, and Qianqian Xie.
+\newblock D\'{o}lares or dollars? unraveling the bilingual prowess of financial llms between spanish and english.
+\newblock In {\em Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining}, KDD '24, page 6236–6246, New York, NY, USA, 2024. Association for Computing Machinery.
+
+\bibitem{xie2024finben}
+Qianqian Xie, Weiguang Han, Zhengyu Chen, Ruoyu Xiang, Xiao Zhang, Yueru He, Mengxi Xiao, Dong Li, Yongfu Dai, Duanyu Feng, et~al.
+\newblock The finben: An holistic financial benchmark for large language models.
+\newblock {\em arXiv preprint arXiv:2402.12659}, 2024.
+
+\bibitem{hu2024no}
+Gang Hu, Ke~Qin, Chenhan Yuan, Min Peng, Alejandro Lopez-Lira, Benyou Wang, Sophia Ananiadou, Wanlong Yu, Jimin Huang, and Qianqian Xie.
+\newblock No language is an island: Unifying chinese and english in financial large language models, instruction data, and benchmarks.
+\newblock {\em arXiv preprint arXiv:2403.06249}, 2024.
+
+\bibitem{yang2024ucfe}
+Yuzhe Yang, Yifei Zhang, Yan Hu, Yilin Guo, Ruoli Gan, Yueru He, Mingcong Lei, Xiao Zhang, Haining Wang, Qianqian Xie, et~al.
+\newblock Ucfe: A user-centric financial expertise benchmark for large language models.
+\newblock {\em arXiv preprint arXiv:2410.14059}, 2024.
+
+\bibitem{park2023generative}
+Joon~Sung Park, Joseph~C O'Brien, Carrie~J Cai, Meredith~Ringel Morris, Percy Liang, and Michael~S Bernstein.
+\newblock Generative agents: Interactive simulacra of human behavior.
+\newblock {\em arXiv preprint arXiv:2304.03442}, 2023.
+
+\bibitem{wu2023autogen}
+Qingyun Wu, Gagan Bansal, Jieyu Zhang, Yiran Wu, Shaokun Zhang, Erkang Zhu, Beibin Li, Li~Jiang, Xiaoyun Zhang, and Chi Wang.
+\newblock Autogen: Enabling next-gen llm applications via multi-agent conversation framework.
+\newblock {\em arXiv preprint arXiv:2308.08155}, 2023.
+
+\bibitem{qiao2024autoact}
+Shuofei Qiao, Ningyu Zhang, Runnan Fang, Yujie Luo, Wangchunshu Zhou, Yuchen~Eleanor Jiang, Chengfei Lv, and Huajun Chen.
+\newblock Autoact: Automatic agent learning from scratch via self-planning.
+\newblock {\em arXiv preprint arXiv:2401.05268}, 2024.
+
+\bibitem{hong2023metagpt}
+Sirui Hong, Xiawu Zheng, Jonathan Chen, Yuheng Cheng, Jinlin Wang, Ceyao Zhang, Zili Wang, Steven Ka~Shing Yau, Zijuan Lin, Liyang Zhou, et~al.
+\newblock Metagpt: Meta programming for multi-agent collaborative framework.
+\newblock {\em arXiv preprint arXiv:2308.00352}, 2023.
+
+\bibitem{guo2024embodied}
+Xudong Guo, Kaixuan Huang, Jiale Liu, Wenhui Fan, Natalia V{\'e}lez, Qingyun Wu, Huazheng Wang, Thomas~L Griffiths, and Mengdi Wang.
+\newblock Embodied llm agents learn to cooperate in organized teams.
+\newblock {\em arXiv preprint arXiv:2403.12482}, 2024.
+
+\bibitem{li2024agent}
+Junkai Li, Siyu Wang, Meng Zhang, Weitao Li, Yunghwei Lai, Xinhui Kang, Weizhi Ma, and Yang Liu.
+\newblock Agent hospital: A simulacrum of hospital with evolvable medical agents.
+\newblock {\em arXiv preprint arXiv:2405.02957}, 2024.
+
+\bibitem{chen2023agentverse}
+Weize Chen, Yusheng Su, Jingwei Zuo, Cheng Yang, Chenfei Yuan, Chi-Min Chan, Heyang Yu, Yaxi Lu, Yi-Hsin Hung, Chen Qian, et~al.
+\newblock Agentverse: Facilitating multi-agent collaboration and exploring emergent behaviors.
+\newblock In {\em The Twelfth International Conference on Learning Representations}, 2023.
+
+\bibitem{pryzant2023automatic}
+Reid Pryzant, Dan Iter, Jerry Li, Yin~Tat Lee, Chenguang Zhu, and Michael Zeng.
+\newblock Automatic prompt optimization with" gradient descent" and beam search.
+\newblock {\em arXiv preprint arXiv:2305.03495}, 2023.
+
+\bibitem{tang2024unleashing}
+Xinyu Tang, Xiaolei Wang, Wayne~Xin Zhao, Siyuan Lu, Yaliang Li, and Ji-Rong Wen.
+\newblock Unleashing the potential of large language models as prompt optimizers: An analogical analysis with gradient-based model optimizers.
+\newblock {\em arXiv preprint arXiv:2402.17564}, 2024.
+
+\bibitem{yao2023retroformer}
+Weiran Yao, Shelby Heinecke, Juan~Carlos Niebles, Zhiwei Liu, Yihao Feng, Le~Xue, Rithesh Murthy, Zeyuan Chen, Jianguo Zhang, Devansh Arpit, et~al.
+\newblock Retroformer: Retrospective large language agents with policy gradient optimization.
+\newblock {\em arXiv preprint arXiv:2308.02151}, 2023.
+
+\bibitem{shinn2024reflexion}
+Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao.
+\newblock Reflexion: Language agents with verbal reinforcement learning.
+\newblock {\em Advances in Neural Information Processing Systems}, 36, 2024.
+
+\bibitem{yang2023fingpt}
+Hongyang Yang, Xiao-Yang Liu, and Christina~Dan Wang.
+\newblock Fingpt: Open-source financial large language models.
+\newblock {\em arXiv preprint arXiv:2306.06031}, 2023.
+
+\bibitem{yu2023finmem}
+Yangyang Yu, Haohang Li, Zhi Chen, Yuechen Jiang, Yang Li, Denghui Zhang, Rong Liu, Jordan~W Suchow, and Khaldoun Khashanah.
+\newblock Finmem: A performance-enhanced llm trading agent with layered memory and character design.
+\newblock {\em arXiv preprint arXiv:2311.13743}, 2023.
+
+\bibitem{zhang2024finagent}
+Wentao Zhang, Lingxuan Zhao, Haochong Xia, Shuo Sun, Jiaze Sun, Molei Qin, Xinyi Li, Yuqing Zhao, Yilei Zhao, Xinyu Cai, et~al.
+\newblock Finagent: A multimodal foundation agent for financial trading: Tool-augmented, diversified, and generalist.
+\newblock {\em arXiv preprint arXiv:2402.18485}, 2024.
+
+\bibitem{delbaen2000coherent}
+Freddy Delbaen and Sara Biagini.
+\newblock {\em Coherent risk measures}.
+\newblock Springer, 2000.
+
+\bibitem{fabozzi2010quantitative}
+Frank~J Fabozzi, Sergio~M Focardi, and Petter~N Kolm.
+\newblock {\em Quantitative equity investing: Techniques and strategies}.
+\newblock John Wiley \& Sons, 2010.
+
+\bibitem{liuai}
+Chong Zhang, Xinyi Liu, Mingyu Jin, Zhongmou Zhang, Lingyao Li, Zhengting Wang, Wenyue Hua, Dong Shu, Suiyuan Zhu, Xiaobo Jin, et~al.
+\newblock When ai meets finance (stockagent): Large language model-based stock trading in simulated real-world environments.
+\newblock {\em arXiv preprint arXiv:2407.18957}, 2024.
+
+\bibitem{kuester2006value}
+Keith Kuester, Stefan Mittnik, and Marc~S Paolella.
+\newblock Value-at-risk prediction: A comparison of alternative strategies.
+\newblock {\em Journal of Financial Econometrics}, 4(1):53--89, 2006.
+
+\bibitem{spaan2012partially}
+Matthijs~TJ Spaan.
+\newblock Partially observable markov decision processes.
+\newblock In {\em Reinforcement learning: State-of-the-art}, pages 387--414. Springer, 2012.
+
+\bibitem{fabozzi2008portfolio}
+Frank~J Fabozzi, Harry~M Markowitz, and Francis Gupta.
+\newblock Portfolio selection.
+\newblock {\em Handbook of finance}, 2, 2008.
+
+\bibitem{liu2020adaptive}
+Yang Liu, Qi~Liu, Hongke Zhao, Zhen Pan, and Chuanren Liu.
+\newblock Adaptive quantitative trading: An imitative deep reinforcement learning approach.
+\newblock In {\em Proceedings of the AAAI conference on artificial intelligence}, volume~34, pages 2128--2135, 2020.
+
+\bibitem{kabbani2022deep}
+Taylan Kabbani and Ekrem Duman.
+\newblock Deep reinforcement learning approach for trading automation in the stock market.
+\newblock {\em IEEE Access}, 10:93564--93574, 2022.
+
+\bibitem{griffiths2023bayes}
+Thomas~L Griffiths, Jian-Qiao Zhu, Erin Grant, and R~Thomas McCoy.
+\newblock Bayes in the age of intelligent machines.
+\newblock {\em arXiv preprint arXiv:2311.10206}, 2023.
+
+\bibitem{rao2022foundations}
+Ashwin Rao and Tikhon Jelvis.
+\newblock {\em Foundations of reinforcement learning with applications in finance}.
+\newblock Chapman and Hall/CRC, 2022.
+
+\bibitem{sumers2023cognitive}
+Theodore Sumers, Shunyu Yao, Karthik Narasimhan, and Thomas~L. Griffiths.
+\newblock Cognitive architectures for language agents, 2023.
+
+\bibitem{zhang2023exploring}
+Jintian Zhang, Xin Xu, and Shumin Deng.
+\newblock Exploring collaboration mechanisms for llm agents: A social psychology view.
+\newblock {\em arXiv preprint arXiv:2310.02124}, 2023.
+
+\bibitem{wagner1999working}
+Anthony~D Wagner.
+\newblock Working memory contributions to human learning and remembering.
+\newblock {\em Neuron}, 22(1):19--22, 1999.
+
+\bibitem{markowitz2000mean}
+Harry~M Markowitz and G~Peter Todd.
+\newblock {\em Mean-variance analysis in portfolio choice and capital markets}, volume~66.
+\newblock John Wiley \& Sons, 2000.
+
+\bibitem{liu2020finrl}
+Xiao-Yang Liu, Hongyang Yang, Qian Chen, Runjia Zhang, Liuqing Yang, Bowen Xiao, and Christina~Dan Wang.
+\newblock Finrl: A deep reinforcement learning library for automated stock trading in quantitative finance.
+\newblock {\em arXiv preprint arXiv:2011.09607}, 2020.
+
+\bibitem{shinn2023reflexion}
+Noah Shinn, Beck Labash, and Ashwin Gopinath.
+\newblock Reflexion: an autonomous agent with dynamic memory and self-reflection.
+\newblock {\em arXiv preprint arXiv:2303.11366}, 2023.
+
+\bibitem{zhao2024expel}
+Andrew Zhao, Daniel Huang, Quentin Xu, Matthieu Lin, Yong-Jin Liu, and Gao Huang.
+\newblock Expel: Llm agents are experiential learners.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial Intelligence}, volume~38, pages 19632--19642, 2024.
+
+\bibitem{li2022competition}
+Yujia Li, David Choi, Junyoung Chung, Nate Kushman, Julian Schrittwieser, R{\'e}mi Leblond, Tom Eccles, James Keeling, Felix Gimeno, Agustin Dal~Lago, et~al.
+\newblock Competition-level code generation with alphacode.
+\newblock {\em Science}, 378(6624):1092--1097, 2022.
+
+\bibitem{chen2022codet}
+Bei Chen, Fengji Zhang, Anh Nguyen, Daoguang Zan, Zeqi Lin, Jian-Guang Lou, and Weizhu Chen.
+\newblock Codet: Code generation with generated tests.
+\newblock {\em arXiv preprint arXiv:2207.10397}, 2022.
+
+\bibitem{qian2023communicative}
+Chen Qian, Xin Cong, Cheng Yang, Weize Chen, Yusheng Su, Juyuan Xu, Zhiyuan Liu, and Maosong Sun.
+\newblock Communicative agents for software development.
+\newblock {\em arXiv preprint arXiv:2307.07924}, 2023.
+
+\bibitem{xu2023language}
+Zelai Xu, Chao Yu, Fei Fang, Yu~Wang, and Yi~Wu.
+\newblock Language agents with reinforcement learning for strategic play in the werewolf game.
+\newblock {\em arXiv preprint arXiv:2310.18940}, 2023.
+
+\bibitem{ma2023large}
+Weiyu Ma, Qirui Mi, Xue Yan, Yuqiao Wu, Runji Lin, Haifeng Zhang, and Jun Wang.
+\newblock Large language models play starcraft ii: Benchmarks and a chain of summarization approach.
+\newblock {\em arXiv preprint arXiv:2312.11865}, 2023.
+
+\bibitem{de2023llm}
+J~de~Curt{\`o}, I~de~Zarz{\`a}, Gemma Roig, Juan~Carlos Cano, Pietro Manzoni, and Carlos~T Calafate.
+\newblock Llm-informed multi-armed bandit strategies for non-stationary environments.
+\newblock {\em Electronics}, 12(13):2814, 2023.
+
+\bibitem{zhao2024revolutionizing}
+Huaqin Zhao, Zhengliang Liu, Zihao Wu, Yiwei Li, Tianze Yang, Peng Shu, Shaochen Xu, Haixing Dai, Lin Zhao, Gengchen Mai, et~al.
+\newblock Revolutionizing finance with llms: An overview of applications and insights.
+\newblock {\em arXiv preprint arXiv:2401.11641}, 2024.
+
+\bibitem{liu2024fmdllama}
+Zhiwei Liu, Xin Zhang, Kailai Yang, Qianqian Xie, Jimin Huang, and Sophia Ananiadou.
+\newblock Fmdllama: Financial misinformation detection based on large language models.
+\newblock {\em arXiv preprint arXiv:2409.16452}, 2024.
+
+\bibitem{cao2024risklabs}
+Yupeng Cao, Zhi Chen, Qingyun Pei, Fabrizio Dimino, Lorenzo Ausiello, Prashant Kumar, KP~Subbalakshmi, and Papa~Momar Ndiaye.
+\newblock Risklabs: Predicting financial risk using large language model based on multi-sources data.
+\newblock {\em arXiv preprint arXiv:2404.07452}, 2024.
+
+\bibitem{xie2024open}
+Qianqian Xie, Dong Li, Mengxi Xiao, Zihao Jiang, Ruoyu Xiang, Xiao Zhang, Zhengyu Chen, Yueru He, Weiguang Han, Yuzhe Yang, et~al.
+\newblock Open-finllms: Open multimodal large language models for financial applications.
+\newblock {\em arXiv preprint arXiv:2408.11878}, 2024.
+
+\bibitem{canese2021multi}
+Lorenzo Canese, Gian~Carlo Cardarilli, Luca Di~Nunzio, Rocco Fazzolari, Daniele Giardino, Marco Re, and Sergio Span{\`o}.
+\newblock Multi-agent reinforcement learning: A review of challenges and applications.
+\newblock {\em Applied Sciences}, 11(11):4948, 2021.
+
+\bibitem{zhang2021multi}
+Kaiqing Zhang, Zhuoran Yang, and Tamer Ba{\c{s}}ar.
+\newblock Multi-agent reinforcement learning: A selective overview of theories and algorithms.
+\newblock {\em Handbook of reinforcement learning and control}, pages 321--384, 2021.
+
+\bibitem{foerster2016learning}
+Jakob Foerster, Ioannis~Alexandros Assael, Nando De~Freitas, and Shimon Whiteson.
+\newblock Learning to communicate with deep multi-agent reinforcement learning.
+\newblock {\em Advances in neural information processing systems}, 29, 2016.
+
+\bibitem{lin2021learning}
+Toru Lin, Jacob Huh, Christopher Stauffer, Ser~Nam Lim, and Phillip Isola.
+\newblock Learning to ground multi-agent communication with autoencoders.
+\newblock {\em Advances in Neural Information Processing Systems}, 34:15230--15242, 2021.
+
+\bibitem{kim2020communication}
+Woojun Kim, Jongeui Park, and Youngchul Sung.
+\newblock Communication in multi-agent reinforcement learning: Intention sharing.
+\newblock In {\em International Conference on Learning Representations}, 2020.
+
+\bibitem{zhu2022survey}
+Changxi Zhu, Mehdi Dastani, and Shihan Wang.
+\newblock A survey of multi-agent reinforcement learning with communication.
+\newblock {\em arXiv preprint arXiv:2203.08975}, 2022.
+
+\bibitem{yao2024reinforcement}
+Zhiyuan Yao, Zheng Li, Matthew Thomas, and Ionut Florescu.
+\newblock Reinforcement learning in agent-based market simulation: Unveiling realistic stylized facts and behavior.
+\newblock {\em arXiv preprint arXiv:2403.19781}, 2024.
+
+\bibitem{li2022impact}
+HaoHang Li and Steve~Y Yang.
+\newblock Impact of false information from spoofing strategies: An abm model of market dynamics.
+\newblock In {\em 2022 IEEE Symposium on Computational Intelligence for Financial Engineering and Economics (CIFEr)}, pages 1--10. IEEE, 2022.
+
+\bibitem{wang2023adapting}
+Kuan Wang, Yadong Lu, Michael Santacroce, Yeyun Gong, Chao Zhang, and Yelong Shen.
+\newblock Adapting llm agents through communication.
+\newblock {\em arXiv preprint arXiv:2310.01444}, 2023.
+
+\bibitem{mandi2023roco}
+Zhao Mandi, Shreeya Jain, and Shuran Song.
+\newblock Roco: Dialectic multi-robot collaboration with large language models.
+\newblock {\em arXiv preprint arXiv:2307.04738}, 2023.
+
+\bibitem{zhang2023building}
+Hongxin Zhang, Weihua Du, Jiaming Shan, Qinhong Zhou, Yilun Du, Joshua~B Tenenbaum, Tianmin Shu, and Chuang Gan.
+\newblock Building cooperative embodied agents modularly with large language models.
+\newblock {\em arXiv preprint arXiv:2307.02485}, 2023.
+
+\bibitem{du2023improving}
+Yilun Du, Shuang Li, Antonio Torralba, Joshua~B Tenenbaum, and Igor Mordatch.
+\newblock Improving factuality and reasoning in language models through multiagent debate.
+\newblock {\em arXiv preprint arXiv:2305.14325}, 2023.
+
+\bibitem{chan2023chateval}
+Chi-Min Chan, Weize Chen, Yusheng Su, Jianxuan Yu, Wei Xue, Shanghang Zhang, Jie Fu, and Zhiyuan Liu.
+\newblock Chateval: Towards better llm-based evaluators through multi-agent debate.
+\newblock {\em arXiv preprint arXiv:2308.07201}, 2023.
+
+\bibitem{xing2024designing}
+Frank Xing.
+\newblock Designing heterogeneous llm agents for financial sentiment analysis.
+\newblock {\em arXiv preprint arXiv:2401.05799}, 2024.
+
+\bibitem{de2024optimized}
+Irene de~Zarz{\`a}~i Cubero, Joaquim de~Curt{\`o}~i D{\'\i}az, Gemma Roig, and Carlos~T Calafate.
+\newblock Optimized financial planning: Integrating individual and cooperative budgeting models with llm recommendations.
+\newblock {\em AI}, 5(1):91--114, 2024.
+
+\bibitem{wan2024enhancing}
+Xiangpeng Wan, Haicheng Deng, Kai Zou, and Shiqi Xu.
+\newblock Enhancing the efficiency and accuracy of underlying asset reviews in structured finance: The application of multi-agent framework.
+\newblock {\em arXiv preprint arXiv:2405.04294}, 2024.
+
+\bibitem{liuai2024}
+Chong Zhang, Xinyi Liu, Mingyu Jin, Zhongmou Zhang, Lingyao Li, Zhengting Wang, Wenyue Hua, Dong Shu, Suiyuan Zhu, Xiaobo Jin, et~al.
+\newblock When ai meets finance (stockagent): Large language model-based stock trading in simulated real-world environments.
+\newblock {\em arXiv preprint arXiv:2407.18957}, 2024.
+
+\bibitem{bolton1994firm}
+Patrick Bolton and Mathias Dewatripont.
+\newblock The firm as a communication network.
+\newblock {\em The Quarterly Journal of Economics}, 109(4):809--839, 1994.
+
+\bibitem{yao2022react}
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao.
+\newblock React: Synergizing reasoning and acting in language models.
+\newblock {\em arXiv preprint arXiv:2210.03629}, 2022.
+
+\bibitem{wei2022chain}
+Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed~Chi, Quoc~V Le, Denny Zhou, et~al.
+\newblock Chain-of-thought prompting elicits reasoning in large language models.
+\newblock {\em Advances in neural information processing systems}, 35:24824--24837, 2022.
+
+\bibitem{yao2024tree}
+Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Tom Griffiths, Yuan Cao, and Karthik Narasimhan.
+\newblock Tree of thoughts: Deliberate problem solving with large language models.
+\newblock {\em Advances in Neural Information Processing Systems}, 36, 2024.
+
+\bibitem{hao2023reasoning}
+Shibo Hao, Yi~Gu, Haodi Ma, Joshua~Jiahua Hong, Zhen Wang, Daisy~Zhe Wang, and Zhiting Hu.
+\newblock Reasoning with language model is planning with world model.
+\newblock {\em arXiv preprint arXiv:2305.14992}, 2023.
+
+\bibitem{zhu2023ghost}
+Xizhou Zhu, Yuntao Chen, Hao Tian, Chenxin Tao, Weijie Su, Chenyu Yang, Gao Huang, Bin Li, Lewei Lu, Xiaogang Wang, et~al.
+\newblock Ghost in the minecraft: Generally capable agents for open-world enviroments via large language models with text-based knowledge and memory.
+\newblock {\em arXiv preprint arXiv:2305.17144}, 2023.
+
+\bibitem{wang2024survey}
+Lei Wang, Chen Ma, Xueyang Feng, Zeyu Zhang, Hao Yang, Jingsen Zhang, Zhiyuan Chen, Jiakai Tang, Xu~Chen, Yankai Lin, et~al.
+\newblock A survey on large language model based autonomous agents.
+\newblock {\em Frontiers of Computer Science}, 18(6):1--26, 2024.
+
+\bibitem{kaelbling1996reinforcement}
+Leslie~Pack Kaelbling, Michael~L Littman, and Andrew~W Moore.
+\newblock Reinforcement learning: A survey.
+\newblock {\em Journal of artificial intelligence research}, 4:237--285, 1996.
+
+\bibitem{xiong2024personalized}
+Guojun Xiong, Shufan Wang, Daniel Jiang, and Jian Li.
+\newblock Personalized federated reinforcement learning with shared representations.
+\newblock In {\em Deployable RL: From Research to Practice@ Reinforcement Learning Conference 2024}, 2024.
+
+\bibitem{xiong2024dopl}
+Guojun Xiong, Ujwal Dinesha, Debajoy Mukherjee, Jian Li, and Srinivas Shakkottai.
+\newblock Dopl: Direct online preference learning for restless bandits with preference feedback.
+\newblock {\em arXiv preprint arXiv:2410.05527}, 2024.
+
+\bibitem{yao2024control}
+Zhiyuan Yao, Ionut Florescu, and Chihoon Lee.
+\newblock Control in stochastic environment with delays: A model-based reinforcement learning approach.
+\newblock In {\em Proceedings of the International Conference on Automated Planning and Scheduling}, volume~34, pages 663--670, 2024.
+
+\bibitem{zhang2023controlling}
+Bin Zhang, Hangyu Mao, Jingqing Ruan, Ying Wen, Yang Li, Shao Zhang, Zhiwei Xu, Dapeng Li, Ziyue Li, Rui Zhao, et~al.
+\newblock Controlling large language model-based agents for large-scale decision-making: An actor-critic approach.
+\newblock {\em arXiv preprint arXiv:2311.13884}, 2023.
+
+\bibitem{hull2007risk}
+John Hull.
+\newblock {\em Risk Management and Financial Institutions}.
+\newblock John Wiley \& Sons, 2007.
+
+\bibitem{sharpe1994sharpe}
+William~F. Sharpe.
+\newblock The sharpe ratio.
+\newblock {\em The Journal of Portfolio Management}, 21(1):49--58, 1994.
+
+\bibitem{ang2003downside}
+Andrew Ang and Joseph Chen.
+\newblock Downside risk.
+\newblock {\em Journal of Portfolio Management}, 29(4):103--112, 2003.
+
+\bibitem{liu2023fingpt}
+Xiao-Yang Liu, Guoxuan Wang, and Daochen Zha.
+\newblock Fingpt: Democratizing internet-scale data for financial large language models.
+\newblock {\em arXiv preprint arXiv:2307.10485}, 2023.
+
+\bibitem{qin2019you}
+Yu~Qin and Yi~Yang.
+\newblock What you say and how you say it matters: Predicting stock volatility using verbal and vocal cues.
+\newblock In {\em Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics}, pages 390--401, 2019.
+
+\bibitem{yang2020html}
+Linyi Yang, Tin Lok~James Ng, Barry Smyth, and Riuhai Dong.
+\newblock Html: Hierarchical transformer-based multi-task learning for volatility prediction.
+\newblock In {\em Proceedings of The Web Conference 2020}, pages 441--451, 2020.
+
+\bibitem{cao2024ecc}
+Yupeng Cao, Zhi Chen, Qingyun Pei, Prashant Kumar, KP~Subbalakshmi, and Papa~Momar Ndiaye.
+\newblock Ecc analyzer: Extract trading signal from earnings conference calls using large language model for stock performance prediction.
+\newblock {\em arXiv preprint arXiv:2404.18470}, 2024.
+
+\bibitem{hull2017options}
+John~C Hull.
+\newblock {\em Options, Futures, and Other Derivatives}.
+\newblock Pearson Education, 2017.
+
+\bibitem{liu2021finrl}
+Xiao-Yang Liu, Hongyang Yang, Jiechao Gao, and Christina~Dan Wang.
+\newblock {FinRL}: Deep reinforcement learning framework to automate trading in quantitative finance.
+\newblock {\em ACM International Conference on AI in Finance (ICAIF)}, 2021.
+
+\bibitem{liu2022finrl}
+Xiao-Yang Liu, Ziyi Xia, Jingyang Rui, Jiechao Gao, Hongyang Yang, Ming Zhu, Christina Wang, Zhaoran Wang, and Jian Guo.
+\newblock Finrl-meta: Market environments and benchmarks for data-driven financial reinforcement learning.
+\newblock {\em Advances in Neural Information Processing Systems}, 35:1835--1849, 2022.
+
+\bibitem{mnih2016asynchronous}
+Volodymyr Mnih, Adria~Puigdomenech Badia, Mehdi Mirza, Alex Graves, Timothy Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu.
+\newblock Asynchronous methods for deep reinforcement learning.
+\newblock In {\em International conference on machine learning}, pages 1928--1937. PMLR, 2016.
+
+\bibitem{schulman2017proximal}
+John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov.
+\newblock Proximal policy optimization algorithms.
+\newblock {\em arXiv preprint arXiv:1707.06347}, 2017.
+
+\bibitem{mnih2013playing}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller.
+\newblock Playing atari with deep reinforcement learning.
+\newblock {\em arXiv preprint arXiv:1312.5602}, 2013.
+
+\bibitem{plyakha2012does}
+Yuliya Plyakha, Raman Uppal, and Grigory Vilkov.
+\newblock Why does an equal-weighted portfolio outperform value-and price-weighted portfolios?
+\newblock {\em Available at SSRN 2724535}, 2012.
+
+\bibitem{murre2015replication}
+Jaap~MJ Murre and Joeri Dros.
+\newblock Replication and analysis of ebbinghaus’ forgetting curve.
+\newblock {\em PloS one}, 10(7):e0120644, 2015.
+
+\bibitem{guardrailsai}
+Guardrails ai.
+\newblock \url{https://docs.guardrailsai.com}.
+\newblock Open source library for interacting with Large Language Models.
+
+\end{thebibliography}

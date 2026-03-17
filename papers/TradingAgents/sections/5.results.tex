@@ -1,0 +1,43 @@
+\section{Results and Analysis}
+
+In this section, we present the experimental results and analyze the performance of \model in comparison to the baseline models.
+
+\input{tables/results}
+
+\subsection{Performance Comparison}
+\subsubsection{Cumulative and Annual Returns}
+Table \ref{tab:performance} and Figures \ref{fig:aapl-transactions}, \ref{fig:aapl-cumulative-returns}, \ref{fig:amzn-performance-details}, \ref{fig:amzn-performance-comparison}, \ref{fig:googl-performance-details}, and \ref{fig:googl-performance-comparison} demonstrate that our method outperforms existing rule-based trading baselines, particularly in profitability, as measured by returns. \model achieves at least a 23.21\% cumulative return and a 24.90\% annual return on the three sampled stocks, surpassing the best-performing baselines by a margin of 6.1\%. Notably, on \$AAPL stock—a particularly challenging case due to market volatility during the testing period—traditional methods struggled, as their patterns failed to generalize to this situation. In contrast, \model excelled under these adverse conditions, achieving returns exceeding 26\% within months.
+
+
+
+% ICML version
+\begin{figure}[htbp]
+% \vskip 0.2in
+\begin{center}
+\centerline{\includegraphics[width=0.75\columnwidth]{figures/AAPL/compare.pdf}}
+\caption{Cumulative Returns on \$AAPL using \textbf{\textcolor{brown}{\model}}. The figure shows the performance comparison of our model against baseline approaches for Apple Inc. stock analysis.}
+\label{fig:aapl-cumulative-returns}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+\vskip -1in
+
+\subsubsection{Sharpe Ratio}
+
+The Sharpe Ratio\footnote{We benchmarked \model over 3 months due to intensive LLM and tool use (11 LLM calls \& 20+ tool calls/prediction). The highest Sharpe Ratio exceeds our expected empirical range (\(SR\) above 2 -- very good, above 3 -- excellent). We exported \model's decision sequences and examined them to ensure calculation correctness. We believe the exceptionally high \(SR\) resulted from the phenomenon that there were few pullbacks in \model during that period. We report results as they are in our experiments faithfully. Future work will optimize LLM reasoning \& tool use to enable longer backtesting under limited budgets.}
+ performance highlights \model's exceptional ability to deliver superior risk-adjusted returns, surpassing all baseline models. This result underscores \model's effectiveness in balancing returns and risk— a crucial factor for sustainable and predictable investment growth. \model outperforms market benchmarks such as Buy-and-Hold and rule-based strategies consistently, demonstrating its adaptability. Its capability to maximize returns while maintaining controlled risk exposure establishes a strong foundation for multi-agent and debate-based automated trading algorithms.
+
+\subsubsection{Maximum Drawdown}
+While rule-based baselines demonstrated superior performance in controlling risk, as reflected by their maximum drawdown scores, they fell short in capturing high returns. This trade-off between risk and reward underscores \model's strength as a balanced approach. Despite higher returns being typically associated with higher risks, \model maintained a relatively low maximum drawdown compared to many baselines. Its effective risk-control mechanisms, facilitated by the debates among risk-control agents, ensured that the maximum drawdown remained within a manageable limit, not exceeding 2. This demonstrates \model's capability to strike a robust balance between maximizing returns and managing risk effectively.
+
+\subsubsection{Explainability}
+A major drawback of current deep learning methods for trading is their dense, complex architectures, often rendering trading agents' decisions indecipherable. This challenge, rooted in AI explainability, is critical for trading agents operating in real-world financial markets, where incorrect decisions can cause severe losses. 
+
+In contrast, an LLM-based agentic framework offers a transformative advantage: its decisions are communicated in natural language, enhancing interpretability. To illustrate, we provide \model's full trading log for a single day in the Appendix, showcasing its use of the ReAct-style prompting framework \citep{yao2023reactsynergizingreasoningacting}. Each decision includes detailed reasoning, tool usage, and thought processes, enabling traders to understand and debug the system. This transparency empowers traders to fine-tune the framework, accounting for decision factors, offering superior explainability over deep-learning trading algorithms.
+
+
+\subsection{Discussion}
+Our results demonstrate that integrating multiple specialized LLM agents and fostering agentic debate significantly enhances trading performance. This framework efficiently synthesizes diverse data sources and expert analyses, enabling trader agents to make well-informed decisions tailored to specific risk profiles. The inclusion of a reflective agent and a dedicated risk management team is pivotal in refining strategies and mitigating risks. As a result, the framework achieves exceptional return capture while maintaining strong risk management metrics, striking an optimal balance between maximizing rewards and minimizing risks. Additionally, the natural language-based operations of the multi-agent LLM framework ensure high explainability, giving \model a distinct advantage over traditional and deep learning methods in transparency and interoperability.
+
+

@@ -1,0 +1,20 @@
+{
+  "asset": "SYNTH",
+  "n_bars": 500,
+  "n_samples": 88,
+  "lookback": 60,
+  "start_date": "2022-01-03",
+  "seed": 42,
+  "ohlcv_path": "data/synthetic/SYNTH_ohlcv.csv",
+  "jsonl_path": "data/synthetic/SYNTH_dataset.jsonl",
+  "chart_dir": "data/synthetic/charts",
+  "date_range": [
+    "2022-03-28",
+    "2023-11-27"
+  ],
+  "modalities": [
+    "time_series",
+    "chart_image",
+    "textual_context"
+  ]
+}

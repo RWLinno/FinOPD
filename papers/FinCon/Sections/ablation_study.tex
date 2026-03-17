@@ -1,0 +1,117 @@
+\subsubsection{The Effectiveness of Within-Episode Risk Control mechanism via CVaR}
+
+To answer the \textbf{RQ2}, we conduct the first ablation study. We assess the efficacy of \textsc{FinCon}'s within-episode risk control mechanisms by monitoring system risk changes through CVaR. To demonstrate the robustness of \textsc{FinCon}, we compare the performance of \textsc{FinCon} with versus without CVaR implementation across two task types: single-asset trading and portfolio management. Furthermore, in single-asset trading tasks, we consider assets in both general bullish and bearish market conditions in the testing phase for comprehensive consideration. 
+
+Our results demonstrate that implementing CVaR in \textsc{FinCon} is highly effective across all financial metrics for both task types, as shown in Table~\ref{tab:performance_overview_cvar} and Fig~\ref{plot_abl_cvar}. For single-asset trading tasks, \textsc{FinCon} without within-episode risk control yields negative CRs and significantly higher MDDs, underperforming compared to the Buy-and-Hold strategy (CR of GOOG: $22.42\%$, CR of NIO: $-77.210\%$), highlighting the severe consequences of ignoring environmental risks. In portfolio management, the CR increases dramatically from $14.699\%$ to $113.836\%$ with within-episode risk control, demonstrating its effectiveness in risk supervision even amid non-uniform market trends.
+
+
+\begin{figure*}[ht]
+\centering
+\begin{minipage}[a]{0.5\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/GOOG-nocvar.png}
+    \caption*{(a) [1] Single Stock: General Bullish}
+    \label{goog_cvar}
+\end{minipage}%
+\hfill
+\begin{minipage}[a]{0.5\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/NIO-abl_cvar.png}
+    \caption*{(b) [2] Single Stock: General Bearlish}
+    \label{nio_cvar}
+\end{minipage}
+\vspace{0.005cm}  % Add some vertical space between the rows
+\begin{minipage}[c]{0.53\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/regular_plot_withoutnocvar.png}
+    \caption*{(c) Multi-Assets}
+    \label{multiassets_cvar}
+\end{minipage}
+\caption{\justifying{\footnotesize{CRs of \textsc{FinCon} with vs. without implementing \textbf{CVaR for within-episode risk control} show that the CVaR mechanism significantly improves \textsc{FinCon}'s performance. This is evident from two metrics: (a) cumulative returns over time for single stocks in both bullish and bearish market conditions, and (b) portfolio value over time for a multi-asset portfolio. In both cases, \textsc{FinCon} with CVaR demonstrates substantially higher gains.}}}
+\label{plot_abl_cvar}
+\end{figure*}
+
+Specifically, the success of utilizing CVaR for within-episode risk control is evident in both bullish and bearish market environments, as shown in the single asset trading case. In bullish markets, CVaR sharply captures immediate market shocks and timely informs \textsc{FinCon} to exercise caution, even amidst general optimism. Conversely, in bearish markets, CVaR consistently alerts \textsc{FinCon} to significant price drops, ensuring awareness of market risks. Moreover, in portfolio trading with mixed price trends, our within-episode risk control mechanism performs robustly by monitoring the entire portfolio's value fluctuations, enabling the trading manager agent to adjust potentially aggressive operations for each asset promptly.
+
+\subsubsection{The Efficacy of Over-Episode Belief Updates Using CVRF}
+\label{over-episode-risk-control}
+%In the second study, we chose the same assets and examined the effectiveness of \textsc{FinCon}'s over-episode risk control mechanisms, which was achieved by consistently improving the \textsc{FinCon}'s beliefs of the market conditions for the targeted assets. To ensure consistent output of the belief for a given training episode, we set the temperature parameter to 0 specifically for belief generation.
+In the second ablation study, to answer \textbf{RQ3}, we use the same assets to examine the effectiveness of \textsc{FinCon}'s over-episode risk control mechanisms. This is achieved by consistently improving \textsc{FinCon}'s beliefs about market conditions for the targeted assets. To ensure consistent belief output for each training episode, we set the temperature parameter to 0 specifically for belief generation.
+
+We collect third-time belief updates over four training episodes using our innovative CVRF mechanism. The overlap of trading actions between the last two adjacent episodes increases to over $80\%$, and the updated investment beliefs are mostly aligned. To illustrate \textsc{FinCon}'s evolving investment beliefs through iterative training, we use the GOOG investment belief update as an example, as shown in Figure~\ref{tab:belief_update_hist}. Compared to the initial and final belief updates, each conceptual aspect, such as historical momentum and news insights, is enriched with executable information through our CRVF mechanism, leading to more profitable actions.
+
+The results in Table~\ref{exp2:performance_overview_belief} and Figure~\ref{fig:allplot_belief} indicate that the over-episode belief update mechanism is more critical than within-episode risk control in enhancing \textsc{FinCon}'s decision-making. Without this functionality, key metrics like CR, SR, and MDD are lower than without the within-episode risk control in single asset trading. Although the CR of $28.432\%$  outperforms the Equal-Weighted ETF strategy's $9.344\%$ for portfolio management, the SR of $1.181$ is higher than Equal-Weighted ETF strategy's $0.492$, with the belief update feature, performance significantly further improves. It can achieve a CR of $113.836\%$ and an SR of $3.269$. These results demonstrate that using CVRF to update investment beliefs over episodes efficiently steers the agent’s investment beliefs towards more profitable directions. \textsc{FinCon} achieves superior performance on multiple tasks, with learning gains evident after just four training episodes, requiring far fewer episodes than traditional RL algorithmic trading agents.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}[ht]
+\centering
+\begin{minipage}[b]{0.5\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/GOOG-nobelief.png}
+    \caption*{(a) [1] Single Stock: General Bullish}
+    \label{goog_belief}
+\end{minipage}%
+\hfill
+\begin{minipage}[b]{0.5\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/NIO-abl_belief.png}
+    \caption*{(b) [2] Single Stock: General Bearlish}
+    \label{nio_belief}
+\end{minipage}
+\vspace{0.005cm}  % Add some vertical space between the rows
+\begin{minipage}[c]{0.53\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/regular_plot_withoutbelief.png}
+    \caption*{(c) Multi-Assets}
+    \label{multiassets_belief}
+\end{minipage}
+\caption{\justifying{\footnotesize{CRs of \textsc{FinCon} with vs. without \textbf{belief updates for over-episode risk control}. (a) The CRs over time for single stocks. The performance of \textsc{FinCon} with belief updates consistently leads in both bullish and bearish market conditions. (b) The portfolio values over time for multi-asset portfolio. \textsc{FinCon}'s performance with belief updates also won a substantially higher gains.}}}
+\label{fig:allplot_belief}
+\end{figure*}
+
+\begin{figure}[ht]
+\centering
+\begin{tcbraster}[raster columns=1]
+
+    \begin{tcolorbox}[
+        colback=white,
+        colframe=black,
+        title=Updated Investment Belief Contents,
+        boxsep=2pt,
+        top=2pt,
+        bottom=2pt,
+        sharp corners,
+        arc=0pt
+    ]
+    \small
+    \raggedright
+    \textbf{First Update:} \\
+    \{\textcolor{darkblue}{'historical momentum'}: 'Enhance the use of momentum indicators by establishing systematic rules for entry and exit based on momentum values to improve consistency and predictability in trading actions.',\\
+    \textcolor{darkblue}{'news insights'}: 'Integrate advanced real-time news sentiment analysis to better understand immediate market reactions and adjust trading strategies accordingly...',\\
+    \textcolor{darkblue}{'Form 10-Q'}: 'Incorporating annual report insights (10-K) could provide a comprehensive view of the company's long-term performance and strategic direction, aiding in more informed decision-making.'..., \\
+    \textcolor{darkblue}{'other aspects'}: ['sector trends', 'technological advancements'], ...\}\\
+    \textbf{Last Update:}\\
+    \{\textcolor{darkblue}{'historical momentum'}: 'The more profitable strategy effectively utilizes negative momentum values to make timely sell decisions, avoiding potential losses during downward trends, and effectively utilizes positive momentum values to make timely buy decisions, facilitating potential gains during upward trends.  It is suggested to refine the use of momentum indicators, possibly by adjusting thresholds or incorporating additional short-term momentum metrics to enhance the timing and accuracy of buy/sell decisions.',\\
+    \textcolor{darkblue}{'news insights'}: 'It is recommended to further develop a systematic approach to quantify the impact of news, especially the sentiment scores and regulatory changes, to refine trading decisions.', \\
+    \textcolor{darkblue}{'Form 10-Q'}: 'It is suggested that even if there is a strong financial performance present 10-Q reports, it is better to prioritize immediate market signals. For future strategies, it is suggested to balance these aspects more evenly, especially in stable or bullish market conditions, to avoid premature exits from potentially profitable positions.',...,\\
+    \textcolor{darkblue}{'other aspects'}: ['sector trends', 'technological advancements', 'macroeconomic factors', 'regulatory risks'], ...\}\\
+    \end{tcolorbox}
+    \begin{tcolorbox}[
+        colback=white,
+        colframe=black,
+        title=Tradng Action Overlapping Percentages,
+        boxsep=2pt,
+        top=2pt,
+        bottom=2pt,
+        sharp corners,
+        arc=0pt
+    ]
+    \small
+    1. Second vs. First Training Episode: \, $46.939\%$ \\
+    2. Third vs. Second Training Episode: $71.429\%$\\
+    3. Fourth vs. Third Training Episode: \;$81.633\%$
+    \end{tcolorbox}
+\end{tcbraster}
+\caption{\justifying{\footnotesize{The first time and last time LLM generated investment belief updates by CVRF for GOOG.}}}
+\label{tab:belief_update_hist}
+\end{figure}

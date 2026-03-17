@@ -1,0 +1,23 @@
+name: "csi300_daily"
+market: "CSI300"
+asset_universe: ["000300.SH"]
+frequency: "daily"
+lookback_window: 60
+chart_types: ["candlestick_volume"]
+decision_type: "long_short_hold"
+temporal_split:
+  train_start: "2008-01-01"
+  train_end: "2014-12-31"
+  valid_start: "2015-01-01"
+  valid_end: "2016-12-31"
+  test_start: "2017-01-01"
+  test_end: "2020-12-31"
+transaction_cost_bps: 15
+slippage_bps: 5
+execution_delay_days: 1
+metrics:
+  - sharpe_ratio
+  - annualized_return
+  - max_drawdown
+  - information_coefficient
+  - directional_accuracy

@@ -1,0 +1,20 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Financial time-series forecasting.}
+Deep learning approaches to financial time-series prediction have evolved from recurrent networks~\cite{hochreiter1997lstm} to Transformer-based architectures. PatchTST~\cite{nie2023patchtst} segments time series into patches for efficient Transformer processing, while TimesNet~\cite{wu2023timesnet} captures multi-periodicity via 2D convolutions. iTransformer~\cite{liu2024itransformer} inverts the attention mechanism to model variate correlations. These approaches process raw numerical vectors and do not leverage visual chart structure.
+
+\paragraph{VLMs for chart understanding.}
+Vision-language models have been applied to chart comprehension tasks such as ChartQA~\cite{masry2022chartqa} and chart-to-text summarization. However, these works focus on generic chart understanding (bar charts, line charts) rather than financial technical analysis. Recent work on financial chart understanding~\cite{} remains limited to simple pattern recognition without structured geometric extraction or decision-making integration.
+
+\paragraph{LLM-based financial agents.}
+FinCon~\cite{fincon2024} proposes a multi-agent LLM system for financial decision-making using conceptual verbal reinforcement. TradingAgents~\cite{tradingagents2024} designs agent teams for stock trading. R\&D-Agent~\cite{rdagent2025} introduces a closed-loop R\&D workflow for quantitative finance research. These systems primarily process textual and numerical data; none treats visual chart reasoning as a first-class reasoning process.
+
+\paragraph{Multi-agent systems for time series.}
+MAS4TS~\cite{mas4ts2025} introduces a multi-agent framework for time-series analysis with visual reasoning, shared memory, and gated cross-attention communication. While MAS4TS demonstrates the value of visual anchors for general time-series tasks, it does not address financial chart geometry, trader-like cognitive decomposition, or backtest-grounded evaluation.
+
+\paragraph{Technical analysis and chart patterns.}
+Classical technical analysis~\cite{murphy1999technical,bulkowski2005encyclopedia} provides a taxonomy of chart patterns and their historical success rates. Automated pattern recognition has been attempted via template matching and convolutional networks~\cite{}, but integration with modern multi-agent reasoning systems and rigorous financial evaluation remains unexplored.
+
+\paragraph{Our positioning.}
+\textsc{FinVL-MAS} differs from prior work in three key aspects: (1)~it treats chart geometry as structured semantic input rather than raw pixels or numerical vectors; (2)~its multi-agent decomposition is cognitively motivated, reflecting the functional stages of expert trader reasoning; and (3)~it evaluates under realistic financial constraints with ablations that isolate the value of each component.

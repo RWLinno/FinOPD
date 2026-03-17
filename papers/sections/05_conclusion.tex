@@ -1,0 +1,19 @@
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\paragraph{When visual reasoning helps.}
+Our regime-conditioned analysis reveals that structured chart reasoning provides the largest marginal value during volatile and trending regimes, where geometric patterns (trendline breaks, formation completions) are most decision-relevant. During quiet, low-volatility periods, the advantage over numerical baselines is smaller.
+
+\paragraph{Limitations.}
+(1)~\emph{VLM reliability}: Vision-language models can hallucinate chart features or misidentify formations. Our hybrid approach (rule-based + VLM) mitigates this, but VLM errors remain a source of noise.
+(2)~\emph{Computational cost}: Each decision point requires one VLM call per agent that uses visual analysis, making the system more expensive than purely numerical approaches.
+(3)~\emph{Market specificity}: Our evaluation covers two equity markets; generalization to commodities, FX, or cryptocurrency markets requires further validation.
+(4)~\emph{Static pattern library}: The pattern base rates used by the PatternReasoner are drawn from technical analysis literature and may not capture market-regime-dependent variations.
+
+\paragraph{Future work.}
+Promising extensions include: real-time trading integration, fine-tuning VLMs on financial chart corpora, expanding the chart type repertoire (Renko, Point-and-Figure, Ichimoku), cross-market transfer studies, and expert trader comparison experiments.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented \textsc{FinVL-MAS}, a multi-agent system that operationalizes expert trader visual cognition for financial decision-making. By extracting structured chart geometry and routing it through cognitively-motivated specialist agents coordinated via gated shared memory, \textsc{FinVL-MAS} captures decision-relevant patterns that purely numerical models miss. Our experiments demonstrate the value of structured visual reasoning, multi-agent decomposition, and gated communication under realistic financial evaluation, with the largest gains observed during volatile market regimes.

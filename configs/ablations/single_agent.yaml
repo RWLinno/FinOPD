@@ -1,0 +1,15 @@
+# Ablation A4: Single agent (all roles in one prompt)
+agents:
+  chart_analyst:
+    enabled: true
+    use_vlm: false
+    use_rule_based: true
+  pattern_reasoner:
+    enabled: false
+  event_analyst:
+    enabled: false
+  risk_controller:
+    enabled: false
+  decision_pm:
+    enabled: true
+    integration_mode: "direct"

@@ -1,0 +1,58 @@
+\setlength{\textfloatsep}{10pt}
+\begin{table*}[h]
+\caption{Experimental results of all models on the CSI~300 constituent stock dataset, including factor predictive metrics and strategy performance metrics. Visual cues indicate ranking groups: \colorbox{top1}{\textbf{Best}}, \colorbox{top2}{\ul{Second Best}}, \colorbox{good}{Good (3--8)}, \colorbox{average}{Average (9--14)}, \colorbox{poor}{Poor (15--20)}, and \colorbox{worse}{Worse (21--26)}.}
+\label{results1}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccccccc}
+\toprule
+\multicolumn{2}{c}{\multirow{4}{*}{\textbf{Models}}}  & 
+\multicolumn{8}{c}{\textbf{CSI300}} \\ \cmidrule(lr){3-10}
+\multicolumn{2}{c}{} & \multicolumn{4}{c}{Factor Predictive Power Metrics} & 
+\multicolumn{4}{c}{Performance Metrics} \\
+\cmidrule(lr){3-6} \cmidrule(lr){7-10}
+\multicolumn{2}{c}{} & \textbf{IC} & \textbf{ICIR} & \textbf{Rank IC} & \textbf{Rank ICIR} & \textbf{ARR} & \textbf{IR (SHR*)} & \textbf{MDD} & \textbf{CR} \\
+\midrule
+\multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}Machine-Learning\\ Models\end{tabular}} 
+& Linear & \cellcolor{worse}0.0134 & \cellcolor{worse}0.0992 & \cellcolor{worse}0.0273 & \cellcolor{worse}0.1962 & \cellcolor{worse}-0.0302 & \cellcolor{worse}-0.3710 & \cellcolor{worse}-0.1987 & \cellcolor{worse}-0.1520 \\
+& MLP & \cellcolor{poor}0.0291 & \cellcolor{poor}0.2096 & \cellcolor{poor}0.0412 & \cellcolor{poor}0.3238 & \cellcolor{worse}0.0003 & \cellcolor{worse}0.0037 & \cellcolor{worse}-0.1390 & \cellcolor{worse}0.0022 \\
+& LightGBM & \cellcolor{worse}0.0277 & \cellcolor{poor}0.2211 & \cellcolor{poor}0.0386 & \cellcolor{poor}0.3120 & \cellcolor{poor}0.0397 & \cellcolor{poor}0.5664 & \cellcolor{good}-0.0855 & \cellcolor{poor}0.4643 \\
+& XGBoost & \cellcolor{poor}0.0291 & \cellcolor{poor}0.2410 & \cellcolor{poor}0.0384 & \cellcolor{average}0.3257 & \cellcolor{worse}0.0316 & \cellcolor{poor}0.4620 & \cellcolor{poor}-0.1139 & \cellcolor{worse}0.2774 \\
+& CatBoost & \cellcolor{worse}0.0279 & \cellcolor{poor}0.2181 & \cellcolor{poor}0.0393 & \cellcolor{poor}0.3110 & \cellcolor{average}0.0513 & \cellcolor{average}0.7008 & \cellcolor{average}-0.0924 & \cellcolor{average}0.5552 \\
+& DoubleEnsemble & \cellcolor{poor}0.0294 & \cellcolor{poor}0.2246 & \cellcolor{average}0.0417 & \cellcolor{poor}0.3211 & \cellcolor{average}0.0551 & \cellcolor{average}0.7968 & \cellcolor{poor}-0.0971 & \cellcolor{average}0.5675 \\
+\midrule
+\multirow{10}{*}{\begin{tabular}[c]{@{}l@{}}Deep-Learning\\ Models\end{tabular}} 
+& Transformer & \cellcolor{average}0.0317 & \cellcolor{average}0.2538 & \cellcolor{average}0.0434 & \cellcolor{average}0.3624 & \cellcolor{worse}0.0293 & \cellcolor{poor}0.4267 & \cellcolor{poor}-0.0987 & \cellcolor{worse}0.2969 \\
+& GRU & \cellcolor{poor}0.0315 & \cellcolor{average}0.2450 & \cellcolor{average}0.0428 & \cellcolor{average}0.3440 & \cellcolor{poor}0.0344 & \cellcolor{poor}0.5160 & \cellcolor{poor}-0.1017 & \cellcolor{poor}0.3382 \\
+& LSTM & \cellcolor{average}0.0318 & \cellcolor{poor}0.2367 & \cellcolor{average}0.0435 & \cellcolor{average}0.3389 & \cellcolor{poor}0.0381 & \cellcolor{poor}0.5561 & \cellcolor{worse}-0.1207 & \cellcolor{worse}0.3157 \\
+& ALSTM & \cellcolor{good}0.0362 & \cellcolor{average}0.2789 & \cellcolor{good}0.0463 & \cellcolor{average}0.3661 & \cellcolor{poor}0.0470 & \cellcolor{average}0.6992 & \cellcolor{poor}-0.1072 & \cellcolor{poor}0.4384 \\
+& GATs & \cellcolor{average}0.0349 & \cellcolor{average}0.2511 & \cellcolor{average}0.0462 & \cellcolor{average}0.3564 & \cellcolor{poor}0.0497 & \cellcolor{average}0.7338 & \cellcolor{good}-0.0777 & \cellcolor{average}0.6396 \\
+\cmidrule(lr){2-10}
+& PatchTST & \cellcolor{worse}0.0247 & \cellcolor{worse}0.1945 & \cellcolor{worse}0.0315 & \cellcolor{worse}0.2463 & \cellcolor{average}0.0571 & \cellcolor{average}0.7191 & \cellcolor{worse}-0.1327 & \cellcolor{poor}0.4303 \\
+& iTransformer & \cellcolor{worse}0.0270 & \cellcolor{worse}0.1946 & \cellcolor{worse}0.0340 & \cellcolor{worse}0.2365 & \cellcolor{good}0.0979 & \cellcolor{good}1.2337 & \cellcolor{poor}-0.1151 & \cellcolor{good}0.8506 \\
+& Mamba & \cellcolor{poor}0.0281 & \cellcolor{poor}0.2244 & \cellcolor{poor}0.0374 & \cellcolor{poor}0.2952 & \cellcolor{worse}0.0229 & \cellcolor{worse}0.3163 & \cellcolor{poor}-0.1154 & \cellcolor{worse}0.1984 \\
+\cmidrule(lr){2-10}
+& TRA & \cellcolor{good}0.0404 & \cellcolor{good}0.3197 & \cellcolor{good}0.0490 & \cellcolor{good}0.4047 & \cellcolor{average}0.0649 & \cellcolor{good}1.0091 & \cellcolor{average}-0.0860 & \cellcolor{good}0.7547 \\
+& MASTER & \cellcolor{worse}0.0215 & \cellcolor{worse}0.1925 & \cellcolor{worse}0.0296 & \cellcolor{worse}0.2486 & \cellcolor{good}0.0896 & \cellcolor{good}1.3406 & \cellcolor{average}-0.0851 & \cellcolor{good}1.0528 \\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Factor Libraries\end{tabular}} 
+& Alpha $101$ & \cellcolor{poor}0.0308 & \cellcolor{average}0.2588 & \cellcolor{worse}0.0331 & \cellcolor{worse}0.2749 & \cellcolor{average}0.0512 & \cellcolor{poor}0.5783 & \cellcolor{worse}-0.1253 & \cellcolor{poor}0.4085 \\
+& Alpha $158$ & \cellcolor{average}0.0341 & \cellcolor{good}0.2952 & \cellcolor{average}0.0450 & \cellcolor{good}0.3987 & \cellcolor{average}0.0570 & \cellcolor{good}0.8459 & \cellcolor{good}-0.0771 & \cellcolor{average}0.7393 \\
+& Alpha $360$ & \cellcolor{good}0.0420 & \cellcolor{good}0.3290 & \cellcolor{good}0.0514 & \cellcolor{good}0.4225 & \cellcolor{poor}0.0438 & \cellcolor{poor}0.6731 & \cellcolor{top2}\uline{-0.0721} & \cellcolor{average}0.6074 \\
+& AutoAlpha & \cellcolor{average}0.0334 & \cellcolor{average}0.2656 & \cellcolor{worse}0.0361 & \cellcolor{poor}0.2967 & \cellcolor{poor}0.0400 & \cellcolor{worse}0.4288 & \cellcolor{worse}-0.1225 & \cellcolor{poor}0.3266 \\
+\midrule
+\multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}R\&D-Agent Series\\ Framework*\end{tabular}}
+& R\&D-Factor\textsubscript{GPT-4o} & \cellcolor{good}0.0489 & \cellcolor{good}0.4050 & \cellcolor{top2}\uline{0.0521} & \cellcolor{top1}\textbf{0.4425} & \cellcolor{top1}\textbf{0.1461} & \cellcolor{good}1.6835 & \cellcolor{good}-0.0750 & \cellcolor{top1}\textbf{1.9468} \\
+& R\&D-Factor\textsubscript{o3-mini} & \cellcolor{top2}\uline{0.0497} & \cellcolor{good}0.3931 & \cellcolor{good}0.0500 & \cellcolor{good}0.4246 & \cellcolor{good}0.1184 & \cellcolor{good}1.3566 & \cellcolor{average}-0.0910 & \cellcolor{good}1.3016 \\
+\cmidrule(lr){2-10}
+& R\&D-Model\textsubscript{GPT-4o} & \cellcolor{average}0.0326 & \cellcolor{poor}0.2305 & \cellcolor{poor}0.0401 & \cellcolor{worse}0.2767 & \cellcolor{good}0.1229 & \cellcolor{good}1.6676 & \cellcolor{average}-0.0876 & \cellcolor{good}1.4029 \\
+& R\&D-Model\textsubscript{o3-mini} & \cellcolor{good}0.0469 & \cellcolor{good}0.3688 & \cellcolor{top1}\textbf{0.0546} & \cellcolor{top2}\uline{0.4385} & \cellcolor{good}0.1009 & \cellcolor{top2}\uline{1.7009} & \cellcolor{top1}\textbf{-0.0694} & \cellcolor{good}1.4538 \\
+\cmidrule(lr){2-10}
+& R\&D-Agent(Q)\textsubscript{GPT-4o} & \cellcolor{top2}\uline{0.0497} & \cellcolor{top2}\uline{0.4069} & \cellcolor{good}0.0499 & \cellcolor{good}0.4122 & \cellcolor{good}0.1144 & \cellcolor{good}1.3167 & \cellcolor{good}-0.0811 & \cellcolor{good}1.4108 \\
+& R\&D-Agent(Q)\textsubscript{o3-mini} & \cellcolor{top1}\textbf{0.0532} & \cellcolor{top1}\textbf{0.4278} & \cellcolor{good}0.0495 & \cellcolor{good}0.4091 & \cellcolor{top2}\uline{0.1421} & \cellcolor{top1}\textbf{1.7382} & \cellcolor{good}-0.0742 & \cellcolor{top2}\uline{1.9150} \\
+\bottomrule
+\end{tabular}
+% \vspace{-12cm}
+}
+\end{table*}
+% \vspace{-2cm}

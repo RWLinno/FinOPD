@@ -1,0 +1,8 @@
+# Ablation A2: No visual reasoning (text + numerical only)
+agents:
+  chart_analyst:
+    enabled: true
+    use_vlm: false
+    use_rule_based: false  # Disable geometry extraction
+  pattern_reasoner:
+    enabled: false  # Skip pattern reasoning without visual input

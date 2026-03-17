@@ -1,0 +1,1952 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+    \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+
+
+% ready for submission
+% \usepackage{neurips_2025}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+    % \usepackage[preprint]{neurips_2025}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{neurips_2025}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{pifont}
+\usepackage{ulem}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{caption}
+\usepackage[most]{tcolorbox}
+\usepackage{todonotes}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{svg}
+\usepackage{makecell}
+\usepackage{multicol}
+\usepackage{longtable}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{parskip}
+\usepackage{soul}
+
+\definecolor{my_yellow}{RGB}{255,255,0}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  % frame=single,
+  % backgroundcolor=\color{gray!10},
+  showstringspaces=false
+}
+\lstdefinelanguage{json}{
+  morestring=[b]",
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  basicstyle=\ttfamily\small,
+  stringstyle=\color{gray}, % value
+  morekeywords={true, false, null},
+  keywordstyle=\color{gray},
+}
+
+\lstdefinestyle{mypython}{
+  language=Python,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{green!50!black},
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=flexible,
+  keepspaces=true,
+  tabsize=4,
+  captionpos=b,
+  frame=single,
+  rulecolor=\color{gray!60},
+  backgroundcolor=\color{gray!5}
+}
+
+\definecolor{top1}{RGB}{50,200,50}  % Dark green - Top 1
+\definecolor{top2}{RGB}{100,220,100}  % Medium green - Top 2
+\definecolor{good}{RGB}{150,255,150}  % Light green - Good
+\definecolor{average}{RGB}{200,255,200} % Very light green - Average
+\definecolor{poor}{RGB}{255,200,200}    % Light red - Poor
+\definecolor{worse}{RGB}{255,150,150}   % Red - Worse
+
+\newcommand{\name}{\texttt{R\&D-Agent(Q)}}
+
+\title{R\&D-Agent-Quant: A Multi-Agent Framework for Data-Centric Factors and Model Joint Optimization}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+% \author{%
+%   Yuante Li\thanks{Work done during an internship at Microsoft.} \ \ \\
+%   Carnegie Mellon University \\
+%   % Address \\
+%   \texttt{yuantel@cs.cmu.edu} \\
+%   \And
+%   Xu Yang \\
+%   Microsoft Research Asia \\
+%   % Address \\
+%   \texttt{xuyang1@microsoft.com} \\
+%   \And
+%   Xiao Yang \\
+%   Microsoft Research Asia \\
+%   % Address \\
+%   \texttt{xiao.yang@microsoft.com} \\
+%   \AND
+%   Xisen Wang\footnotemark[1] \\
+%   University of Oxford \\
+%   % Address \\
+%   \texttt{xisen.ox@gmail.com} \\
+%   \And
+%   Weiqing Liu\thanks{Corresponding Author} \\
+%   Microsoft Research Asia \\
+%   % Address \\
+%   \texttt{weiqing.liu@microsoft.com} \\
+%   \And
+%   Jiang Bian \\
+%   Microsoft Research Asia \\
+%   % Address \\
+%   \texttt{jiang.bian@microsoft.com} \\
+% }
+
+\author{Yuante Li\textsuperscript{\rm 1}\thanks{Work done during an internship at Microsoft Research Asia.},\hspace{4pt} Xu Yang\textsuperscript{\rm 2},\hspace{4pt} Xiao Yang\textsuperscript{\rm 2}, \\
+\textbf{Minrui Xu\textsuperscript{\rm 3}\footnotemark[1], \hspace{4pt}Xisen Wang\textsuperscript{\rm 4}\footnotemark[1], \hspace{4pt}Weiqing Liu\textsuperscript{\rm 2}\thanks{Corresponding Author}, \hspace{4pt}Jiang Bian\textsuperscript{\rm 2}} \\
+\textsuperscript{\rm 1} Carnegie Mellon University, \textsuperscript{\rm 2} Microsoft Research Asia \\
+\textsuperscript{\rm 3} Hong Kong University of Science and Technology,
+\textsuperscript{\rm 4} University of Oxford \\
+% \vspace{0.02cm}
+\texttt{yuantel@cs.cmu.edu},
+\texttt{\{xuyang1, xiao.yang\}@microsoft.com}\\
+\texttt{mxubh@connect.ust.hk},
+\texttt{xisen.wang@keble.ox.ac.uk} \\
+\texttt{\{weiqing.liu, jiang.bian\}@microsoft.com}
+}
+
+\begin{document}
+
+
+\maketitle
+
+\vspace{-0.6cm}
+\begin{abstract}
+    Financial markets pose fundamental challenges for asset return prediction due to their high dimensionality, non-stationarity, and persistent volatility.
+    Despite advances in large language models and multi-agent systems, current quantitative research pipelines suffer from limited automation, weak interpretability, and fragmented coordination across key components such as factor mining and model innovation.
+    In this paper, we propose R\&D-Agent for Quantitative Finance, in short \textbf{\name}, the first data-centric multi-agent framework designed to automate the full-stack research and development of quantitative strategies via coordinated factor-model co-optimization.
+    \texttt{\name} decomposes the quant process into two iterative stages: a \textbf{Research} stage that dynamically sets goal-aligned prompts, formulates hypotheses based on domain priors, and maps them to concrete tasks, and a \textbf{Development} stage that employs a code-generation agent, \texttt{Co-STEER}, to implement task-specific code, which is then executed in real-market backtests. The two stages are connected through a feedback stage that thoroughly evaluates experimental outcomes and informs subsequent iterations, with a multi-armed bandit scheduler for adaptive direction selection.
+    Empirically, \texttt{\name} achieves up to 2× higher annualized returns than classical factor libraries using 70\% fewer factors, and outperforms state-of-the-art deep time-series models on real markets. Its joint factor–model optimization delivers a strong balance between predictive accuracy and strategy robustness. Our code is available at: \url{https://github.com/microsoft/RD-Agent}.
+\end{abstract}
+
+
+\section{Introduction}
+
+Financial markets constitute high-dimensional, nonlinear dynamical systems whose return series display heavy tails \cite{mandelbrot1997variation}, time-varying volatility \cite{engle1982autoregressive}, and intricate cross-sectional dependence \cite{diebold2014network}.
+These features imply that asset prices are driven simultaneously by macro factors, microstructural signals, and behavioral feedback \cite{brock1997rational, brock1998heterogeneous, kahneman2013prospect}, making forecasting far more challenging than conventional time series.
+Driven by the exponential growth of data and breakthroughs in computational power and AI techniques, the asset management industry is transitioning from experience-driven to data-driven paradigms.
+Within this shift, quantitative investing is becoming mainstream due to: \textit{(i)} efficient decision-making via the data–factor–model loop, \textit{(ii)} repeatable execution with integrated risk control, and \textit{(iii)} precise pursuit of excess returns under increasing strategy convergence \cite{cao2025deeplearningllmssurvey, garleanu2013dynamic}.
+
+Fig.~\ref{fig:intro} illustrates the modern quantitative research pipeline. Microsoft's open-source project Qlib \cite{yang2020qlib} streamlines data processing and backtesting, alleviating much of the repetitive engineering burden.
+Consequently, this shift redirects the focus of quantitative research toward its core components: factor mining and model innovation. \textbf{\textit{Factor mining}} progresses from closed-form risk–return models \cite{fama1993common, carhart1997persistence} such as Fama–French to evolutionary symbolic regression \cite{koza1993genetic, stelmack2020kaizen, kamienny2023deep} and, more recently, reinforcement learning optimization of factor combinations \cite{zhao2024quantfactor, andre2020dirichlet, deng2016deep}.
+\textbf{\textit{Model innovation}} evolves from classical autoregression \cite{box2015time, engle1982autoregressive} to machine learning models \cite{SVM, DecisionTree, 8250694} and sequence-to-sequence deep learning architectures (e.g., GRU \cite{cho-etal-2014-learning} and LSTM \cite{hochreiter1997long}).
+More recent developments include specialized time series models that decompose signals into trend–seasonal components \cite{wu2021autoformer} or improve attention mechanisms for long-range forecasting \cite{zhou2021informer}.
+\begin{wrapfigure}[13]{r}{0.5\textwidth}
+\centering
+\vspace{-0.4cm}
+\includegraphics[width=\linewidth]{figure/rd_agent_pipeline.pdf}
+\vspace{-0.52cm}
+\caption{Quantitative finance research pipeline. Qlib makes stages \ding{182} and \ding{185} easier. \texttt{\name} further automates stages \ding{183}, \ding{184}, and \ding{186}, which are also key aspects of quantitative research.}
+\label{fig:intro}
+\end{wrapfigure}
+In parallel, stock-specific models integrate temporal event sequences with cross-sectional dependencies via graph neural networks to capture inter-stock interactions \cite{zhang2023dynamic, zhu2024lsr, THGNN}.
+Recently, large language models (LLMs) and multi-agent systems further extend the information set by extracting signals from news and social networks~\cite{yan2025beyond, wang2024llmfactor, lopezlira2023}, and simulating hedge funds and collaboration among financial experts \cite{hongmetagpt, zhang2024multimodal, xiao2024tradingagents}.
+
+Despite these advances, quantitative research still faces three critical limitations: \textbf{\textit{(i)~Limited automation:}} 
+Current workflows require extensive human intervention in hypothesis generation, coding, and tuning, creating slow iterations and biases, Besides, semi-automated systems fail to achieve the responsiveness and scalability required for fast-moving markets.
+\textbf{\textit{(ii)~Poor interpretability:}} Existing LLM-based agents often produce trading signals directly from language interaction, without grounded factor construction or transparent model logic, and thus are prone to hallucinations. This hinders adoption in live trading, where explainability and risk controls are essential.
+\textbf{\textit{(iii)~Fragmented optimization:}} Quantitative pipelines span data processing, factor mining, model training, and evaluation, yet current approaches lack systematic task decomposition or agent-level coordination. This siloed structure limits cross-stage feedback and joint performance gains.
+
+\begin{wrapfigure}[10]{r}{0.5\textwidth}
+\centering
+\vspace{-0.4cm}
+\includegraphics[width=\linewidth]{figure/rd_agent_concept.pdf}
+\vspace{-0.5cm}
+\caption{Conceptual diagram of \texttt{\name}. The modules \texttt{R\&D-Factor} and \texttt{R\&D-Model} represent the full optimization loops for factor and model development, respectively.}
+\label{fig:concept}
+\end{wrapfigure}
+To address these challenges, we propose \texttt{\name}, the first data-centric multi-agent framework for automating full-stack quantitative strategy development via coordinated factor–model co-optimization (Fig.~\ref{fig:concept}).
+Our~framework decomposes quant research into five stages spanning two core phases: \textbf{\uline{R}esearch} and \textbf{\uline{D}evelopment}.
+In the Research phase, the \textbf{Specification Unit} dynamically generates goal-aligned prompts from optimization targets. The \textbf{Synthesis Unit} then grows a task-specific knowledge forest from prior outcomes and generates new factor or model hypotheses, which are then mapped to executable tasks.
+In the Development phase, we introduce \texttt{Co-STEER}, a code-generation agent leveraging chain-of-thought~\cite{wei2022chain} reasoning and a graph-based knowledge store. The \textbf{Implementation Unit} translates hypotheses into code, while the \textbf{Validation Unit} runs real-market backtests.The \textbf{Analysis Unit} evaluates with unified metrics and uses a multi-armed bandit scheduler to adaptively select the next optimization direction.
+This forms a closed hypothesis–implementation–validation–feedback loop that supports continual, goal-directed evolution of strategies, marking a step toward intelligent and autonomous quantitative research.
+
+\vspace{-0.12cm}
+Our main contributions are as follows:
+
+\vspace{-0.12cm}
+\begin{itemize}[leftmargin=2ex]
+    \item \textbf{End-to-end automation with transparency: }
+    \texttt{\name} is the first data-centric multi-agent framework in quantitative finance that automates the entire R\&D process with verifiable outputs that enhance interpretability and reduce hallucination risks.  \vspace{-0.18cm}
+
+    \item \textbf{High-performance R\&D tools:} In the Research stage, \texttt{\name} mimics analyst workflows via a structured knowledge forest, enabling the generation of coherent, high-quality hypotheses. In the Development stage, we propose \texttt{Co-STEER}, a knowledge-evolving agent tailored for data-centric tasks, improving the accuracy and efficiency of factor and model code generation.\vspace{-0.18cm}
+    
+    \item \textbf{Strong empirical performance:}
+    Extensive experiments in real stock markets show that, at a cost under \$10, \texttt{\name} achieves approximately 2× higher ARR than benchmark factor libraries while using over 70\% fewer factors. It also surpasses state-of-the-art deep time-series models under smaller resource budgets. Its alternating factor–model optimization further delivers excellent trade-off between predictive accuracy and strategy robustness.
+\end{itemize}
+
+
+\newpage
+\section{\name}
+Based on the formal quantitative research pipeline structure in Fig.\ref{fig:intro} and Appendix\ref{app_quant_pipeline_def}, we propose \textbf{\texttt{\name}}, a data-centric multi-agent framework for iterative factor-model R\&D with automation, interpretability, and efficiency.
+We decompose the quantitative process into five LLM-powered units, each mainly focused on information gathering and LLM API interactions: \textit{Specification} (scenario definition), \textit{Synthesis} (ideas generation), \textit{Implementation} (code development), \textit{Validation} (backtesting), and \textit{Analysis} (result evaluation and task scheduling).
+Under unified input–output constraints, these units operate in a closed-loop cycle that simulates the trial-and-error process of human quantitative researchers.
+Unlike manual workflows, \texttt{\name} runs continuously and autonomously, supporting dynamic co-optimization of factor and model components.
+Moreover, each round’s hypotheses, implementations, and results are persistently stored, enabling cumulative knowledge growth and increasingly informed decision-making over time.
+
+\begin{figure}[htbp]
+    \centering
+    \vspace{-0.2cm}
+    \includegraphics[width=0.95\linewidth]{figure/rd_agent_framework.pdf}
+    \caption{\texttt{\name} consists of five functional modules that collaborate in a continuous iterative loop to generate highly effective quantitative factors and models for real-world financial markets.}
+    \label{fig:framework}
+\end{figure}
+\vspace{-0.5cm}
+
+\subsection{Specification Unit} \label{sec:spec}
+% \vspace{-0.2cm}
+The Specification Unit serves as the top-level component of the \texttt{\name}, dynamically configuring task context and constraints for downstream modules, ensuring consistency across design, implementation, and evaluation.
+It operates along two axes:
+\ding{182} Theoretical~\ding{217}~encoding prior assumptions, data schemas, and output protocols into a structured specification;
+\ding{183} Empirical~\ding{217}~establishing a verifiable execution environment and standardized interfaces for backtesting, shielding agents from low-level preprocessing and infrastructure concerns.
+By combining formal definitions with unified interfaces, the module reduces ambiguity and improves coordination efficiency across components.
+
+We formalize the Specification Unit as a tuple $\mathcal{S} = (\mathcal{B}, \mathcal{D}, \mathcal{F}, \mathcal{M})$, where $\mathcal{B}$ encodes background assumptions and prior knowledge about factors or models; $\mathcal{D}$ defines the market data interface; $\mathcal{F}$ expected output format (e.g., factor tensors or return predictions); and $\mathcal{M}$ denotes the external execution environment (e.g., \texttt{Qlib}-based backtesting).
+Under this formulation, any candidate factor or model $f_{\boldsymbol{\theta}}$ must satisfy the condition that $\forall,x\in\mathcal{D},;f_{\boldsymbol{\theta}}(x)\in\mathcal{F}$ and $f_{\boldsymbol{\theta}}$ is executable within $\mathcal{M}$.
+This enforces compatibility with standardized input/output structures and ensures that subsequent modules can interact with $f_{\boldsymbol{\theta}}$ within a shared operational context, thereby supporting consistency and reproducibility across collaborative workflows. Implementation details are provided in Appendix~\ref{app_pdsu}.
+
+\subsection{Synthesis Unit}
+The Synthesis Unit simulates human-like reasoning by generating new hypotheses based on historical experiments.
+Each optimization action is defined as $a_t \in \{\text{factor}, \text{model}\}$.
+For the current action $a_t$, the unit constructs an experiment trajectory by selecting a subset of relevant historical experiments. The $t$-th experiment is denoted by $e^t = \{h^t, f^t\}$, where $h^t$ is the hypothesis and $f^t$ is the corresponding feedback from the Analysis Unit.
+A set of current best-performing solutions is maintained as $\text{SOTA}$. Based on this, the historical hypothesis and feedback sets are defined as $\mathcal{H}_t = \{h_1, \dots, h_t\}$ and $\mathcal{F}_t = \{f_1, \dots, f_t\}$, respectively.
+Action-conditioned subsets are then extracted as Eq. \eqref{eq1}.
+\begin{equation}
+\begin{aligned}
+\mathcal{F}_t^{(a)} &= \{ f_{i}^{a} \in \mathcal{F}_t \mid a = a_t \lor e_{i} \in \text{SOTA}(a) \} \\
+\mathcal{H}_t^{(a)} &= \{ h_{i}^{a} \in \mathcal{H}_t \mid a = a_t \lor h_{i} \in \text{SOTA}(a) \}
+\end{aligned}
+\label{eq1}
+\end{equation}
+% \endgroup
+These subsets are passed to a generative stochastic mapping $G$ (serving as the core of Research, mimicking the synthesis of theoretical priors and empirical feedback to generate valid and novel hypotheses) to produce the next hypothesis:
+$h^{(t+1)} = G(\mathcal{H}_t^{(a)}, \mathcal{F}_t^{(a)})$.
+In practice, this module relies on structured templates and standardized formats to ensure that hypotheses are both executable and scientifically grounded. For example, in a factor generation task, $h^{(t+1)}$ incorporates not only the most recent feedback but also current market conditions and domain-specific economic theory, ensuring the factor's validity and observability.
+To promote diversity and progressive refinement, the generation mechanism adapts its strategy based on performance feedback. If $\mathcal{F}_t^{(a)}$ suggests success, the next hypothesis increases in complexity or scope; otherwise, it undergoes structural adjustments or introduces novel variables, thereby constituting an idea forest.
+This adaptive mechanism enables the agent to explore new directions while maintaining responsiveness to empirical results, supporting iterative and effective strategy development.
+
+Finally, the hypothesis $h^t$ is instantiated into a concrete task $t^t$, which the downstream implementation module uses for code-level realization. Factor hypotheses $h_t^{\text{factor}}$, due to their heterogeneity and potential interactions, can be decomposed into multiple subtasks $t_i^{\text{factor}}$.
+\begin{wrapfigure}[21]{r}{0.65\textwidth}
+\centering
+\vspace{-0.3cm}
+\includegraphics[width=\linewidth]{figure/rd_agent_costeer.pdf}
+\vspace{-0.45cm}
+\caption{Diagram of the \texttt{Co-STEER} workflow. In the context of factor development, it consists of two main modules: the scheduling module ingests candidate tasks and performs iterative ranking based on multiple factors; the implementation module learns from previous code execution results to construct a fine-grained, transferable knowledge base applicable across tasks.}
+ \label{fig:costeer}
+\end{wrapfigure}
+In contrast, model hypotheses, given their structural coherence, are mapped to a single task $t^{\text{model}}$ responsible for executing the entire modeling and inference pipeline.
+
+\subsection{Implementation Unit}
+The Implementation Unit is responsible for translating the executable tasks generated by the Synthesis Unit into functional code. It forms the core of complex development within the \texttt{\name}. To support this process, we design a specialized agent, \texttt{Co-STEER}, tailored for factor and model development in quantitative research. As illustrated in Fig.~\ref{fig:costeer}, \texttt{Co-STEER} integrates systematic scheduling and code-generation strategies to ensure correctness, efficiency, and adaptability in implementation.
+
+In factor development, tasks often exhibit structural dependencies. To address this, we introduce a guided chain-of-thought mechanism that encourages reasoning traceability. Specifically, the agent constructs a directed acyclic graph (DAG) $\mathcal{G} = (\mathcal{V}, \mathcal{E})$ to represent task dependencies, where an edge from task A to task B implies that A should precede B due to knowledge flow or complexity. A topological ordering $\pi_S = \bigl(t_{(1)}, \dots, t_{(n)}\bigr)$ is then derived to guide task execution.
+Scheduling is adaptive. Feedback from previous executions is continually integrated to improve planning: repeated failures on a task signal increased complexity, prompting prioritization of simpler tasks to enhance knowledge accumulation and execution success.
+
+For each task $t_j$, the implementation agent $I$ generates its corresponding code $c_j$ based on both the task description and the current knowledge base, thus $c_j = I(t_j, \mathcal{K})$. This process includes task parsing, code synthesis and refinement, execution, and validation. The agent’s objective is to maximize cumulative implementation quality: $
+\pi_I = \arg\max_{\pi} \mathbb{E} \left[ \sum_{j=1}^{n} R_I(c_j) \right]
+$, where $R_I(c_j)$ evaluates the correctness and performance of code $c_j$.
+The knowledge base $\mathcal{K}$ plays a central role by recording successful and failed task-code-feedback triples: $\mathcal{K}^{(t+1)} = \mathcal{K}^{(t)} \cup \{ (t_j, c_j, f_j) \}$, where $f_j$ denotes the feedback received after executing task $t_j$. Through a knowledge transfer mechanism, the implementation agent can also retrieve solutions to similar tasks from the knowledge base based on the current feedback $f^{(t)}$, thereby improving the efficiency and success rate of code generation for new tasks: $c_{new} = \arg\max_{c_k \in \mathcal{K}} \text{similarity}(t_{new}, t_k) \cdot c_k$.
+The complete algorithmic details are provided in Appendix~\ref{app:alg-cos}.
+
+This feedback-driven optimization loop allows the Implementation Unit to continually enhance code quality and efficiency, facilitating rapid and robust development of quantitative research components.
+
+\subsection{Validation Unit} \label{valu}
+The Validation Unit evaluates the practical effectiveness of factors or model generated by the Implementation Unit.
+For \textbf{factors}, a de-duplication process is first applied to filter out redundant signals by computing their correlation with the existing SOTA factor library.
+Given the concatenated factor matrix $\mathbf{F} = [F_{\text{SOTA}}, F_{\text{new}}] \in \mathbb{R}^{T \times (M+N)}$, the IC is computed within each time slice between all $M \times N$ pairs of SOTA and new factors: $ \text{IC}_{m,n}^{(t)} = \text{corr}(F_{\text{SOTA}, m}^{(t)}, F_{\text{new}, n}^{(t)})$, where $(m, n)$ indexes a SOTA-new pair, and $t$ indexes a time slice.
+These IC values are then averaged across time, and for each new factor $n$, its maximum IC across all SOTA factors is obtained as $\text{IC}_{\max}^{(n)} = \max_{m} \; \mathbb{E}_t \left[ \text{IC}_{m,n}^{(t)} \right]$.
+New factors with $\text{IC}_{\max}^{(n)} \geq 0.99$ are deemed redundant and excluded.
+After factor filtering, the remaining candidates are combined with the current SOTA model (or a baseline model, if none is available) and evaluated through the \texttt{Qlib} backtesting platform. This allows performance to be assessed under realistic market conditions. For \textbf{model}, the process is symmetric: each candidate model is paired with the current SOTA factor set and evaluated through the same backtesting pipeline.
+
+Therefore, the Validation Unit provides an integrated and automated pipeline that supports standardized evaluation of novel components within a production-grade market simulation environment.
+
+\subsection{Analysis Unit} \label{sec:analysis}
+The Analysis Unit serves as both a research evaluator and strategy analyst within the \texttt{\name} framework. After each experimental round, it conducts a multi-dimensional assessment of the current hypothesis $h^t$, the specific task $t^t$, and the experimental result $r^t$.
+If the experiment is judged to outperform the SOTA under action type $a_t$, its result is added to the corresponding SOTA set $\text{SOTA}(a_t)$. The unit then diagnoses failure strategy and generates targeted suggestions for refinement. The feedback $f_t$ is passed to the Synthesis Unit to guide the formulation of future hypotheses.
+
+Notably, the Analysis Unit operates with a local view of the current experiment, while the Synthesis Unit maintains a global perspective across the full experimental history. Their interaction enables a closed-loop system that balances short-term responsiveness with long-term exploration, supporting automated iteration across research design, strategy implementation, validation, and deep analysis.
+
+Following each analysis round, the Analysis Unit further determines whether to prioritize factor refinement or model optimization for the next iteration.
+To maximize performance gains, this decision is formulated as a contextual two-armed bandit problem and solved via linear Thompson sampling (see Appendix~\ref{app:linear_thompson_two_arm} for the detailed algorithm).
+Specifically, At each round $t$, the system observes an 8-dimensional performance state vector $\mathbf{x}_t \in \mathbb{R}^8$, which encodes key evaluation metrics of the current strategy. The action space is $\mathcal{A} = \{\text{factor}, \text{model}\}$, corresponding to the two possible optimization paths.
+To evaluate the expected benefit of each action under context $\mathbf{x}_t$, we adopt a linear reward function $r = \mathbf{w}^\top \mathbf{x}_t$, where $\mathbf{w}$ reflects the relative importance of each metric. A separate Bayesian linear model is maintained for each action, with Gaussian posteriors encoding uncertainty over reward coefficients.
+At each step, the system samples a reward vector from each posterior and computes the corresponding expected reward. The action with the highest sampled reward is executed.
+After observing the actual improvement, the posterior for the chosen arm is updated. Through this contextual Thompson sampling mechanism, \texttt{\name} adaptively balances exploration and exploitation, enabling robust performance improvement across iterations.
+
+\newpage
+\section{Experimental Setup}
+\label{sec:experiments}
+\textbf{\ding{229} Datasets.}
+Following \cite{li2024alphafin, FactorVAE, lin2021learning, li2024master}, we use the CSI~300 dataset, covering 300 large-cap A-share stocks in the Chinese market. The time span is split into training (Jan 1, 2008 – Dec 31, 2014), validation (Jan 1, 2015 – Dec 31, 2016), and testing (Jan 1, 2017 – Aug 1, 2020).
+We evaluate \texttt{\name} under three configurations: \ding{202} \textbf{\texttt{R\&D-Factor}} fixes the prediction model as LightGBM~\cite{ke2017lightgbm} and optimizes factor sets starting from Alpha~20 \footnote{twenty empirically validated factors from Alpha~158 covering momentum, value, quality, and growth.};
+\ding{203} \textbf{\texttt{R\&D-Model}} fixes the input factor set to Alpha~20 and searches for better models;
+\ding{204} \textbf{\texttt{\name}} jointly optimizes both factor and model components.
+
+\textbf{\ding{229} Baselines.}
+At the factor level, we compare against Alpha~101~\cite{kakushadze2016101formulaicalphas}, Alpha~158~\cite{alpha158}, Alpha~360~\cite{alpha360}, and AutoAlpha~\cite{kou2024automate}.
+At the model level, we include \textbf{machine learning models} (Linear, MLP, LightGBM\cite{ke2017lightgbm}, XGBoost~\cite{chen2016xgboost}, CatBoost~\cite{prokhorenkova2018catboost}, DoubleEnsemble~\cite{zhang2020doubleensemble}), and \textbf{deep learning models} (GRU~\cite{cho-etal-2014-learning}, LSTM~\cite{hochreiter1997long}, ALSTM~\cite{qin2017dual}, Transformer~\cite{NIPS2017_3f5ee243}, PatchTST~\cite{nietime}, iTransformer~\cite{liuitransformer}, Mamba~\cite{gumamba}, TRA~\cite{lin2021learning}, MASTER~\cite{li2024master}, GATs~\cite{velivckovic2018graph}). More details are provided in Appendix~\ref{app:baselines}.
+
+\textbf{\ding{229} Evaluation Details.}
+We evaluate \texttt{\name} using two metric categories: \textbf{factor predictive metrics}, including information coefficient (IC), IC information ratio (ICIR), rank IC, and rank ICIR; and \textbf{strategy performance metrics}, including annualized return (ARR), information ratio (IR), maximum drawdown (MDD), and Calmar ratio (CR). We follow a daily long-short trading strategy based on predicted return rankings, with position updates, holding retention rules, and \uline{realistic transaction costs}. Full evaluation and implementation details are provided in Appendix~\ref{app:evaluation} and~\ref{app:impl_settings}.
+
+\section{Experiment Analysis} \label{sec:results}
+
+\textbf{\ding{229} Analyses of Main Results.}
+% \input{tables/main}
+Table~\ref{results1} reports the performance of baseline models and \texttt{R\&D-Agent} frameworks on the CSI~300  dataset, showing that the \texttt{R\&D-Agent} consistently outperform all baselines in both predictive and strategic metrics.
+
+\textbf{\ding{202} \texttt{R\&D-Factor} (Factor Optimization).} When only the factor space is adaptively optimized, both \texttt{R\&D-Factor\textsubscript{GPT-4o}} and \texttt{R\&D-Factor\textsubscript{o3-mini}} surpass static factor libraries (e.g., Alpha 158/360) with higher IC (up to 0.0497) and significantly improved ARR (up to 14.61\%) using fewer handcrafted factors. This demonstrates that dynamic hypothesis refinement and factor screening in \texttt{\name} lead to more informative signals than those from fixed, high-dimensional factor sets.
+
+\textbf{\ding{203} \texttt{R\&D-Model} (Model Optimization).} For model optimization with fixed factors, \texttt{R\&D-Model\textsubscript{o3-mini}} surpasses all baseline and achieves best performance on Rank IC(0.0546) and MDD ($-6.94\%$). Machine learning models lag significantly, highlighting their limitations in capturing financial noisy and non-linear patterns. While general deep learning architectures (GRU, LSTM, Transformer) deliver moderate predictive metrics, their strategic performance remains weak, suggesting a gap between feature extraction and actionable returns. Surprisingly, time-series forecasting models (e.g. PatchTST, Mamba) underperform on both fronts, indicating a fundamental mismatch between standard sequence prediction and stock market dynamics. In contrast, specialized stock prediction models (TRA, MASTER) excel in strategic metrics but trail in predictive power, highlighting a trade-off between robustness (low MDD, high IR) and precision (high IC). These results shows that adaptive model configuration—guided by automated hypothesis evaluation—yields more robust and risk-sensitive forecasting structures than both ML and handcrafted DL architectures.
+
+\textbf{\ding{204} \texttt{\name} (Joint Optimization).} By co-optimizing factors and models, \texttt{\name\textsubscript{o3-mini}} achieves the highest overall performance: an IC of 0.0532, ARR of 14.21\%, and IR of 1.74. These improvements exceed those of the strongest baseline methods (e.g., Alpha 158, TRA) by a large margin. This demonstrates that joint refinement of factors and architectures unlocks complementary improvements, enabling scalable and consistent alpha modeling.
+
+\textbf{\ding{229} Analyses of Research Component.}
+To evaluate the research dynamics of \texttt{\name}, we analyze the evolution of factor hypotheses in \texttt{R\&D-Factor}, focusing on its balance between exploration (diverse idea generation) and exploitation (local refinement). The methodology involves three steps: \textit{(i)} \textbf{Text Embedding}: Encode generated hypothesis $h_t$ at iteration $t$ into a fixed-dimensional vector $\mathbf{h}_t$ using Sentence-BERT \cite{reimers2019sentence};
+\textit{(ii)} \textbf{Similarity matrix}: Compute pairwise cosine similarities to form a symmetric matrix $\mathbf{S} \in [0,1]^{T \times T}$;
+\textit{(iii)} \textbf{Hierarchical Clustering}: Apply agglomerative clustering to group similar hypotheses and reorder $\mathbf{S}$ for block structure.
+\input{tables/main_color}
+
+\begin{wrapfigure}[22]{r}{0.54\textwidth}
+\centering
+\vspace{-0.05cm}
+% \vspace{-1.05cm}
+    % \includesvg[width=\linewidth]{figure/rd_agent_research}
+    \includegraphics[width=\linewidth]{figure/rd_agent_research.pdf}
+\vspace{-0.6cm}
+\caption{Cosine similarity heatmap of factor hypotheses across experiment loops in \texttt{R\&D-Factor}. Black boxes mark clusters of similar ideas; \textcolor{red}{\textbf{RED}} indices indicate those selected into the SOTA factor library.}
+ \label{fig:idea}
+\end{wrapfigure}
+
+\vspace{-0.15cm}
+Fig.~\ref{fig:idea} reveals three exploration patterns: 
+\textbf{\ding{202} Local refinement followed by directional shift:} Diagonal blocks (e.g., trials 1–6, 7–11) show that \texttt{R\&D-Factor} performs multi-step refinement within a conceptual thread before shifting direction, balancing depth with novelty.
+\textbf{\ding{203} Strategic revisitation:} Trial 26 clusters with earlier trials 12–14, demonstrating the agent’s ability to revisit and incrementally refine promising early hypotheses.
+\textbf{\ding{204} Diverse paths yield synergy:} 8 out of 36 trials are selected into the final SOTA set, spanning 5 of 6 clusters. This suggests that exploring multiple directions produces complementary signals that collectively strengthen the final factor library.
+This\textit{ refine–shift–reuse} pattern underpins efficient deep search and broad conceptual coverage, enabling the construction of compact, diverse, and high-performing factor libraries.
+
+\textbf{\ding{229} Analyses of Development Component.}
+To evaluate the code generation capability of the development component, we analyze \texttt{Co-STEER}’s performance across frameworks of \texttt{\name} using the pass@$k$ accuracy metric (Fig.~\ref{fig:pass}).
+In both factor and model tasks, success rates quickly converge within a few iterations, showing \texttt{Co-STEER}’s ability to efficiently repair initial errors through feedback.
+The difference is amplified in full-stack tasks (\texttt{\name}) due to their greater complexity, making iterative refinement essential.
+Here, \texttt{o3-mini} consistently achieves higher recovery rates, reflecting its stronger chain-of-thought reasoning—a clear advantage in structured, high-dependency coding scenarios.
+Overall, the pass@$k$ trajectory illustrates \texttt{Co-STEER}’s ability to \textbf{progressively self-correct through iterative refinement} in structured financial coding. Additional experiments on \texttt{Co-STEER} are available in Appendix~\ref{app:costeer}.
+
+\begin{figure}[htbp]
+    \centering
+    \vspace{-0.2cm}
+    % \includesvg[width=\linewidth]{figure/rd_agent_dev}
+    \includegraphics[width=\linewidth]{figure/rd_agent_dev.pdf}
+    \vspace{-0.5cm}
+    \caption{Pass@$k$ accuracy of \texttt{GPT-4o} and \texttt{o3-mini} in \texttt{R\&D-Factor}, \texttt{R\&D-Model}, and \texttt{\name}. $x$-axis: attempts ($k$); $y$-axis: success rate within $k$ tries.}
+    \label{fig:pass}
+\end{figure}
+\vspace{-0.2cm}
+
+\textbf{\ding{229} Analyses of Factor Effects.}
+In Fig.~\ref{fig:yearly_ic_rankic_nav}, we compare factor libraries produced by \texttt{R\&D-Factor} with baselines to assess factor generation.
+Subfigures (a) and (b) show that even when initialized from Alpha 20, \texttt{R\&D-Factor} quickly achieves IC levels comparable to Alpha 158 and Alpha 360 while using only ~22\% of factors. After 2017, it consistently outperforms Alpha 20, and maintains stable IC during 2019–2020 when baselines degrade.
+When initialized from Alpha 158, \texttt{R\&D-Factor} further improves, particularly with \texttt{o3-mini}, reaching IC >0.07 in 2020 and surpassing all baselines.
+This demonstrates that iterative factor refinement helps \textbf{eliminate regime-sensitive or redundant signals}, improving overall predictive stability.
+More relevant results are provided in Appendix~\ref{app:factor}.
+
+\textbf{\ding{229} Analyses of Model Effects.}
+Fig.~\ref{fig:model_arr_mdd} compares \texttt{R\&D-Model} with baseline deep learning models across three dimensions: ARR, MDD, and resource usage. Both \texttt{R\&D-Model} variants shift significantly toward the desirable upper-left region. \texttt{R\&D-Model\textsubscript{GPT-4o}} achieves ARR (12\%) with |MDD| (8\%), attaining the highest return-risk slope. \texttt{R\&D-Model\textsubscript{o3-mini}} offers lower drawdown with ARR (11\%), yielding \textbf{strong performance under tighter risk constraints}.
+
+\vspace{-0.15cm}
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+    \centering
+    \vspace{-3.35cm}
+    % \includesvg[width=\linewidth]{figure/rd_agent_factor}
+    \includegraphics[width=\linewidth]{figure/rd_agent_factor.pdf}
+    \vspace{-0.35cm}
+    \caption{Comparison between classical factor libraries and \texttt{R\&D-Factor}-generated factors using a LightGBM predictor on CSI~300. \texttt{R\&D-Factor} was initialized from Alpha~20 or~Alpha 158 and operated with \texttt{GPT-4o} or \texttt{o3-mini}.}
+    \label{fig:yearly_ic_rankic_nav}
+\end{minipage}
+\hfill
+\begin{minipage}[ht]{0.48\textwidth}
+    \centering
+    \vspace{-0.1cm}
+    % \includesvg[width=\linewidth]{figure/rd_agent_model}
+    \includegraphics[width=\linewidth]{figure/rd_agent_model.pdf}
+    \vspace{-0.55cm}
+    \caption{Comparison of models on CSI 300 in terms of return, drawdown, and resource efficiency. Bubble size encodes memory usage (MB); labels show memory and inference latency (ms). Line slope indicates Calmar Ratio.}
+    \label{fig:model_arr_mdd}
+\end{minipage}
+\end{figure}
+
+\vspace{-0.3cm}
+\textbf{Analyses of Empirical Scope and Generalizability.}
+To address concerns about scope, recency, and data leakage, we extended evaluation to another major Chinese market (CSI~500) and the U.S. market (NASDAQ~100). 
+We adopted new dataset splits (Train: 2008-2021, Validation: 2022-2023, Test: 2024-2025), ensuring that both LLM backends have cutoffs completely or nearly prior to the test period. The detailed experimental settings and the complete results are provided in \ref{app_esga}.
+
+Moreover, our framework adopts a data-centric design: the LLM is never exposed to raw market data or explicit temporal splits, but only to schema-level information (as shown in the prompt for the Specification Unit in Appendix~\ref{app_pdsu}).
+This prevents the model from accessing precise temporal boundaries or dataset partitions, thereby mitigating the risk of information leakage.
+
+As summarized in Table~\ref{results-csi-nasdaq}, \texttt{\name} consistently achieves top-ranked performance across both Chinese and U.S. markets, with strong out-of-sample robustness in IC, ICIR, IR (SHR*), and MDD. 
+These findings confirm that our framework generalizes beyond the Chinese market, captures recent dynamics, and remains unaffected by knowledge cutoff concerns, thereby reinforcing its \textbf{robustness} and \textbf{real-world applicability}.
+\input{tables/csi500_nasdaq100}
+
+% \vspace{-0.3cm}
+\textbf{\ding{229} Ablation Study.}
+To evaluate the impact of different action selection strategies, we conduct an ablation study as shown in Table~\ref{res_abl}. The Bandit scheduler achieves the best overall performance, with the highest IC, ARR, and number of SOTA selections, confirming its ability to \textbf{prioritize the most promising optimization targets under limited computational budgets}.
+The LLM-based strategy performs moderately but incurs higher per-step overhead due to additional model calls, resulting in fewer iterations.
+Random scheduling performs the worst, underscoring the importance of informed decision-making in driving effective optimization.
+Full ablation results are provided in Appendix~\ref{app:abl}.
+
+\begin{table*}[h]
+\vspace{-0.24cm}
+\caption{Ablation results on action selection strategies for \texttt{\name} (o3-mini). We compare random, LLM-based, and Bandit controllers across predictive quality, strategy performance, and execution statistics (TL: total loops, VL: valid loops, SL: SOTA selections, TRH: runtime in hours).}
+\label{res_abl}
+\vspace{-0.09cm}
+\centering
+\resizebox{1.0\textwidth}{!}{
+\begin{tabular}{llcccccccc}
+\toprule
+\multicolumn{2}{c}{\multirow{3}{*}{\textbf{Models}}} & 
+\multicolumn{2}{c}{Factor Predictive Power Metrics} & 
+\multicolumn{2}{c}{Performance Metrics} & 
+\multicolumn{4}{c}{Execution Metrics} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-10}
+\multicolumn{2}{c}{} & \textbf{IC} & \textbf{ICIR} & \textbf{ARR} & \textbf{MDD} & \textbf{TL} & \textbf{VL} & \textbf{SL} & \textbf{TRH} \\
+\midrule
+\multirow{3}{*}{Algorithm Ablation}
+& \name w/ random  & 0.0445 & 0.3589 & 0.0897 & -0.1004 & 33 & 19 & 7 & 12 \\
+& \name w/ LLM  & 0.0476 & 0.3891 & 0.1009 & -0.0794 & 33 & 20 & 5 & 12\\
+& \name w/ Bandit  & \textbf{0.0532} & \textbf{0.4278} & \textbf{0.1421} & \textbf{-0.0742} & \textbf{44} & \textbf{24} & \textbf{8} & 12 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+\begin{wrapfigure}[14]{r}{0.4\textwidth}
+\centering
+\vspace{-0.55cm}
+% \vspace{-1.05cm}
+    % \includesvg[width=\linewidth]{figure/rd_agent_api_radar}
+    \includegraphics[width=\linewidth]{figure/rd_agent_api_radar.pdf}
+\vspace{-0.6cm}
+\caption{Comparison of \texttt{\name} using different API backends (30 loops each). Axes are normalized, with outer points indicating better performance.}
+ \label{fig:backend}
+\end{wrapfigure}
+\textbf{\ding{229} Backend Comparisons.}
+To assess the sensitivity of \texttt{\name} to the LLM backend, we evaluate six API variants across research and strategy metrics (Fig.~\ref{fig:backend}).
+Despite moderate loop statistics, \texttt{o1} achieves top performance through several impactful rounds with strong strategic breakthroughs.
+The recently released \texttt{GPT-4.1} ranks second across most metrics.
+Other variants (except \texttt{GPT-4o-mini}, with limited reasoning capacity, leading to weaker performance) exhibit comparable results, showing the robustness of our framework across LLM backends.
+
+\textbf{\ding{229} Extended Studies.}
+Appendix~\ref{app:costs} further shows that \texttt{\name}'s cost (in the paper's setting) is under \$10, confirming its cost-efficient scalability. Appendix~\ref{app:kaggle} validates its robustness on real-world quant scenarios.
+
+% Related Work
+\section{Related Work}
+\textbf{Traditional Methods in Quantitative Research.}
+Quantitative strategies have traditionally relied on human-crafted factors from asset pricing theory, such as value and momentum \cite{fama1993common, carhart1997persistence}. While interpretable, these fixed signals often lack flexibility in adapting to changing regimes.
+To overcome these limitations, symbolic regression and genetic programming (GP) methods \cite{kamienny2023deep, petersendeep} automate factor mining by evolving complex, non-linear expressions.
+Enhancements like lag operators \cite{stelmack2020kaizen} and operator mutation with pruning \cite{cui2021alphaevolve} yield more diverse and effective signals.
+Reinforcement learning (RL) methods reframe factor allocation as sequential decision-making, directly optimizing Sharpe or Calmar ratios \cite{zhao2024quantfactor, hu2019deep}.
+Andre et al.~\cite{andre2020dirichlet} model factor weights via Dirichlet policies with KL regularization, enabling sparse and adaptive strategies.
+% Their approach improves annualized returns by 19\% over static baselines.
+However, RL methods often lack robustness under regime shifts (e.g., 2020 circuit breaker \cite{gu2020empirical}) and remain hard to interpret.
+
+Model-wise, early approaches like ARIMA \cite{7046047} and exponential smoothing \cite{exponsmoothing} struggle with noisy, high-dimensional data.
+Classical machine learning methods (e.g., SVMs \cite{SVM}, random forests \cite{DecisionTree}) improve robustness but still require manual feature engineering.
+Deep learning models like LSTMs \cite{CLVSA} and Transformers \cite{Transformer} have since been applied to capture long-term and cross-sectional dependencies~\cite{REST, zhao2024polymodelhedgefundsportfolio}.
+Building upon these, specialized time series neural networks have emerged. PatchTST \cite{PatchTST2023} segments inputs into local patches, while iTransformer \cite{iTransformer2024} remaps variable-token relations to model multivariate structure. Domain-specific models like MASTER \cite{MASTER} further incorporates market-level dynamics for improved financial prediction.
+However, both factor and model pipelines remain siloed, expert-dependent, and inflexible, restricting  scalability in volatile markets.
+
+\textbf{LLM-Driven Agents in Finance.}
+Large language models (LLMs) offer new opportunities for automating financial research due to their strong reasoning and abstraction capabilities.
+Recent work explores their use in extracting predictive signals from financial text \cite{liu2021finbert, lopezlira2023}, generating factor explanations \cite{wang2024llmfactor}, and enabling multi-modal market analysis \cite{zhang2024multimodal}.
+Parallel advances in LLM-based multi-agent systems (e.g., AutoGen \cite{wu2024autogen}, AutoGPT \cite{yang2023auto}) provide coordination frameworks for complex decision-making. In finance, systems like FinAgent \cite{zhang2024multimodal} and TradingAgents\cite{xiao2024tradingagents} use role-based agents for subtasks such as event extraction or portfolio updates. However, most existing efforts focus on narrow subtasks and rely heavily on semantic signals, making them prone to hallucination, hard to interpret, and difficult to reproduce. Moreover, they lack mechanisms for joint factor-model optimization or workflow integration, limiting their effectiveness in real-world quantitative systems.
+
+\section{Conclusion} \label{Conclusion}
+We propose \texttt{\name}, a LLM-driven framework for collaborative factor-model development in quantitative finance. By decomposing research into modular components and integrating a bandit-based scheduler, it supports efficient, adaptive iteration under fixed compute budgets.
+Empirically, \texttt{R\&D-Agent} outperforms baselines in both signal quality and strategy performance, with strong cost-efficiency and generalizability. Its modularity also enables adaptation to real-world settings. However, current framework relies solely on the LLM’s internal financial knowledge. Future work may enhance data diversity, incorporate domain priors, and enable online adaptation to evolving market regimes.
+
+\section{Disclaimer}
+Users of the \texttt{\name} framework and the associated code should prepare their own financial data and independently assess and test the risks of the generated factors and model in use's own scenarios. It is essential to use the agent-generated code, data, and model with caution and thoroughly check them. The \texttt{\name} framework does not provide financial opinions, nor is it designed to replace the role of qualified financial professionals in formulating, assessing, and approving financial products. The outputs of the \texttt{\name} framework do not reflect the opinions of Microsoft.
+
+\newpage
+\bibliographystyle{IEEEtran}
+\bibliography{refs.bib}
+% References follow the acknowledgments in the camera-ready paper. Use unnumbered first-level heading for
+% the references. Any choice of citation style is acceptable as long as you are
+% consistent. It is permissible to reduce the font size to \verb+small+ (9 point)
+% when listing the references.
+% Note that the Reference section does not count towards the page limit.
+% \medskip
+
+
+% {
+% \small
+
+
+% [1] Alexander, J.A.\ \& Mozer, M.C.\ (1995) Template-based algorithms for
+% connectionist rule extraction. In G.\ Tesauro, D.S.\ Touretzky and T.K.\ Leen
+% (eds.), {\it Advances in Neural Information Processing Systems 7},
+% pp.\ 609--616. Cambridge, MA: MIT Press.
+
+
+% [2] Bower, J.M.\ \& Beeman, D.\ (1995) {\it The Book of GENESIS: Exploring
+%   Realistic Neural Models with the GEneral NEural SImulation System.}  New York:
+% TELOS/Springer--Verlag.
+
+
+% [3] Hasselmo, M.E., Schnell, E.\ \& Barkai, E.\ (1995) Dynamics of learning and
+% recall at excitatory recurrent synapses and cholinergic modulation in rat
+% hippocampal region CA3. {\it Journal of Neuroscience} {\bf 15}(7):5249-5262.
+% }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\newpage
+
+\section{Algorithmic Details}
+\subsection{Co-STEER Implementation Logic} \label{app:alg-cos}
+To further clarify the internal mechanism of the \texttt{Co-STEER} agent, we provide both a formal algorithmic procedure (Algorithm~\ref{algo:costeer}) and a comparative method analysis (Table~\ref{tab:method_comparison}).
+
+Existing natural-language-to-code methods primarily focus on isolated capabilities. Few-shot~\cite{brown2020lanugage} learning leverages in-context examples to guide model outputs. Chain-of-Thought (CoT)~\cite{wei2022chain} improves reasoning coherence via step-by-step prompting. Reflexion~\cite{shinn2023reflexion} and Self-Debugging~\cite{jiang2023self} emphasize iterative correction through feedback, while Self-Planning~\cite{chen2024teaching} supports automatic task decomposition.
+
+In contrast, \texttt{Co-STEER} offers a unified solution that integrates scheduling, reasoning, feedback-driven refinement, and long-term knowledge accumulation. It maintains a continually growing knowledge base of prior attempts, which enables retrieval and adaptation of previously successful solutions. Additionally, its scheduling agent supports multi-task code generation, such as factor implementation in quantitative research, by dynamically prioritizing tasks based on complexity and feedback—favoring simpler, more foundational tasks early on to provide informative scaffolding for subsequent code generation.
+
+\newcommand{\cmark}{\ding{51}}  % for checkmark
+\newcommand{\xmark}{\textcolor{red}{\ding{55}}}   % for x mark
+
+\begin{table*}[ht]
+ \centering
+ \caption{
+Comparison of code-generation methods in quantitative research. \texttt{Co-STEER} is the only method supporting end-to-end development, from task scheduling to implementation, enhanced by structured reasoning and lifelong knowledge reuse. This makes it especially suited for multi-step, data-centric financial workflows.
+}
+\small
+\begin{tabular}{lccccc} 
+ \toprule
+\multirow{2}{*}[-3.5ex]{\textbf{Methods}} & 
+ \multicolumn{1}{c}{\textbf{Schedule}} & 
+ \multicolumn{4}{c}{\textbf{Implementation}} \\ 
+ \cmidrule(lr){2-2} \cmidrule(l){3-6}
+ & - & \makecell{Demonstration} & 
+ \makecell{Planning or\\Reasoning\\Before Impl.} & 
+ \makecell{LLM-Based\\Self-Feedback} & 
+ \makecell{Growing\\Practical\\Knowledge} \\
+ \cmidrule(r){1-1} 
+ \cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5} \cmidrule(lr){6-6}
+
+ Few-shot~\cite{brown2020lanugage} & \xmark & \cmark & \xmark & \xmark & \xmark \\
+ CoT~\cite{wei2022chain} & \xmark & \xmark & \cmark & \xmark & \xmark \\
+ Reflexion~\cite{shinn2023reflexion} & \xmark & \xmark & \xmark & \cmark & \xmark \\
+ Self-Debugging~\cite{jiang2023self} & \xmark & \xmark & \xmark & \cmark & \xmark \\
+ Self-Planning~\cite{chen2024teaching} & \xmark & \xmark & \cmark & \xmark & \xmark \\
+ \textbf{\texttt{\textbf{Co-STEER}}} & \cellcolor{my_yellow} \cmark & \cmark & \cmark & \cmark & \cellcolor{my_yellow}\cmark \\
+ \bottomrule
+\end{tabular}
+\label{tab:method_comparison}
+\end{table*}
+
+
+Below, we present the complete pseudocode of the Co-STEER workflow for the factor implementation task.
+
+\begin{algorithm}
+\caption{\texttt{Co-STEER}: Collaborative Scheduling and Task Execution Engine for Quant Research}
+\label{algo:costeer}
+\begin{algorithmic}[1]
+\Require Tasks $\mathcal{T} = \{t_1, \dots, t_n\}$, Knowledge base $\mathcal{K}$
+\Ensure Implemented code solutions $\{c_1, \dots, c_n\}$
+
+\State Initialize DAG $\mathcal{G} = (\mathcal{V}, \mathcal{E})$ where $\mathcal{V} = \mathcal{T}$
+\State Initialize task complexity scores $\alpha_j = 1$ for all $t_j \in \mathcal{T}$
+
+\Function{UpdateTaskOrder}{$\mathcal{G}, \{\alpha_j\}$}
+    \State Compute weighted edges: $w_{ij} = \alpha_i / \alpha_j$ for $(i,j) \in \mathcal{E}$
+    \State Return topological order $\pi_S$ considering $w_{ij}$
+\EndFunction
+
+\Function{ImplementTask}{$t_j, \mathcal{K}, f^{(t)}$}
+    \State Find similar tasks: $S_j = \{t_k \in \mathcal{K} : \text{similarity}(t_j, t_k) > \theta\}$
+    \State $c_{ref} = \arg\max_{c_k \in \mathcal{K}} \text{similarity}(t_j, t_k) \cdot c_k$
+    \State Generate code: $c_j = I(t_j, c_{ref}, \mathcal{K})$
+    \State Execute and get feedback $f_j$
+    \State Update knowledge base: $\mathcal{K} \gets \mathcal{K} \cup \{(t_j, c_j, f_j)\}$
+    \State \Return $(c_j, f_j)$
+\EndFunction
+
+\While{$\mathcal{T}$ not empty}
+    \State $\pi_S \gets$ \Call{UpdateTaskOrder}{$\mathcal{G}, \{\alpha_j\}$}
+    \For{$t_j \in \pi_S$}
+        \State $(c_j, f_j) \gets$ \Call{ImplementTask}{$t_j, \mathcal{K}, f^{(t)}$}
+        \If{$f_j$ indicates failure}
+            \State Update complexity: $\alpha_j \gets \alpha_j + \delta$
+            \State Break and recompute $\pi_S$
+        \Else
+            \State $\mathcal{T} \gets \mathcal{T} \setminus \{t_j\}$
+        \EndIf
+    \EndFor
+\EndWhile
+
+\State \Return $\{c_1, \dots, c_n\}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Bandit Scheduling Logic}
+\label{app:linear_thompson_two_arm}
+As stated in Section~\ref{sec:analysis}, we apply contextual Thompson Sampling to adaptively select between two optimization directions—factor refinement and model optimization—based on current strategy performance. The problem is formulated as a two-armed contextual bandit with linear reward functions. Each arm maintains its own Bayesian linear regression model, whose posterior is updated after every interaction.
+
+At each round \( t \), the system summarizes strategy quality using the following 8-dimensional performance vector:
+
+\[
+\mathbf{x}_t = \bigl[\text{IC},\ \text{ICIR},\ \operatorname{Rank}(\text{IC}),\ \operatorname{Rank}(\text{ICIR}),\ \text{ARR},\ \text{IR},\ -\text{MDD},\ \text{SR}\bigr]^\top \in \mathbb{R}^8
+\]
+
+Each component is positively correlated with desirable strategy outcomes; maximum drawdown (MDD) is negated to align with this direction.
+
+Given a prior \( \mu^{(a)} = \mathbf{0} \), \( P^{(a)} = \tau^{-2} I \), the algorithm samples a reward coefficient vector from the posterior for each action, estimates the reward under the current context \( \mathbf{x}_t \), and selects the action with the highest sampled value. The posterior is then updated using standard Bayesian linear regression updates.
+
+\vspace{0.3cm}
+
+\begin{algorithm}
+\caption{Contextual Thompson Sampling scheduler used to adaptively choose between factor and model optimization.}
+\label{algo:linear_thompson_two_arm}
+\begin{algorithmic}[1]
+\Statex \textit{(Assume prior: $\mu^{(a)} = 0$, $P^{(a)} = \tau^{-2} I$)}
+\State Define reward weight vector $\mathbf{w} \in \mathbb{R}^8$
+\For{$t = 1$ \textbf{to} $T$}
+    \State Get performance state vector $\mathbf{x}_t$
+    \ForAll{$a \in \mathcal{A}$}
+        \State Sample $\tilde{\boldsymbol{\theta}}^{(a)} \sim \mathcal{N}(\mu^{(a)}, (P^{(a)})^{-1})$
+        \State Compute expected reward: $\hat{r}^{(a)} = \tilde{\boldsymbol{\theta}}^{(a)\top} \mathbf{x}_t$
+    \EndFor
+    \State Select $a_t = \arg\max_{a} \hat{r}^{(a)}$; observe reward: $r_t$
+    \State Update $P^{(a_t)}$ and $\mu^{(a_t)}$ based on $(\mathbf{x}_t, r_t)$
+    \[
+    \begin{aligned}
+    P^{(a_t)} &\gets P^{(a_t)} + \frac{1}{\sigma^2} \mathbf{x}_t \mathbf{x}_t^\top \\
+    \mu^{(a_t)} &\gets \left(P^{(a_t)}\right)^{-1} \left(P^{(a_t)} \mu^{(a_t)} + \frac{1}{\sigma^2} r_t \mathbf{x}_t\right)
+    \end{aligned}
+    \]
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Formal Definition of the Quantitative Research Pipeline} \label{app_quant_pipeline_def}
+Building on several classic works in quantitative finance \cite{yang2020qlib, li2024master, shi2025alphaforge}, we define the raw dataset as a three-dimensional tensor with dual temporal indexing, denoted as $\mathbf{X}\in\mathbb{R}^{N\times T\times P}$. This dataset takes stocks as the underlying asset class, each associated with a set of factor dimensions. As formally defined in Equation~\eqref{eq:data_tensor}, the tensor contains $N$ assets over an observation period $\mathcal{T}=\{1,\dots,T\}$. The row index corresponds to time $t$, the column index to asset $i$, and the channel index $p$ refers to one of the $P$ factor dimensions. Each entry $x^{(p)}_{i,t}$ represents the value of the $p$-th factor for asset $i$ at time $t$.
+
+\begin{equation}
+\mathbf{X}\;=\;\bigl\{x^{(p)}_{i,t}\;\big|\;i\in[N],\,t\in\{1,\dots,T\},\,p\in[P]\bigr\}\in\mathbb{R}^{N\times T\times P},
+\label{eq:data_tensor}
+\end{equation}
+
+New factors are then constructed either analytically or using machine learning, based on the original factor features. Given a sliding window of length $\ell$, $m$ new factors $f^{(j)}_{i,t}$ are generated via a mapping defined in Equation~\eqref{eq:phi}, where $\mathbf{x}_{i,t-\ell+1:t}$ denotes the recent $\ell$-day tensor slice for asset $i$, and $f^{(j)}_{i,t}$ is the $j$-th derived factor. The new factor tensor $\mathbf{Z}\in\mathbb{R}^{N\times T\times (P+m)}$ is formed by concatenating the original and generated factors, with $\mathbf{z}_{i,t}$ representing the concatenated vector at $(i,t)$, as shown in Equation~\eqref{eq:feature_concat}.
+
+\begin{equation}
+\Phi:\mathbb{R}^{\ell\times P}\longrightarrow\mathbb{R}^{m},\quad\Phi\bigl(\mathbf{x}_{i,t-\ell+1:t}\bigr)=\bigl(f^{(1)}_{i,t},\dots,f^{(m)}_{i,t}\bigr),
+\label{eq:phi}
+\end{equation}
+\begin{equation}
+\mathbf{z}_{i,t}=\bigl[\mathbf{x}_{i,t}\,\Vert\,\mathbf{F}_{i,t}\bigr]\in\mathbb{R}^{P+m},\quad\mathbf{F}_{i,t}=\Phi\bigl(\mathbf{x}_{i,t-\ell+1:t}\bigr).
+\label{eq:feature_concat}
+\end{equation}
+
+Given the noisy and incomplete nature of financial data, a two-stage preprocessing procedure is adopted to suppress the impact of outliers. First, a cross-sectional robust Z-score normalization is applied to each feature, as in Equation~\eqref{eq:robust_z}, where $\operatorname{MAD}$ is the median absolute deviation and $\varepsilon$ is a numerical stability constant. Second, missing values are imputed using a “forward-fill + cross-sectional mean” strategy, formally defined in Equation~\eqref{eq:impute}.
+
+\begin{equation}
+\tilde{x}^{(p)}_{i,t}=\frac{x^{(p)}_{i,t}-\operatorname{Median}_i\!\left(x^{(p)}_{\cdot,t}\right)}{\operatorname{MAD}_i\!\left(x^{(p)}_{\cdot,t}\right)+\varepsilon},
+\label{eq:robust_z}
+\end{equation}
+\begin{equation}
+x^{(p)}_{i,t}\leftarrow\begin{cases}
+x^{(p)}_{i,t-1}, & \text{if }x^{(p)}_{i,t}=\text{NA and
+}x^{(p)}_{i,t-1}
+eq\text{NA},\\[4pt]
+\operatorname{Mean}_i\!\left(x^{(p)}_{\cdot,t}\right), & \text{otherwise}.
+\end{cases}
+\label{eq:impute}
+\end{equation}
+
+Asset returns are defined as the prediction target for training and validation, denoted $y_{i,t}^{(\tau)}$ with $\tau=1$ trading day in this work, as shown in Equation~\eqref{eq:label}. Similar to factor preprocessing, missing labels are removed, and Z-score normalization is applied cross-sectionally on each trading day, yielding the supervised sample pairs $\bigl(\mathbf{z}_{i,t},\,\tilde{y}_{i,t}^{(\tau)}\bigr)$.
+
+\begin{equation}
+y_{i,t}^{(\tau)}=\frac{P_{i,t+\tau}-P_{i,t}}{P_{i,t}},\quad P_{i,t} \text{ is the closing price of asset } i \text{ at time } t,
+\label{eq:label}
+\end{equation}
+
+\begin{equation}
+\tilde{y}_{i,t}^{(\tau)}
+=\frac{y_{i,t}^{(\tau)}-\operatorname{Mean}_i\!\bigl(y_{\cdot,t}^{(\tau)}\bigr)}{\operatorname{Std}_i\!\bigl(y_{\cdot,t}^{(\tau)}\bigr)+\varepsilon},
+\label{eq:csznorm}
+\end{equation}
+
+To better encapsulate the interaction interface between factors and models, predictions $\hat{y}_{i,t}$ are uniformly generated by a predictor $f_{\boldsymbol{\theta}}$ as defined in Equation~\eqref{eq:predictor}, where $\boldsymbol{\theta}$ denotes learnable parameters. The predictor supports both tabular models (which take $\mathbf{z}_{i,t}$ as input) and time series models, which instead use the tensor slice $\mathbf{Z}_{i,t-\ell+1:t}$ to capture temporal structures.
+
+\begin{equation}
+\hat{y}_{i,t}=f_{\boldsymbol{\theta}}\left(\mathbf{z}_{i,t}\right),\quad f_{\boldsymbol{\theta}}:\mathbb{R}^{P+m}\rightarrow\mathbb{R},
+\label{eq:predictor}
+\end{equation}
+
+Model training follows a walk-forward validation procedure, minimizing the mean squared error loss $\mathcal{L}(\boldsymbol{\theta})$ (Equation~\eqref{eq:mse_loss}) via gradient descent to optimize parameters to $\boldsymbol{\theta}^{\ast}$.
+
+\begin{equation}
+\mathcal{L}(\boldsymbol{\theta})=\frac{1}{|\mathcal{D}_{\mathrm{train}}|}\!
+\sum_{(i,t)\in\mathcal{D}_{\mathrm{train}}}\!\bigl(y_{i,t}^{(\tau)}-\hat{y}_{i,t}\bigr)^{2}.
+\label{eq:mse_loss}
+\end{equation}
+
+This pipeline covers four essential components—data representation, feature engineering, sample construction, and model training—providing a standardized input interface for the dual-loop factor-model optimization mechanism in the \texttt{\name} framework.
+
+\section{Experimental Details} \label{app:exp_details}
+\subsection{Implementation Settings} \label{app:impl_settings}
+\textbf{Hardware Setup.}
+All experiments were conducted on a dedicated server equipped with dual Intel Xeon Gold 6348 CPUs, providing a total of 112 threads, and four NVIDIA RTX A6000 GPUs, each with 48\,GiB of memory (192\,GiB in total). 
+
+\textbf{Evaluation Protocol.}
+All models were trained and validated on consistent dataset splits to ensure fair comparison.
+For each baseline model, we conducted extensive hyperparameter tuning and evaluated robustness using five independent runs with different random seeds. Rather than reporting standard error bars or confidence intervals, we report the \textbf{median} annualized return (ARR) across these runs. This follows quantitative finance practice, where consistent outperformance is valued more than pointwise variance. The use of median also reduces the influence of outliers.
+
+\textbf{Framework Configuration.}
+The experiments were conducted using the \texttt{R\&D-Agent} framework. \texttt{R\&D-Factor} automates factor design and evaluation, and \texttt{R\&D-Model} optimizes predictive models. Each module runs for 6 hours per experiment. The joint framework \texttt{\name} alternates between the two for 12 hours total. Persistent caching was enabled throughout to accelerate repeated access to intermediate outputs, including the SOTA factor library, which is referenced in each loop.
+
+\textbf{Parameter Configuration.}
+We used various LLM API backends during experiments. For \texttt{GPT-4o} and \texttt{GPT-4o-mini}, we enabled streaming, set temperature to 0.8, and capped token usage at 4096. For \texttt{o3-mini}, \texttt{o3}, and \texttt{GPT-4.1}, we disabled streaming, used a temperature of 1.0, and allowed up to 10,000 tokens. All API interactions used a unified system prompt from the user role, adjusted per backend capability. In the \texttt{Co-STEER} module (Implementation Unit), we used \texttt{text-embedding-ada-002} to compute semantic embeddings for code, hypothesis, and log analysis. To ensure efficiency in fine-grained debugging, inner optimization loops in \texttt{Co-STEER} were capped at 10 iterations per task for both factor and model workflows. For each task, we set the maximum runtime of the Implementation Unit to 600 seconds, and the Validation Unit to 3600 seconds.
+
+\begin{table*}[ht!]
+\renewcommand{\arraystretch}{1.3}
+\centering
+\caption{Alpha~20 Baseline Factor Formulas}
+\label{factor20}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{cc}
+\toprule
+\textbf{Factor} & \textbf{Formula} \\
+\toprule
+RESI5 & $\mathrm{Resi}(\$close, 5)/\$close$ \\
+WVMA5 & $\mathrm{Std}(|\$close/\mathrm{Ref}(\$close, 1)-1| \cdot \$volume, 5) / (\mathrm{Mean}(|\$close/\mathrm{Ref}(\$close, 1)-1| \cdot \$volume, 5) + 1e^{-12})$ \\
+RSQR5 & $\mathrm{Rsquare}(\$close, 5)$ \\
+KLEN & $(\$high - \$low)/\$open$ \\
+RSQR10 & $\mathrm{Rsquare}(\$close, 10)$ \\
+CORR5 & $\mathrm{Corr}(\$close, \log(\$volume + 1), 5)$ \\
+CORD5 & $\mathrm{Corr}(\$close/\mathrm{Ref}(\$close, 1), \log(\$volume/\mathrm{Ref}(\$volume, 1) + 1), 5)$ \\
+CORR10 & $\mathrm{Corr}(\$close, \log(\$volume + 1), 10)$ \\
+ROC60 & $\mathrm{Ref}(\$close, 60)/\$close$ \\
+RESI10 & $\mathrm{Resi}(\$close, 10)/\$close$ \\
+VSTD5 & $\mathrm{Std}(\$volume, 5)/(\$volume + 1e^{-12})$ \\
+RSQR60 & $\mathrm{Rsquare}(\$close, 60)$ \\
+CORR60 & $\mathrm{Corr}(\$close, \log(\$volume + 1), 60)$ \\
+WVMA60 & $\mathrm{Std}(|\$close/\mathrm{Ref}(\$close, 1)-1| \cdot \$volume, 60) / (\mathrm{Mean}(|\$close/\mathrm{Ref}(\$close, 1)-1| \cdot \$volume, 60) + 1e^{-12})$ \\
+STD5 & $\mathrm{Std}(\$close, 5)/\$close$ \\
+RSQR20 & $\mathrm{Rsquare}(\$close, 20)$ \\
+CORD60 & $\mathrm{Corr}(\$close/\mathrm{Ref}(\$close, 1), \log(\$volume/\mathrm{Ref}(\$volume, 1) + 1), 60)$ \\
+CORD10 & $\mathrm{Corr}(\$close/\mathrm{Ref}(\$close, 1), \log(\$volume/\mathrm{Ref}(\$volume, 1) + 1), 10)$ \\
+CORR20 & $\mathrm{Corr}(\$close, \log(\$volume + 1), 20)$ \\
+KLOW & $(\mathrm{Less}(\$open, \$close) - \$low)/\$open$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+
+\subsection{Dataset}
+\label{app:dataset}
+We do not propose a new dataset in this paper. The baseline factor library, Alpha~20, is shown in Table~\ref{factor20}.
+The raw financial data used for factor mining can be divided into two categories: market data and fundamental data. 
+The market data can be generated using the script at \url{https://github.com/microsoft/RD-Agent/blob/main/rdagent/scenarios/qlib/experiment/factor_data_template/generate.py}, while the fundamental data—which includes standard financial indicators such as profitability, valuation, and growth metrics—is listed in Table~\ref{factor_fundamental}.
+
+
+\begin{longtable}{@{}ll@{}}
+\caption{Fundamental data fields used for factor mining in \texttt{\name}. These fields can be obtained by searching their names in the \texttt{Wind} terminal (\url{https://www.wind.com.cn/mobile/WFT/en.html}).} \label{factor_fundamental} \\
+\toprule
+\multicolumn{1}{c}{\textbf{Factor}} & \multicolumn{1}{c}{\textbf{Description}} \\
+\midrule
+\endfirsthead
+
+\toprule
+\multicolumn{1}{c}{\textbf{Factor}} & \multicolumn{1}{c}{\textbf{Description}} \\
+\midrule
+\endhead
+
+\multicolumn{2}{c}{\textbf{Profitability}} \\
+\midrule
+ROE\_TTM & Return on Equity (TTM) \\
+ROA\_TTM & Return on Assets (TTM) \\
+ROIC & Return on Invested Capital \\
+EBIT\_EV & EBIT / Enterprise Value \\
+EBITDA\_EV & EBITDA / Enterprise Value \\
+NET\_PROFIT\_YOY & Net Income Year-over-Year Growth \\
+NET\_PROFIT\_YOY\_Q & Net Income YoY Growth (Quarterly) \\
+NET\_PROFIT\_MARGIN & Net Profit Margin \\
+NET\_PROFIT\_MARGIN\_TTM & Net Profit Margin (TTM) \\
+GROSS\_PROFIT\_MARGIN\_TTM & Gross Profit Margin (TTM) \\
+\midrule
+\multicolumn{2}{c}{\textbf{Growth}} \\
+\midrule
+NET\_PROFIT\_YOY\_TTM & Net Profit Growth (TTM) \\
+OPER\_REV\_YOY\_TTM & Revenue Growth (TTM) \\
+OPER\_REV\_YOY & Revenue Year-over-Year Growth \\
+OPER\_PROFIT\_YOY & Operating Profit Year-over-Year Growth \\
+OPER\_REV\_YOY\_Q & Revenue YoY Growth (Quarterly) \\
+OPER\_REV\_QOQ & Revenue Quarter-over-Quarter Growth \\
+OPER\_PROFIT\_QOQ & Operating Profit QoQ Growth \\
+NET\_PROFIT\_QOQ & Net Profit QoQ Growth \\
+EST\_OPER\_REV\_CHANGE\_1M & Forecast Revenue Change (1M) \\
+EST\_OPER\_REV\_CHANGE\_3M & Forecast Revenue Change (3M) \\
+\midrule
+\multicolumn{2}{c}{\textbf{Valuation}} \\
+\midrule
+EP\_TTM & Earnings-to-Price Ratio \\
+BP & Book-to-Price Ratio \\
+EP\_FY1 & Forward Earnings-to-Price Ratio \\
+BP\_FY1 & Forward Book-to-Price Ratio \\
+CFO\_TO\_PRICE\_TTM & Cash Flow-to-Price Ratio \\
+OCF\_TO\_MKT\_CAP & Operating Cash Flow / Market Cap \\
+OCF\_TO\_PRICE\_TTM & Operating Cash Flow-to-Price Ratio \\
+\midrule
+\multicolumn{2}{c}{\textbf{Risk \& Volatility}} \\
+\midrule
+VOLATILITY\_1M & 1-Month Volatility \\
+VOLATILITY\_3M & 3-Month Volatility \\
+VOLATILITY\_1Y & 12-Month Volatility \\
+BETA\_1Y & Market Beta (12-Month) \\
+IDIOSYNCRATIC\_VOLATILITY & Idiosyncratic Volatility \\
+\midrule
+\multicolumn{2}{c}{\textbf{Risk \& Volatility}} \\
+\midrule
+VOLATILITY\_1M & 1-Month Volatility \\
+VOLATILITY\_3M & 3-Month Volatility \\
+VOLATILITY\_1Y & 12-Month Volatility \\
+BETA\_1Y & Market Beta (12-Month) \\
+IDIOSYNCRATIC\_VOLATILITY & Idiosyncratic Volatility \\
+\midrule
+\multicolumn{2}{c}{\textbf{Quality}} \\
+\midrule
+INTEREST\_COVERAGE & Interest Coverage Ratio \\
+CFO\_TTM & Cash Flow from Operations (TTM) \\
+CFO\_Q & Cash Flow from Operations (Quarterly) \\
+CFO\_TO\_OPER\_REV\_TTM & Operating Cash Flow / Revenue (TTM) \\
+NET\_PROFIT\_MARGIN & Net Profit Margin \\
+ASSET\_TURNOVER\_TTM & Asset Turnover (TTM) \\
+FIXED\_ASSET\_TURNOVER\_TTM & Fixed Asset Turnover (TTM) \\
+\midrule
+\multicolumn{2}{c}{\textbf{Sentiment \& Flow}} \\
+\midrule
+MID\_ORDER\_BUY\_AMT & Medium Order Active Buy Amount \\
+MID\_ORDER\_SELL\_AMT & Medium Order Active Sell Amount \\
+RATING\_UPGRADE & Analyst Rating Upgrade \\
+RATING\_DOWNGRADE & Analyst Rating Downgrade \\
+ANALYST\_MOMENTUM\_SCORE & Analyst Momentum Score \\
+\midrule
+\multicolumn{2}{c}{\textbf{Momentum}} \\
+\midrule
+RETURN\_1M & 30-Day Return \\
+RETURN\_2M & 60-Day Return \\
+RETURN\_3M & 90-Day Return \\
+RETURN\_6M & 182-Day Return \\
+RETURN\_1Y & 365-Day Return \\
+
+\bottomrule
+\end{longtable}
+
+\subsection{Baselines} \label{app:baselines}
+In the benchmark experiments, factor-based experiments are conducted using the LightGBM model, and model-based experiments are conducted using the Alpha~20 factor library.
+
+\textbf{Machine Learning Models.}
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{Linear Model}: The most basic linear regression model, used to model linear relationships between features and the target variable. It is highly interpretable and has low complexity, serving as the lower bound benchmark for model predictive performance.
+    \item \textbf{Multilayer Perceptron (MLP)}: A feedforward neural network architecture that includes one or more nonlinear hidden layers, suitable for modeling nonlinear relationships between features.
+    \item \textbf{LightGBM} \cite{ke2017lightgbm}: A tree-based model built on the gradient boosting framework. It uses histogram-based split methods and a leaf-wise growth strategy, offering fast training speed and low memory usage. Source code is available at: \url{https://github.com/microsoft/LightGBM}.
+    \item \textbf{XGBoost} \cite{chen2016xgboost}: An enhanced tree model that utilizes second-order gradient optimization, pruning, and regularization strategies to improve generalization and robustness. Source code is available at: \url{https://github.com/dmlc/xgboost}.
+    \item \textbf{CatBoost} \cite{prokhorenkova2018catboost}: A boosting tree model optimized for categorical features. It employs an ordered boosting strategy to reduce prediction bias and is applicable to a wide range of structured data modeling tasks. Source code is available at: \url{https://github.com/catboost/catboost}.
+    \item \textbf{DoubleEnsemble} \cite{zhang2020doubleensemble}: Integrates multiple heterogeneous models and combines sample reweighting with feature selection mechanisms to enhance accuracy and robustness. Source code is available at: \url{https://github.com/microsoft/qlib/tree/main/examples/benchmarks/DoubleEnsemble}.
+\end{itemize}
+
+\textbf{Deep Learning Models.}
+
+\textbf{\ding{224} General Deep Learning Models.}
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{Transformer} \cite{NIPS2017_3f5ee243}: Utilizes multi-head self-attention mechanisms to capture long-range dependencies in time series data. It processes the entire sequence in parallel and offers better scalability compared to recurrent structures.
+    \item \textbf{GRU} \cite{cho-etal-2014-learning}: The Gated Recurrent Unit simplifies traditional recurrent neural networks by introducing update and reset gates, improving training efficiency and mitigating gradient vanishing.
+    \item \textbf{LSTM} \cite{hochreiter1997long}: The Long Short-Term Memory network is a variant of recurrent neural networks, incorporating memory cells and gating mechanisms to model long-term dependencies effectively. It is one of the standard methods for time series modeling.
+    \item \textbf{ALSTM} \cite{qin2017dual}: An enhanced version of the LSTM model that integrates an attention mechanism, enabling the model to focus on key time steps and selectively model sequence features.
+    \item \textbf{GATs} \cite{velivckovic2018graph}: Graph Attention Networks extend the attention mechanism to graph structures, enabling modeling of relationships among nodes in non-Euclidean space.
+\end{itemize}
+
+\textbf{\ding{224} Time-series Forecasting Models.}
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{PatchTST} \cite{nietime}: A Transformer-based time series model that uses patching and channel independence techniques. It supports effective pretraining and transfer learning across datasets. Source code is available at: \url{https://github.com/yuqinie98/PatchTST}.
+    \item \textbf{iTransformer} \cite{liuitransformer}: A Transformer-based time series model that embeds each time series as variable tokens, improving parameter efficiency and modeling precision. It is suitable for long-sequence modeling tasks. Source code is available at: \url{https://github.com/thuml/iTransformer}.
+    \item \textbf{Mamba} \cite{gumamba}: A next-generation long-sequence model based on state-space models, offering parallel computation and linear spatiotemporal complexity.
+\end{itemize}
+
+\textbf{\ding{224} Stock Prediction Models.}
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{TRA} \cite{lin2021learning}: Introduces a novel dynamic routing mechanism into the Transformer architecture, enabling the model to adaptively learn temporal patterns in stock prices and improve its ability to capture diverse market trends. Source code is available at: \url{https://github.com/TongjiFinLab/THGNN}.
+    \item \textbf{MASTER} \cite{li2024master}: A market-centric Transformer model designed to dynamically model instantaneous and cross-temporal correlations among stocks, thereby improving trend prediction accuracy. Source code is available at: \url{https://github.com/SJTU-DMTai/MASTER}.
+\end{itemize}
+
+\textbf{Factor Libraries.}
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{Alpha~101} \cite{kakushadze2016101formulaicalphas}: A collection of 101 formulaic trading alpha factors proposed by the WorldQuant team in 2015. Constructed using daily price-volume data, it represents an early publicly available benchmark of structured alpha factors in quantitative finance.
+    \item \textbf{Alpha~158} \cite{alpha158}: Proposed by the Microsoft Qlib team, this library includes 158 traditional technical indicators (e.g., MA, RSI) constructed from combinations over different time windows (e.g., 5, 10, 20 days).
+    \item \textbf{Alpha~360} \cite{alpha360}: A more comprehensive factor library provided by Microsoft Qlib, containing 360 factors constructed via normalization over historical price sequences (e.g., multi-period relative values of closing prices and volumes).
+    \item \textbf{AutoAlpha} \cite{kou2024automate}: A dynamic structured factor library driven by large language models, integrating multimodal data such as text, numerical values, and images.
+\end{itemize}
+
+
+
+
+
+\subsection{Evaluation Details} \label{app:evaluation}
+\subsubsection{Metrics}
+We adopt two classes of metrics: factor-level predictive performance and strategy-level portfolio returns.
+
+\textbf{Information Coefficient (IC).}
+IC measures the cross-sectional correlation between the predicted ranking and the realized return ranking. It is widely used in quantitative finance and defined as:
+
+\begin{equation}
+\text{IC} = \frac{( \hat{y} - \mathbb{E}[\hat{y}] )^\top (y - \mathbb{E}[y])}{\sigma(\hat{y}) \cdot \sigma(y)}
+\end{equation}
+
+where $\hat{y}$ and $y$ denote the predicted and realized rankings, respectively; $\mathbb{E}[\cdot]$ is the expectation, and $\sigma(\cdot)$ is the standard deviation. In practice, IC is computed daily and reported by its mean across time.
+
+\textbf{Information Coefficient Information Ratio (ICIR).}
+ICIR evaluates the stability of IC over time and is defined as the ratio of the mean and standard deviation of daily IC values:
+
+\begin{equation}
+\text{ICIR} = \frac{\text{mean(IC)}}{\text{std(IC)}}
+\end{equation}
+
+A higher ICIR indicates more consistent predictive ranking across trading days.
+
+\textbf{Rank IC.}
+Rank IC refers to the Spearman rank correlation between the predicted and realized return rankings. It is robust to outliers and particularly suitable for distributions with heavy tails or extreme values.
+
+\textbf{Rank ICIR.}
+Analogous to ICIR, Rank ICIR measures the temporal stability of Rank IC:
+
+\begin{equation}
+\text{Rank ICIR} = \frac{\text{mean(Rank IC)}}{\text{std(Rank IC)}}
+\end{equation}
+
+It is a key indicator for assessing the long-term consistency of factor-based ranking models.
+
+\textbf{Annual Return Ratio (ARR).}
+ARR reflects the compound annual growth rate of the portfolio:
+
+\begin{equation}
+\text{ARR} = \left( \prod_{t=1}^{T} (1 + r_t) \right)^{\frac{252}{T}} - 1
+\end{equation}
+
+where $r_t$ denotes the daily return, and $T$ is the total number of trading days.
+
+\textbf{Information Ratio (IR).}
+IR evaluates the risk-adjusted excess return by comparing the annualized mean and standard deviation of returns relative to a benchmark:
+
+\begin{equation}
+\text{IR} = \frac{\text{mean}(r_t - r_b)}{\text{std}(r_t - r_b)} \times \sqrt{252}
+\end{equation}
+
+where $r_b$ denotes the benchmark return (e.g., a market index or risk-free asset).
+When $r_b$ is set to the risk-free rate $r_f$, the IR coincides with the Sharpe Ratio.
+
+In our setting, $r_b = r_f$, so IR and Sharpe Ratio values are numerically identical. 
+To improve clarity, we denote this metric as $\text{IR (SHR*)}$ in Table~\ref{results1}, Table~\ref{results-csi-nasdaq}, Table~\ref{results-csi500}, and Table~\ref{results-nasdaq100}.
+
+\textbf{Maximum Drawdown (MDD).}
+MDD measures the maximum loss from peak to trough during the evaluation period and captures downside risk:
+
+\begin{equation}
+\text{MDD} = \max_{t \in [1, T]} \left( \frac{\max_{i \in [1, t]} P_i - P_t}{\max_{i \in [1, t]} P_i} \right)
+\end{equation}
+
+where $P_t$ is the portfolio value on day $t$, and $T$ is the evaluation horizon.
+
+\textbf{Calmar Ratio.}
+The Calmar Ratio quantifies return relative to downside risk and is defined as:
+
+\begin{equation}
+\text{Calmar Ratio} = \frac{\text{ARR}}{|\text{MDD}|}
+\end{equation}
+
+A higher Calmar Ratio indicates better return per unit of maximum loss, making it suitable for evaluating strategies that emphasize drawdown control.
+
+
+\subsubsection{Trading Strategy} \label{app:trading}
+The full trading strategy is simulated as follows:
+\begin{itemize}[leftmargin=4ex]
+\item On the close of trading day $t$, the model generates a ranking score for each stock based on its predicted return.
+\item At the open of trading day $t+1$, the trader sells all holdings from day $t$ and selects the top 50 stocks by ranking to construct a new portfolio based on predicted returns. The bottom 5 performing stocks are excluded.
+\item Stocks that remain consistently highly ranked are retained in the portfolio to support the long-term holding of high-quality assets.
+\item During trade execution, a price limit threshold of 0.095 is applied. Trades are executed at the closing price, with a buy cost of 0.05\%, a sell cost of 0.15\%, and a minimum transaction fee of 5 CNY per trade.
+\end{itemize}
+
+\section{Supplementary Experiments} \label{app_exp_details}
+\subsection{Empirical Scope and Generalizability Analysis} \label{app_esga}
+
+To further evaluate the effectiveness and generalizability of \texttt{\name}, we conducted a series of out-of-sample experiments on two additional markets, namely the CSI 500 and the NASDAQ 100.
+
+For both datasets, we adopt a consistent temporal split, using the period from January 1, 2008, to December 31, 2021, for training, January 1, 2022, to December 31, 2023, for validation, and January 1, 2024, to June 30, 2025, for testing. Regarding the large language model (LLM) backends, we employ \texttt{GPT-4o}, whose training cutoff date is October 1, 2023, entirely preceding our test horizon, and \texttt{o4-mini}, whose training cutoff date is June 1, 2024, which remains almost entirely prior to the designated test period.
+
+For the CSI 500 experiments, we apply the same trading settings as those used for the CSI 300 (see Appendix~\ref{app:trading}). For the NASDAQ 100, we adopt market-specific settings, including portfolio rebalancing by selecting the top 20 stocks in each period (in contrast to 50 stocks for the CSI 300), a transaction cost of 0.1\% per trade (as opposed to 0.5\% in CSI 300), and the absence of daily price limits. The resulting out-of-sample performance on both the NASDAQ 100 and CSI 500 markets is summarized below.
+
+\input{tables/csi500}
+\input{tables/nasdaq100}
+
+As shown in Fig.~\ref{results-csi500} and Fig.~\ref{results-nasdaq100}, \texttt{\name} consistently achieves strong out-of-sample performance across markets, instruments, and time periods not included in LLM training, providing further evidence for the robustness and real-world applicability of our approach.
+
+\subsection{Ablation Analysis} \label{app:abl}
+Table~\ref{app:abl_full} presents an extended ablation study of the \texttt{\name} framework across two LLM backends (GPT-4o and o3-mini). We evaluate component-level contributions and compare three scheduling strategies for action selection: random, LLM-based, and contextual bandit.
+
+\begin{table*}[h]
+\caption{Ablation study of the \texttt{\name} framework. The top rows show component-level ablations by disabling either factor or model generation. The bottom rows compare action selection strategies in \texttt{\name}: random, LLM-based, and Bandit. Metrics include factor predictive power (IC, ICIR), strategy performance (ARR, MDD), and execution statistics (TL: total loops; VL: valid loops; SL: SOTA selections; TRH: total runtime in hours).}
+\label{app:abl_full}
+\centering
+\resizebox{1.0\textwidth}{!}{
+\begin{tabular}{llcccccccc}
+\toprule
+\multicolumn{2}{c}{\multirow{3}{*}{\textbf{Models}}} & 
+\multicolumn{2}{c}{Factor Predictive Power Metrics} & 
+\multicolumn{2}{c}{Performance Metrics} & 
+\multicolumn{4}{c}{Execution Metrics} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-10}
+\multicolumn{2}{c}{} & \textbf{IC} & \textbf{ICIR} & \textbf{ARR} & \textbf{MDD} & \textbf{TL} & \textbf{VL} & \textbf{SL} & \textbf{TRH} \\
+\midrule
+\multicolumn{10}{l}{\texttt{GPT-4o}} \\
+\midrule
+\multirow{2}{*}{Component Ablation}
+& R\&D-Factor & 0.0489 & 0.4050 & 0.1461 & -0.0750 & 36 & 33 & \textbf{9} & 6 \\
+& R\&D-Model & 0.0326 & 0.2305 & 0.1229 & -0.0876 & 23 & 12 & 5 & 6 \\
+\midrule
+\multirow{3}{*}{Algorithm Ablation}
+& \name w/ random  & 0.0318 & 0.2431 & 0.0914 & -0.0782 & 36 & 18 & 7 & 12 \\
+& \name w/ LLM  & \textbf{0.0523} & \textbf{0.4172} & 0.0940 & -0.0989 & 32 & 19 & 6 & 12\\
+& \name w/ Bandit  & 0.0497 & 0.4069 & \textbf{0.1144} & \textbf{-0.0811} & \textbf{38} & \textbf{22} & 8 & 12 \\
+\midrule
+\multicolumn{10}{l}{\texttt{o3-mini}} \\
+\midrule
+\multirow{2}{*}{Component Ablation}
+& R\&D-Factor & 0.0497 & 0.3931 & 0.1184 & -0.0910 & 28 & 16 & 6 & 6 \\
+& R\&D-Model & 0.0469 & 0.3688 & 0.1009 & -0.0694 & 30 & 15 & 7 & 6 \\
+\midrule
+\multirow{3}{*}{Algorithm Ablation}
+& \name w/ random  & 0.0445 & 0.3589 & 0.0897 & -0.1004 & 33 & 19 & 7 & 12 \\
+& \name w/ LLM  & 0.0476 & 0.3891 & 0.1009 & -0.0794 & 33 & 20 & 5 & 12\\
+& \name w/ Bandit  & \textbf{0.0532} & \textbf{0.4278} & \textbf{0.1421} & \textbf{-0.0742} & \textbf{44} & \textbf{24} & \textbf{8} & 12 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}
+\textbf{Component Ablation.}
+Removing the model branch (\texttt{R\&D-Factor}) consistently yields stronger IC, ICIR, and ARR than removing the factor branch (\texttt{R\&D-Model}). This reflects two effects: \textit{(i)} factor optimization enables faster iteration and greater signal discovery under tight runtime; \textit{(ii)} in early-stage pipelines, improved features have a larger impact than tuning the model. Nonetheless, \texttt{R\&D-Model} contributes to portfolio-level risk smoothing (e.g., lower MDD with o3-mini).
+
+\textbf{Algorithm Ablation.}
+For scheduling, random selection yields the lowest performance across both models. LLM-based decisions improve predictive quality but suffer from planning instability. The Bandit scheduler consistently outperforms alternatives in IC, ARR, and valid loop count, demonstrating superior resource allocation by adapting to evolving performance signals.
+
+Overall, the results highlight the factor branch as the main driver of signal quality, the model branch as a risk stabilizer, and the Bandit scheduler as an efficient mechanism to manage trade-offs under limited time and compute budgets.
+
+\subsection{Factor Library Analysis} \label{app:factor}
+Fig. \ref{fig:factor_all} shows the complete results of Factor Effects evaluation experiment. Beyond IC (subfigures (a) and (c)), subfigures (b) and (d) show consistent gains in Rank IC, confirming that \texttt{R\&D-Factor} not only improves absolute prediction accuracy but also enhances relative ranking of stock returns. Especially under Alpha~158 initialization, Rank IC remains above 0.07 in 2020 with \texttt{o3-mini}, while classical libraries decline sharply. This supports the claim that iterative refinement improves both signal strength and ranking consistency across regimes.
+
+In terms of cumulative return (subfigure~(e)), performance divergence becomes evident from early 2018. Factor sets generated by \texttt{R\&D-Factor(158)} consistently outperform others, ending with a net asset value (NAV) exceeding 5.1 by 2020~Q3. Even \texttt{R\&D-Factor(20)} configurations surpass Alpha360, indicating that larger factor sets do not necessarily yield higher returns. Traditional libraries suffer from increased volatility due to factor redundancy. In contrast, \texttt{R\&D-Factor} mitigates this through dynamic filtering, achieving more stable and capital-efficient performance.
+
+These results underscore \texttt{R\&D-Factor}’s dual advantage in information efficiency (achieving higher IC/Rank IC with fewer factors) and capital efficiency (delivering superior NAV). Whether starting from a compact or high-dimensional base, its iterative refinement pipeline reliably discovers effective signals and removes redundancies, laying a solid foundation for subsequent model optimization and full-stack co-evolution in \texttt{RD-Quant}.
+
+\begin{figure}[htbp]
+    \centering
+    % \includesvg[width=\linewidth]{figure/rd_agent_factor_all}
+    \includegraphics[width=\linewidth]{figure/rd_agent_factor_all.pdf}
+    \caption{Comparison between classical factor libraries and \texttt{R\&D-Factor}-generated factors using a LightGBM predictor on CSI~300. \texttt{R\&D-Factor} was initialized from Alpha~20 or~Alpha 158 and operated with \texttt{GPT-4o} or \texttt{o3-mini}. The top left figure shows the IC values of each method across different years, while the top right figure shows the RankIC values—the higher the value, the stronger the predictive power. The bottom figure presents the cumulative returns (NAV) of the corresponding strategies.}
+    \label{fig:factor_all}
+\end{figure}
+
+
+\subsection{Co-STEER Effectiveness Analysis} \label{app:costeer}
+
+\newcommand{\ppname}{\texttt{Co-STEER}}
+\newcommand{\sname}{Automatic Data-Centric Development}
+
+As a key component of the Development Phase in \texttt{\name}, in addition to the direct implementation of \ppname{} within the \texttt{\name} framework described in Section~\ref{sec:results}, we conducted further experiments to validate the capabilities of \ppname{}. Specifically, we want to answer the following research questions.
+
+\begin{itemize}[leftmargin=4ex]
+  \item \textbf{RQ1}: How well does \texttt{Co-STEER} perform in generating executable and semantically correct code for financial tasks, compared to recent code generation baselines?
+  \item \textbf{RQ2}: Can its evolving scheduler improve implementation efficiency and output quality under constrained compute budgets?
+\end{itemize}
+
+\textbf{Dataset.} 
+We evaluate \ppname{} on RD2Bench~\cite{chen2024rdbench}, a comprehensive benchmark for data-centric agent systems in finance. The benchmark encompasses both implementable 27 and non-implementable 13 factors, spanning fundamental, price-volume, and high-frequency categories. Each factor presents unique challenges, requiring sophisticated reasoning over heterogeneous financial data sources and the generation of executable Python code under strict constraints.
+
+\textbf{Baselines.}
+We adopted Few-shot~\cite{brown2020lanugage}, CoT~\cite{wei2022chain}, Reflexion~\cite{shinn2023reflexion}, Self-Debugging~\cite{chen2024teaching}, and Self-Planning~\cite{jiang2023self} as baselines. For details, see Section~\ref{app:alg-cos}.
+
+\textbf{Metrics.} We introduced four evaluation metrics: average execution rate, average formatting correctness, average correlation, and maximum correlation. The average execution rate metric is used to measure the average success rate of code execution; any error encountered during execution is counted as 0. The average formatting correctness metric is used to measure the degree to which the generated code adheres to the correct format, such as whether column names meet expectations. The average correlation metric reflects the average correlation between the code output sequence generated by the model and the ground truth results. For example, given the same input features, it evaluates the correlation between the factors generated by a large language model and those generated by actual implementation. The maximum correlation metric represents the highest correlation between the code output sequence generated by the model and the ground truth results.
+
+\textbf{Results of Method Implementation (RQ1).}
+
+\begin{table*}[!ht]
+\centering
+\caption{Results of method implementation. All the agent workflows are based on \texttt{GPT-4-turbo}.}
+\begin{tabular}{lcccc}
+\toprule
+ Methods &  avg. exec. & avg. format & avg. corr. & max. corr. \\
+\midrule
+
+\multirow[t]{4}{*}{Few-shot~\cite{brown2020lanugage}} &   0.733 & 0.433 & 0.454 & 0.562 \\
+
+\multirow[t]{4}{*}{CoT~\cite{wei2022chain}} 
+ & 0.833 & 0.433 & 0.336 & 0.538 \\
+
+\multirow[t]{4}{*}{Reflexion~\cite{shinn2023reflexion}} 
+& 0.822 & 0.400 & 0.269 & 0.550 \\
+
+\multirow[t]{4}{*}{Self-Debugging~\cite{chen2024teaching}} &
+0.367 & 0.256 & 0.232 & 0.539 \\
+
+\multirow[t]{4}{*}{Self-Planning~\cite{jiang2023self}}   & 0.578 & 0.211 & 0.119 & 0.341\\ 
+
+\multirow[t]{4}{*}{Co-STEER (ours)}    & \textbf{0.889} & \textbf{0.611} & \textbf{0.646} & \textbf{0.887} \\
+\bottomrule
+\end{tabular}
+\label{exp:codegen-full}
+\end{table*}
+
+Experimental results in Table~\ref{exp:codegen-full} demonstrate \ppname{}'s superior implementation capabilities across all evaluation metrics on our 27 test cases. This performance advantage stems from two key innovations: dynamic knowledge expansion and contextual retrieval. While both Reflexion and Self-Debugging leverage environmental feedback (Table~\ref{tab:method_comparison}), \ppname{} uniquely accumulates and retrieves practical experience across implementations. Unlike existing approaches that only consider immediate feedback, \ppname{} builds a comprehensive knowledge base through continuous practice, effectively bridging the expertise gap between junior and senior engineers. This systematic knowledge accumulation and retrieval mechanism enables \ppname{} to achieve significant performance gains across diverse implementation scenarios.
+
+
+\textbf{Overall Performance Analysis (RQ2).}
+We evaluate \ppname{}'s effectiveness in a resource-constrained environment, where agents must optimize performance across 40 candidate methods (27 implementable, 13 non-implementable) with limited implementation attempts. This setup mirrors real-world computational constraints and tests the synergy between scheduling and implementation capabilities. Table~\ref{exp:a3d-full} presents comparative results, revealing several key insights about system performance under practical constraints.
+
+\begin{table*}[!h]
+  \centering
+  \caption{
+Comparison of \ppname{} with random and evolving schedulers under top-$k$ evaluation (for $k=5,10,15,20$).
+Metrics include execution success rate (exec.), format correctness, and correlation with ground truth (average and maximum).
+}
+  \setlength{\tabcolsep}{3pt}
+  \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}lcccccccc@{}}
+      \toprule
+      & \multicolumn{4}{c}{\textbf{Top 5}} & \multicolumn{4}{c}{\textbf{Top 10}} \\
+      \cmidrule(lr){2-5} \cmidrule(lr){6-9}
+      \textbf{Methods} & \textbf{exec.} & \textbf{format} & \textbf{avg.\ corr.} & \textbf{max.\ corr.}
+                       & \textbf{exec.} & \textbf{format} & \textbf{avg.\ corr.} & \textbf{max.\ corr.} \\
+      \midrule
+      Random Scheduler   & 0.522 & 0.400 & 0.211 & 0.444 & 0.567 & 0.289 & 0.417 & 0.655 \\
+      Evolving Scheduler & 0.765 & 0.259 & 0.280 & 0.515 & 0.815 & 0.358 & 0.519 & 0.778 \\
+      \midrule
+      & \multicolumn{4}{c}{\textbf{Top 15}} & \multicolumn{4}{c}{\textbf{Top 20}} \\
+      \midrule
+      Random Scheduler   & 0.856 & 0.544 & 0.594 & 0.778 & 0.911 & 0.589 & 0.532 & 0.778 \\
+      Evolving Scheduler & 0.856 & 0.556 & 0.584 & 0.872 & \textbf{0.878} & \textbf{0.567} & \textbf{0.792} & \textbf{0.987} \\
+      \bottomrule
+    \end{tabular}%
+  }
+  \label{exp:a3d-full}
+\end{table*}
+
+\textbf{\ding{182} Evolving scheduling improves task effectiveness.}
+Table~\ref{exp:a3d-full} shows that the evolving scheduler consistently outperforms the random baseline across all top-$k$ thresholds. This highlights its ability to learn effective execution orderings by identifying task complexity and dependencies. By accumulating experience over time, the system builds a form of engineering intuition, allowing it to prioritize easier or foundational tasks that unlock downstream implementation success.
+
+
+\textbf{\ding{183} More resources lead to stronger generalization.}
+As more budget is allocated, both schedulers benefit, but the evolving strategy shows greater gains. Unlike self-correction approaches that plateau early, the evolutionary process continues improving by retrieving and refining past attempts—regardless of whether initial trials were successful. This co-evolution between scheduler and implementation enables efficient adaptation under practical constraints.
+
+
+\subsection{Cost Efficiency Analysis} \label{app:costs}
+Fig.~\ref{fig:cost} compares token expenditures of \texttt{GPT-4o} and \texttt{o3-mini} under fixed runtime settings. Factor tasks incur higher cost per loop due to their multi-stage structure—spanning hypothesis generation, implementation, and analysis for multiple candidates—whereas model tasks are simpler and less costly, as each loop generates only one model. \texttt{GPT-4o} and \texttt{o3-mini} show similar per-loop costs in model and quant settings. The larger gap in factor tasks stems from \texttt{o3-mini} generating more complex hypotheses per loop (producing more diverse factor types and handling more difficult implementations), resulting in higher costs. Despite these differences, both backends keep total costs under \$10 across all \texttt{\name} workflows (see Appendix~\ref{app:impl_settings}), confirming the framework’s cost-effectiveness for scalable, automated quantitative research.
+
+
+\begin{figure}[htbp]
+    \centering
+    % \includesvg[width=\linewidth]{figure/rd_agent_token}
+    \includegraphics[width=\linewidth]{figure/rd_agent_token.pdf}
+    \caption{Token cost across different large language model backends (averaged over 5 trials). Left: total cost over corresponding runtimes (6h for \texttt{R\&D-Factor}/\texttt{R\&D-Model}, 12h for \texttt{\name}); right: average per-loop cost. All costs are in USD.}
+    \label{fig:cost}
+\end{figure}
+
+\subsection{Real-World Quantitative Competition Analysis} \label{app:kaggle}
+To further explore the potentials of \texttt{\name} frameworks, we utilize \texttt{\name} for the Optiver Realized Volatility Prediction~\cite{optiver-realized-volatility-prediction} competition on \texttt{Kaggle}. This is a forecasting competition focused on predicting short-term volatility for hundreds of stocks using highly granular financial data. The competition challenges participants to predict the realized volatility of a set of stocks using information collected over a 10-minute time window, involving working with classic tabular time-series data and optimizing the Root Mean Squared Percentage Error (RMSPE) metric.
+
+As shown in Fig.~\ref{fig:optiver}, the \texttt{\name} achieved its best performance in the 12th experiment. According to the experiment summary, this experiment was based on the hypothesis that \textit{by capturing the temporal evolution of bid-ask spreads across different time windows, the model's ability to predict short-term stock volatility can be enhanced.} The specific implementation involved calculating the rolling averages and standard deviations of bid-ask spreads over multiple time windows (5 seconds, 10 seconds, and 30 seconds) to efficiently capture the dynamic characteristics of market microstructure. Overall, from the optimization of the model in the 3rd round to the factor tuning in the 8th and 12th rounds, through continuous experimentation and exploration, \texttt{\name} discovered that capturing the temporal features of bid-ask spread dynamics was most effective for this financial task. This also demonstrates that \texttt{\name} can explore among many possible modeling approaches and, through empirical evaluation rather than relying solely on intuition or predetermined strategies, rationally identify the most promising directions. Furthermore, the \texttt{\name} framework can be adapted to various quantitative financial tasks and performs relatively well.
+\begin{figure}[htbp]
+    \centering
+    % \includesvg[width=\linewidth]{figure/rd_agent_optiver}
+    \includegraphics[width=\linewidth]{figure/rd_agent_optiver.pdf}
+    \caption{The RMSPE curve and fitted curve of \texttt{R\&D-Agent} on  Optiver Realized Volatility Prediction.}
+    \label{fig:optiver}
+\end{figure}
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Generated Hypotheses of \texttt{R\&D-Agent} on Optiver Realized Volatility Prediction Competition,
+  breakable
+]
+\label{tab:hypothesis}
+\textbf{Experiment Loop Index 1}\\
+\textbf{Action}: Construct Pipeline\\
+\textbf{Hypothesis}: /\\
+\textbf{Conclusion}: /\\[1ex]
+\textbf{Experiment Loop Index 2}\\
+\textbf{Action}: Model\\
+\textbf{Hypothesis}: Introducing a Gradient Boosting model, like LightGBM, with optimized hyperparameters will outperform the current linear regression model and ensemble strategy.\\
+\textbf{Conclusion}: Failed.\\[1ex]
+\textbf{Experiment Loop Index 3}\\
+\textbf{Action}: Model\\
+\textbf{Hypothesis}: Replacing the linear regression model with a LightGBM model and using early stopping will improve the performance by capturing complex patterns better.\\
+\textbf{Conclusion}: Success\\
+...\\
+\textbf{Experiment Loop Index 8}\\
+\textbf{Action}: Factor\\
+\textbf{Hypothesis}: Incorporating features that capture the interaction between bid and ask prices, such as bid-ask spread and order imbalance, will enhance the model's ability to predict short-term stock volatility.\\
+\textbf{Conclusion}: Success\\
+...\\
+\textbf{Experiment Loop Index 12}\\
+\textbf{Action}: Factor\\
+\textbf{Hypothesis}: Incorporating features that capture the temporal evolution of bid-ask spreads over different time windows will enhance the model’s ability to predict short-term stock volatility.\\
+\textbf{Conclusion}: Success\\
+...
+\end{tcolorbox}
+
+\section{Prompt Design}
+\subsection{Specification Unit} \label{app_pdsu}
+As described in Section~\ref{sec:spec}, the Specification Unit is responsible for dynamically generating the tuple $\mathcal{S}$ based on the current optimization objective. Downstream units selectively access components of $\mathcal{S}$ according to their functional roles—for instance, the Synthesis Unit and Analysis Unit typically use $\mathcal{B}$, $\mathcal{D}$, and $\mathcal{M}$, while the Implementation Unit relies on $\mathcal{D}$, $\mathcal{F}$, and $\mathcal{M}$.
+
+Below, we provide the complete specification tuple for both factor and model optimization settings.
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Specification Prompt – Factor-Oriented,
+  breakable
+]
+You are one of the most authoritative quantitative researchers at a top Wall Street hedge fund. I need your expertise to design and implement new factors or models to enhance investment returns.
+
+This time, I need your help with the research and development of the \textbf{factor}.
+
+\vspace{1mm}
+\textbf{Scenario Background}
+\begin{itemize}
+  \item \textbf{Name}: Factor name.
+  \item \textbf{Description}: Explanation of the factor logic.
+  \item \textbf{Formulation}: Mathematical expression.
+  \item \textbf{Variables}: All used variables or intermediate functions.
+\end{itemize}
+
+Clearly list all \textbf{hyperparameters}, such as lookback periods, window sizes, etc. Each factor must produce one output using a static data source. Different parameterizations count as different factors.
+
+\vspace{1mm}
+\textbf{Source Dataset}
+
+\texttt{daily\_pv.h5}
+\begin{itemize}
+  \item Type: HDF5
+  \item Index: MultiIndex [datetime, instrument]
+  \item Columns: \texttt{\$open, \$high, \$low, \$close, \$volume, \$factor, ...}
+\end{itemize}
+
+\vspace{1mm}
+\textbf{Output Format}
+\begin{itemize}
+  \item Python file executable via: \texttt{python \{your\_file\_name\}.py}
+  \item Includes: import section, function section, and a \texttt{main} function named \texttt{calculate\_\{function\_name\}}.
+  \item Called under: \texttt{if \_\_name\_\_ == "\_\_main\_\_"}
+  \item Do not use \texttt{try-except}.
+  \item Output: Save computed factor to \texttt{result.h5} as a pandas DataFrame with index \texttt{[datetime, instrument]} and one column named by the factor.
+\end{itemize}
+
+\vspace{1mm}
+\textbf{Workflow Mechanism}
+\begin{enumerate}
+  \item Qlib generates a feature table from the factor values.
+  \item Trains models (e.g., LightGBM, LSTM, GRU) to predict future returns.
+  \item Builds portfolio based on predicted returns.
+  \item Evaluates performance (return, Sharpe ratio, max drawdown, etc.).
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Specification Prompt – Model-Oriented,
+  breakable
+]
+You are one of the most authoritative quantitative researchers at a top Wall Street hedge fund. I need your expertise to design and implement new models to enhance investment returns.
+
+This time, I need your help with the research and development of the \textbf{model}.
+
+\vspace{1mm}
+\textbf{Scenario Background}
+The model is a machine learning or deep learning structure used in quantitative investment to predict the returns and risks of a portfolio or a single asset. Models are employed to generate forecasts based on historical data and extracted factors, forming the core of many quantitative investment strategies.
+
+Each model takes factor values as input and predicts future returns. Models are defined with a fixed architecture and hyperparameters to ensure reproducibility and consistency.
+
+Each model should include the following components:
+\begin{itemize}
+  \item \textbf{Name}: The name of the model.
+  \item \textbf{Description}: Explanation of the model logic and purpose.
+  \item \textbf{Architecture}: The internal structure of the model (e.g., LSTM layers, MLP, decision trees).
+  \item \textbf{Hyperparameters}: All hyperparameters related to model structure.
+  \item \textbf{Training\_hyperparameters}: The hyperparameters used in training (e.g., learning rate, batch size).
+  \item \textbf{ModelType}: One of \texttt{"Tabular"} or \texttt{"TimeSeries"} to indicate the input format.
+\end{itemize}
+
+The model must output one predicted return value. Different sets of hyperparameters define different models.
+
+\vspace{1mm}
+\textbf{Source Dataset}
+
+\texttt{daily\_pv.h5}
+\begin{itemize}
+  \item Type: HDF5
+  \item Index: MultiIndex [datetime, instrument]
+  \item Columns: \texttt{\$open, \$high, \$low, \$close, \$volume, \$factor, ...}
+\end{itemize}
+
+\vspace{1mm}
+\textbf{Output Format}
+\begin{itemize}
+  \item Python file named \texttt{model.py} containing a PyTorch model definition.
+  \item Includes the following parts:
+    \begin{itemize}
+      \item \textbf{Import section}: Import only necessary libraries (e.g., \texttt{torch}, \texttt{torch.nn}).
+      \item \textbf{Model class}: A subclass of \texttt{torch.nn.Module} implementing \texttt{\_\_init\_\_} and \texttt{forward}.
+      \item \textbf{Model interface}: A variable named \texttt{model\_cls} must be assigned to the defined model class.
+    \end{itemize}
+  \item The model must follow these interface constraints:
+    \begin{itemize}
+      \item For Tabular input: \texttt{input shape = (batch\_size, num\_features)}.
+      \item For TimeSeries input: \texttt{input shape = (batch\_size, num\_timesteps, num\_features)}.
+      \item Output shape must always be \texttt{(batch\_size, 1)}.
+      \item The model must only use current input tensor, no external data loading or saving.
+      \item No other arguments will be passed; model must accept either:
+      \texttt{(num\_features)} or \texttt{(num\_features, num\_timesteps)}.
+    \end{itemize}
+  \item Do \textbf{not} include any \texttt{try-except} blocks.
+  \item Do \textbf{not} include any training, inference, or saving logic.
+  \item The user will import the model class via: \texttt{from model import model\_cls}
+\end{itemize}
+
+\vspace{1mm}
+\textbf{Workflow Mechanism}
+\begin{enumerate}
+  \item Qlib generates a feature table from the factor values.
+  \item Trains models (e.g., LightGBM, LSTM, GRU) to predict future returns.
+  \item Builds portfolio based on predicted returns.
+  \item Evaluates performance (return, Sharpe ratio, max drawdown, etc.).
+\end{enumerate}
+
+\end{tcolorbox}
+
+\subsection{Synthesis Unit}
+After receiving the dynamically assembled specification tuple from the Specification Unit, the Synthesis Unit leverages its evolving knowledge forest to propose new hypothesis. This is then decomposed into actionable research tasks.
+
+Below is the prompt used when the optimization target is a factor:
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Hypothesis Synthesis Prompt – Factor-Oriented,
+  breakable
+]
+
+\textcolor{blue!60!black}{\textbf{System prompt:}}\\
+
+\textbf{Background information ...} (Received from Specification Unit)\\
+
+The user has proposed several hypotheses and conducted evaluations. Your task is to analyze these trials, identify why those labeled \texttt{true} were successful, and why those labeled \texttt{false} failed. Then propose how to improve — either by refining existing approaches or exploring a new one.
+
+If a new hypothesis is already provided in feedback and you agree with it, you may reuse it. Otherwise, generate an improved one.\\
+
+\textbf{Guidelines for Hypothesis Generation:}
+\begin{enumerate}
+  \item Each generation should produce 1--5 factors. Balance simplicity and complexity; use all available financial data.
+  \item Start with simple, easy-to-implement factors. Avoid complex or combined factors at the beginning. Clearly explain their rationale.
+  \item Increase complexity gradually. Introduce advanced or combined factors only after simpler ones are validated.
+  \item If several iterations fail to outperform SOTA, restart with a new direction beginning from simple factors. Optimize a given factor type from simple to complex.
+  \item Record factors that surpass SOTA to prevent redundant implementation.
+\end{enumerate}
+
+\textbf{Output Format (JSON Schema):}
+\begin{lstlisting}[language=json]
+{
+  "action": "factor",
+  "hypothesis": "The new hypothesis generated based on the information provided.",
+  "reason": "Comprehensive explanation for the new hypothesis."
+}
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{User prompt:}}\\
+
+\textbf{The former hypotheses and the corresponding feedbacks are as follows:}
+
+\vspace{1mm}
+\texttt{\textbf{Trial 1}}
+\begin{itemize}
+  \item \textbf{Action:} factor
+  \item \textbf{Hypothesis:} Develop simple momentum-based and price-volume factors using daily price and volume data.
+  \item \textbf{Reason:} Momentum and price-volume factors are simple yet effective for quant investment. They capture underlying trends and trading activity, which can be indicative of future returns. Testing these straightforward factors will provide a baseline for performance and help identify potential opportunities for more complex factor development in subsequent iterations.
+
+  \item \textbf{Specific Factors:}
+    \begin{itemize}
+      \item \texttt{factor\_name:} 10\_day\_momentum\\
+            \texttt{factor\_description:} [Momentum Factor] The momentum factor captures the tendency of stocks with positive recent performance to continue performing well in the near future. Specifically, this factor calculates the return over the past 10 days.\\
+            \texttt{factor\_formulation:} $MOM_{10} = \frac{P_t}{P_{t-10}} - 1$
+      \item \texttt{factor\_name:} 10\_day\_volatility\\
+            \texttt{factor\_description:}[Price-Volume Factor] The average volume factor captures the average trading volume over the past 10 days, indicating the level of trading activity. Higher trading volume can signal stronger price movements.
+            \texttt{factor\_formulation:} $VOL_{10} = \text{std}(R_{t-i}), \ i=0\ldots9$
+      \item ...
+    \end{itemize}
+
+  \item \textbf{Observation:} The newly developed momentum-based and price-volume factors show promising results in the context of the given hypothesis. All implemented factors consistently contributed to a performance that surpassed the previous SOTA results. Specifically, improvements were observed in terms of both the Information Coefficient (IC) and annualized return, which are critical metrics for assessing a predictive model's effectiveness. However, it is noted that the maximum drawdown has worsened compared to the SOTA benchmark.
+  \item \textbf{Evaluation:} The results support the hypothesis that simple momentum-based and price-volume factors can enhance model performance in quantitative investment. The significant improvement in IC and annualized return suggests that these factors effectively capture underlying patterns and trends in stock performance.
+  \item \textbf{Decision:} \texttt{True}
+\end{itemize}
+\vspace{1mm}
+\texttt{\textbf{Trial 2}}\\
+...
+
+\vspace{1mm}
+\textbf{The SOTA hypothesis and the corresponding feedback are as follows:}
+\begin{itemize}
+  \item \textbf{Action:} factor
+  \item \textbf{Hypothesis:} ...
+  \item \textbf{Reason:} ...
+  \item \textbf{Specific Factors:} ...
+  \item \textbf{Observation:} ...
+  \item \textbf{Evaluation:} ...
+  \item \textbf{Decision:} \texttt{True}
+\end{itemize}
+
+\vspace{1mm}
+\textbf{Last hypothesis and the corresponding feedback are as follows:}
+\begin{itemize}
+  \item \textbf{Action:} factor
+  \item \textbf{Hypothesis:} ...
+  \item \textbf{Reason:} ...
+  \item \textbf{Specific Factors:} ...
+  \item \textbf{Observation:} ...
+  \item \textbf{Evaluation:} ...
+  \item \textbf{Decision:} ...
+  \item \textbf{New Hypothesis (from the Analysis Unit, for reference):} ...
+  \item \textbf{Reason:} ...
+\end{itemize}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{Example Output:}}
+\begin{lstlisting}[language=json]
+{
+  "action": "factor",
+  "hypothesis": "Incorporate advanced variations and combinations of existing momentum-based, price-volume, and volatility factors. Introduce factors like cumulative returns, turnover ratios, or volatility clustering measures to further refine performance while potentially minimizing drawdowns.",
+  "reason": "The previous trials successfully demonstrated that basic momentum-based and price-volume factors can improve performance metrics like IC and annualized return. However, the increased drawdown indicates a potential need for more sophisticated risk control. By using advanced variations, such as factor combinations and new risk measures, we may optimize returns and address volatility concerns. This aligns with the feedback suggesting more complex factor formulations for enhanced predictability and stability in returns."
+}
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Task Synthesis Prompt – Factor-Oriented,
+  breakable
+]
+
+\textcolor{blue!60!black}{\textbf{System prompt:}}\\
+
+The user is trying to generate new factors based on the hypothesis generated in the previous step. 
+The factors are used in certain scenario, the scenario is as follows:\\
+
+\textbf{Background information ...} (Received from Specification Unit)\\
+
+The user will use the factors generated to do some experiments. The user will provide this information to you:\\
+1. The target hypothesis you are targeting to generate factors for.\\
+2. The hypothesis generated in the previous steps and their corresponding feedbacks.\\
+3. Former proposed factors on similar hypothesis.\\
+4. Some additional information to help you generate new factors.\\
+
+\textbf{Output Format (JSON Schema):}
+\begin{lstlisting}[language=json]
+{
+  "factor name 1": {
+    "description": "description of factor 1, start with its type, e.g. [Momentum Factor]",
+    "formulation": "latex formulation of factor 1",
+    "variables": {
+      "variable or function name 1": "description of variable or function 1",
+      "variable or function name 2": "description of variable or function 2"
+    }
+  },
+  "factor name 2": {
+    "description": "description of factor 2, start with its type, e.g. [Machine Learning based Factor]",
+    "formulation": "latex formulation of factor 2",
+    "variables": {
+      "variable or function name 1": "description of variable or function 1",
+      "variable or function name 2": "description of variable or function 2"
+    }
+  }
+}
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{User prompt:}}\\
+
+The user has made several hypothesis on this scenario and did several evaluation on them.\\
+\textbf{The target hypothesis you are targeting to generate factors for is as follows:}\\
+\textbf{Chosen Action:} factor\\
+\textbf{Hypothesis:} Develop simple momentum-based and price-volume factors using the daily price and volume data available.\\
+\textbf{Reason:} Momentum and price-volume factors are simple yet effective for quant investment. They capture underlying trends and trading activity, which can be indicative of future returns. Testing these straightforward factors will provide a baseline for performance and help identify potential opportunities for more complex factor development in subsequent iterations.
+
+\vspace{1mm}
+The former hypothesis and the corresponding feedbacks are as follows:\\
+...\\
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{Example Output:}}
+\begin{lstlisting}[language=json]
+{
+  "cumulative_return_30_days": {
+    "description": "[Momentum Factor] This factor measures the cumulative return of a stock over the past 30 days. It extends previous momentum factors by capturing a longer-term trend of price movements.",
+    "formulation": "CR_{30} = \\prod_{i=0}^{29} (1 + R_{t-i}) - 1",
+    "variables": {
+      "R_{t-i}": "Daily return at time t-i, defined as (P_{t-i} - P_{t-i-1}) / P_{t-i-1}"
+    }
+  },
+  "turnover_ratio_20_days": {
+    "description": "[Price-Volume Factor] This factor computes the average daily turnover ratio over the past 20 days, representing the liquidity and trading activity of the stock.",
+    "formulation": "TR_{20} = \\frac{1}{20} \\sum_{i=0}^{19} \\frac{V_{t-i}}{\\text{Shares Outstanding}}",
+    "variables": {
+      "V_{t-i}": "Trading volume at time t-i",
+      "Shares Outstanding": "Total number of shares outstanding for the stock"
+    }
+  }
+  ...
+}
+\end{lstlisting}
+
+\end{tcolorbox}
+
+
+\subsection{Implementation Unit}
+The Implementation Unit executes tasks proposed by the Synthesis Unit using the \texttt{Co-STEER} framework, which transforms high-level descriptions into executable code through iterative refinement. This process involves three key prompt stages: \textit{(i)} Code Synthesis: Initial code generation based on task descriptions; \textit{(ii)} Log Analysis: Parsing error traces or outputs to diagnose issues; \textit{(iii)} Correctness Verification: Determining if the current code meets specification; if not, prompting for revision.
+
+Each stage contributes to a self-correcting loop that enables robust execution even under imperfect initial synthesis.
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Implementation Prompt – Factor-Oriented – Code Implementation,
+  breakable]
+
+\textcolor{blue!60!black}{\textbf{System prompt:}}\\
+
+The user is trying to implement some factors in the following scenario:\\
+
+\textbf{Background information ...} (Received from Specification Unit)\\
+
+Your code is expected to align the scenario in any form which means the user needs to get the exact factor values with your code as expected.
+
+To help you write the correct code, the user might provide multiple information that helps you write the correct code:\\
+1. The user might provide you the correct code to similar factors. You should learn from these code to write the correct code.\\
+2. The user might provide you the failed former code and the corresponding feedback to the code. The feedback contains the execution, the code and the factor value. You should analyze the feedback and try to correct the latest code.\\
+3. The user might provide you the suggestion to the latest fail code and some similar fail-to-correct pairs. Each pair contains the fail code with similar error and the corresponding corrected version code. You should learn from these suggestions to write the correct code.
+
+You must write your code based on your former latest attempt below which consists of your former code and code feedback. You should read the former attempt carefully and must not modify the correct parts of your former code.\\
+
+\textbf{Output Format (JSON Schema):}
+\begin{lstlisting}[language=json]
+{
+    "code": "The Python code as a string."
+}
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{User prompt:}}\\
+
+----- Target factor information: -----\\
+factor\_name: ...\\
+factor\_description: ...\\
+factor\_formulation: ...\\
+
+[NOTE]\\
+1. Ensure the computations are efficient. Prefer vectorized operations where possible, and consider JIT compilation (e.g., via numba) for recursive calculations if necessary.\\
+2. Parallelization techniques (e.g., Joblib, Dask) are allowed if it improves performance.\\
+
+\textbf{Here are some success implements of similar component tasks, take them as references:}\\
+=====Factor 1:=====\\
+factor\_name: ...\\
+factor\_description: ...\\
+factor\_formulation: ...\\
+=====Code:=====
+\begin{lstlisting}[language=Python]
+# File Path: factor.py
+<code>
+\end{lstlisting}
+
+=====Factor 2:=====\\
+...\\
+
+\textbf{Here are some wrong implements of similar component tasks, take them as references:}\\
+=====Factor 1:=====\\
+factor\_name: ...\\
+factor\_description: ...\\
+factor\_formulation: ...\\
+=====Code:=====
+\begin{lstlisting}[language=Python]
+# File Path: factor.py
+<code>
+\end{lstlisting}
+
+=====Factor 2:=====\\
+...\\
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{Example Output:}}
+\begin{lstlisting}[language=json]
+{
+    "code": "import pandas as pd\nimport numpy as np\n\n\ndef cumulative_return_30_days():\n..."
+}
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{System prompt:}}\\
+
+The User will provide you the information of the factor.
+
+Your job is to check whether user's code is aligned with the factor and the scenario.\\
+The user will provide the source Python code and the execution error message if execution failed.\\
+The user might provide you the ground truth code for you to provide the critic. You should not leak the ground truth code to the user in any form, but you can use it to provide the critic.
+
+User has also compared the factor values calculated by the user's code and the ground truth code. The user will provide you some analysis result comparing the two outputs. You may find some error in the code which caused the difference between the two outputs.
+
+If the ground truth code is provided, your critic should only consider checking whether the user's code is aligned with the ground truth code, since the ground truth is definitely correct.\\
+If the ground truth code is not provided, your critic should consider checking whether the user's code is reasonable and correct.
+
+Notice that your critics are not for user to debug the code. They are sent to the coding agent to correct the code. So do not give any following items for the user to check like “Please check the code line XXX.”
+
+Your suggestion should not include any code, just some clear and short suggestions. Please point out very critical issues in your response, ignore non-important issues to avoid confusion. If no big issue found in the code, you can respond “No critics found.”
+
+You should provide the suggestion to each of your critic to help the user improve the code. Please respond the critic in the following format. Here is an example structure for the output:
+
+\begin{lstlisting}
+critic 1: The critic message to critic 1  
+critic 2: The critic message to critic 2
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{User prompt:}}\\
+
+=====Factor information:=====\\
+factor\_name: ...\\
+factor\_description: ...\\
+factor\_formulation: ...\\
+
+=====Python code:=====
+\begin{lstlisting}[language=Python]
+# File Path: factor.py
+<code>
+\end{lstlisting}
+
+=====Execution feedback:=====\\
+Execution succeeded without error.\\
+Expected output file found.
+
+=====Factor value feedback:=====\\
+The source dataframe has only one column which is correct.\\
+The source dataframe does not have any infinite values.\\
+The output format is correct. The dataframe has a MultiIndex with 'datetime' and 'instrument', a single column for the factor name, and the factor values are of type float32, which is acceptable. The result aligns with the requirements.\\
+The generated dataframe is daily.
+
+\vspace{1mm}
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{Example Output1:}}
+\begin{lstlisting}
+No critics found.
+\end{lstlisting}
+
+\textcolor{blue!60!black}{\textbf{Example Output2:}}
+\begin{lstlisting}
+critic 1: The main error arises due to the incorrect index handling when applying the rolling function over the grouped data. Specifically, ...
+critic 2: The logic for handling empty or zero sums of volumes is present, but the application logic in rolling apply needs consistent indexing that matches the function's expectations.
+\end{lstlisting}
+\vspace{1mm}
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{System prompt:}}\\
+
+The user has finished evaluation and got some feedback from the evaluator.\\
+The evaluator ran the code and obtained the factor value dataframe and provided several feedback items regarding the user's code and output. You should analyze the feedback and, considering the scenario and factor description, give a final decision about the evaluation result. The final decision concludes whether the factor is implemented correctly and, if not, detailed feedback containing the reason and suggestion if the final decision is \texttt{False}.\\
+
+\textbf{The implementation final decision is considered in the following logic:}
+\begin{enumerate}
+    \item If the value and the ground truth value are exactly the same under a small tolerance, the implementation is considered correct.
+    \item If the value and the ground truth value have a high correlation on IC or rank IC, the implementation is considered correct.
+    \item If no ground truth value is provided, the implementation is considered correct if the code executes successfully (assuming the data provided is correct). Any exceptions, including those actively raised, are considered faults of the code. Additionally, the code feedback must align with the scenario and factor description.\\
+\end{enumerate}
+
+\textbf{Output Format (JSON Schema):}
+\begin{lstlisting}[language=json]
+{
+    "final_decision": true,
+    "final_feedback": "The final feedback message"
+}
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{User prompt:}}\\
+
+=====Factor information:=====\\
+factor\_name: ...\\
+factor\_description: ...\\
+factor\_formulation: ...\\
+
+=====Python code:=====
+\begin{lstlisting}[language=Python]
+# File Path: factor.py
+<code>
+\end{lstlisting}
+
+=====Execution feedback:=====\\
+Execution succeeded without error.\\
+Expected output file found.
+
+=====Factor value feedback:=====\\
+The source dataframe has only one column which is correct.\\
+The source dataframe does not have any infinite values.\\
+The output format is correct. The dataframe has a MultiIndex with 'datetime' and 'instrument', a single column for the factor name, and the factor values are of type float32, which is acceptable. The result aligns with the requirements.\\
+The generated dataframe is daily.\\
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{Example Output:}}
+\begin{lstlisting}[language=json]
+{
+    "final_decision": "True",
+    "final_feedback": "The factor '10_day_momentum' has been successfully implemented. The code executed without errors, and the resultant dataframe adheres to the specified requirements. The factor values are stored in the correct format and appear accurate given the nature of the momentum factor."
+}
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\subsection{Validation Unit}
+
+The Validation Unit does not involve any prompts.
+
+\subsection{Analysis Unit}
+As described in Section~\ref{sec:analysis}, the Analysis Unit not only evaluates experimental outcomes but also generates prompt-based feedback for local refinement. After each round, it uses structured prompts to interpret the result triplet $(h^t, t^t, r^t)$, identify potential failure causes, and generate short-term hypotheses targeting specific weaknesses (e.g., overfitting, poor generalization, feature instability).
+
+These refined hypotheses are passed to the Synthesis Unit as context for the next generation cycle. While the Analysis Unit operates on local, recent evidence, the Synthesis Unit integrates these suggestions with global search memory—achieving a complementary balance between short-term adaptation and long-term discovery.
+
+\begin{tcolorbox}[
+  colback=gray!5, 
+  colframe=gray!80,
+  title style={fontupper=\bfseries\large},
+  title=Analysis Prompt – Factor-Oriented,
+  breakable]
+
+\textcolor{blue!60!black}{\textbf{System prompt:}}\\
+
+You will receive a hypothesis, multiple tasks with their factors, their results, and the SOTA result. Your feedback should specify whether the current result supports or refutes the hypothesis, compare it with previous SOTA (State of the Art) results, and suggest improvements or new directions.\\
+
+Please understand the following operation logic and then make your feedback that is suitable for the scenario:
+
+\textbf{1. Logic Explanation:}
+\begin{itemize}
+  \item[a)] All factors that have surpassed SOTA in previous attempts will be included in the SOTA factor library.
+  \item[b)] New experiments will generate new factors, which will be combined with the factors in the SOTA library.
+  \item[c)] These combined factors will be backtested and compared against the current SOTA to enable continuous iteration.
+\end{itemize}
+
+\textbf{2. Development Directions:}
+\begin{itemize}
+  \item[a)] \textbf{New Direction:} Propose a new factor direction for exploration and development.
+  \item[b)] \textbf{Optimization of Existing Direction:}
+    \begin{itemize}
+      \item Suggest further improvements to that factor (this can include further optimization of the factor or proposing a direction that combines better with the factor).
+      \item Avoid re-implementing previous factors as those that surpassed SOTA are already included in the factor library and will be used in each run.
+    \end{itemize}
+\end{itemize}
+
+\textbf{3. Final Goal:} To continuously accumulate factors that surpass each iteration to maintain the best SOTA.
+
+Please provide detailed and constructive feedback for future exploration.\\
+
+\textbf{Output Format (JSON Schema):}
+\begin{lstlisting}[language=json]
+{
+  "Observations": "Your overall observations here",
+  "Feedback for Hypothesis": "Observations related to the hypothesis",
+  "New Hypothesis": "Your new hypothesis here",
+  "Reasoning": "Reasoning for the new hypothesis",
+  "Replace Best Result": "yes or no"
+}
+\end{lstlisting}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{User prompt:}}\\
+
+\textbf{Target hypothesis:  }
+Incorporate advanced variations and combinations of existing momentum-based, price-volume, and volatility factors. Introduce factors like cumulative returns, turnover ratios, or volatility clustering measures to further refine performance while potentially minimizing drawdowns.
+
+\textbf{Tasks and Factors:}
+\begin{itemize}
+  \item \textbf{cumulative\_return\_30\_days:} [Momentum Factor] This factor measures the cumulative return of a stock over the past 30 days. It extends previous momentum factors by capturing a longer-term trend of price movements. \textbf{Implemented}.
+  \item \textbf{turnover\_ratio\_20\_days:} [Price-Volume Factor] This factor computes the average daily turnover ratio over the past 20 days, representing the liquidity and trading activity of the stock. \textbf{Not Implemented}.
+  \item ...
+\end{itemize}
+
+
+\textbf{Combined Results:}
+\begin{itemize}
+  \item IC: 0.033412 vs SOTA IC: 0.027691
+  \item Annualized Return: 0.097140 vs SOTA: 0.076871
+  \item Max Drawdown: -0.133149 vs SOTA: -0.075444\\
+\end{itemize}
+
+\hrulefill
+\vspace{1mm}
+
+\textcolor{blue!60!black}{\textbf{Example Output:}}
+\begin{lstlisting}[language=json]
+{
+  "Observations": "The current results show a slight improvement in both the Information Coefficient (IC) and annualized return compared to the SOTA results. However, the max drawdown has increased slightly, indicating a potential increase in risk.",
+  "Feedback for Hypothesis": "The hypothesis is partly supported as the introduction of advanced variations and combinations of factors has led to a slight improvement in the performance metrics, specifically the IC and annualized return. However, the hypothesis also aimed at potentially minimizing drawdowns, which was not achieved as the max drawdown increased.",
+  "New Hypothesis": "Introduction of risk mitigation techniques alongside factor combinations could improve return metrics while effectively minimizing drawdowns.",
+  "Reasoning": "While the advanced combinations have improved some aspects of the performance, the increased drawdown suggests the need to balance risk more effectively. Considering risk-adjusted factors or incorporating strategies such as variance reduction or diversification could further refine the improvements while maintaining or reducing drawdowns.",
+  "Replace Best Result": "yes"
+}
+\end{lstlisting}
+
+\end{tcolorbox}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+\subsection{Diagnostic Insight}
+The stability of automated quantitative research pipelines is often challenged by three scenarios: (i) noisy or sparse factors, (ii) exploration loops that fail to diversify, and (iii) sensitivity to the initial factor set. In our framework, each of these issues is explicitly considered.
+\begin{enumerate}[leftmargin=4ex]
+    \item \textbf{Noisy or sparse factors:} To prevent unreliable signals from propagating through iterations, \texttt{Co-STEER} integrates health-check modules that verify factors are leakage-free, non-trivial, and statistically meaningful within the training window. This mechanism filters out sparse or redundant candidates before they enter the optimization loop, as detailed in Section~\ref{valu}.
+    
+    \item \textbf{Exploration inefficiency:} The multi-armed bandit scheduler is regularized by imposing an upper bound on the length of consecutive exploration in one direction. This prevents the system from getting trapped in a local loop and ensures adaptive balancing between factor-side and model-side refinements. Ablation studies in Appendix~\ref{app:abl} confirm that this mechanism improves both predictive quality and SOTA selections under limited resources.
+    
+    \item \textbf{Initial factor sensitivity:} To reduce the dependence on starting conditions, generated factors are systematically deduplicated against the initial set, and the optimization process is isolated from raw definitions. Empirical results (Fig.~\ref{fig:yearly_ic_rankic_nav}, Fig.~\ref{fig:factor_all}) show that when initialized with either small libraries (e.g., Alpha 20) or larger libraries (e.g., Alpha 158), the system converges toward diverse, high-quality factors. In particular, starting from Alpha 20, the framework rapidly achieves performance comparable to Alpha 158, while initialization from Alpha 158 yields further gains by building upon a stronger baseline. Moreover, out-of-sample evaluations across different markets (CSI~300, CSI~500, and NASDAQ~100) and time periods further demonstrate that these improvements are not restricted to specific datasets, but reflect consistent robustness and generalizability.
+\end{enumerate}
+
+
+\subsection{Limitations and Future Works} \label{app:limitation}
+While \texttt{\name} shows compelling results in both real-world markets and quantitative competitions, we identify several limitations that outline clear paths for future research directions:
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{Multimodal Data Integration:} Although the system processes diverse market data, its factor generation could be enhanced by incorporating alternative data sources (e.g., news sentiment, macroeconomic indicators, and corporate filings) to capture richer market signals.
+    
+    \item \textbf{Domain Knowledge Incorporation:} While the current system already delivers strong results using general-purpose LLMs (e.g., \texttt{GPT-4o}, \texttt{o3-mini}), it relies solely on the models' built-in knowledge to propose financial hypotheses. Incorporating structured financial expertise—such as innovative solutions from financial reports or economic theory—through retrieval-augmented generation (RAG) could further enhance the plausibility, domain grounding, and efficiency of hypothesis generation.
+    
+    \item \textbf{Real-Time Market Adaptation:} The batch-based design restricts timely reactions to high-frequency trading. Incorporating event-driven or incremental learning could improve adaptability to regime shifts, anomalies, and emergent signals.
+\end{itemize}
+
+\subsection{Broader Impacts}
+\label{app:implications}
+\texttt{\name} advances intelligent asset management through several transformative contributions:
+
+\begin{itemize}[leftmargin=4ex]
+    \item \textbf{Generalizable R\&D Automation:} Although tailored to quantitative finance, our framework provides a modular, data-centric workflow that can be readily adapted to other scientific and engineering domains requiring hypothesis–implementation–validation cycles, potentially addressing bottlenecks in fields like healthcare, materials science, and operations research.
+    
+     \item \textbf{Reproducible and Deployable Outputs:} Every result produced by \texttt{\name} is implemented as executable code. This design ensures end-to-end reproducibility and enables seamless deployment across different datasets or financial markets with minimal adaptation overhead.
+    
+    \item \textbf{Toward a New Financial AI Paradigm:} The framework unifies data-driven modeling and economic reasoning through a structured multi-agent design, offering a new foundation for interpretable, composable, and adaptive financial intelligence systems.
+\end{itemize}
+
+\noindent These advances position \texttt{\name} as a foundational technology for the next decade of evidence-based quantitative investing.
+
+While \texttt{\name} lowers the barrier to building quantitative strategies, this accessibility also raises concerns that non-expert users may deploy generated factors or models directly in live trading without proper financial expertise or risk management. To mitigate this, we include clear disclaimers in the codebase stating that the framework is intended for research purposes only and that outputs require rigorous validation before real-world deployment.
+
+
+
+\subsection{Large Language Model Usage}
+\label{app:llm}
+We use large language models (LLMs) as a core component of our framework—specifically, for the automated generation of trading factors and predictive models. All the settings of the LLM we used are provided in Appendix~\ref{app:impl_settings}. Apart from this, we only use the LLM for checking grammatical errors and formatting in the paper.
+
+\end{document}

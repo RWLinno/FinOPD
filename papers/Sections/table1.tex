@@ -1,0 +1,81 @@
+\begin{table*}[thbp]
+\renewcommand{\arraystretch}{1}
+\vspace{-0.2cm}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\begin{threeparttable}
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\linewidth}{!}{ 
+\begin{tabular}{clccclccclccclccclccclccc}
+\toprule
+\centering
+\footnotesize
+\multirow{3}{*}{\textbf{Categories}} & \multirow{3}{*}{\textbf{Models}} & \multicolumn{3}{c}{TSLA} & & \multicolumn{3}{c}{AMZN} & & \multicolumn{3}{c}{NIO} & &  \multicolumn{3}{c}{MSFT} & &  \\ 
+\cmidrule{3-5}\cmidrule{7-9}\cmidrule{11-13}\cmidrule{15-17}
+&& CR$\%\uparrow$ & SR$\uparrow$  & MDD$\%\downarrow$  & & CR $\%\uparrow$ & SR$\uparrow$  & MDD$\%\downarrow$  & & CR$\%\uparrow$  & SR$\uparrow$  & MDD$\%\downarrow$  & & CR$\%\uparrow$  & SR$\uparrow$  & MDD$\%\downarrow$  & &  \\
+\midrule
+Market 
+& B\&H & 6.425 & 0.145 & 58.150 && 2.030 & 0.072 & 34.241 && -77.210 & -1.449 & 63.975 && \textcolor{darkblue}{27.856} & \textcolor{darkblue}{1.230} & 15.010 &&\\
+\midrule
+\multirow{1}{*}{\begin{tabular}[c]{@{}c@{}} Our Model\end{tabular}}
+& \textsc{FinCon} & \textcolor{red}{82.871} & \textcolor{red}{1.972} & 29.727 && \textcolor{red}{24.848} & \textcolor{red}{0.904} & 25.889 && \textcolor{red}{17.461} & \textcolor{red}{0.335} & 40.647 && \textcolor{red}{31.625} & \textcolor{red}{1.538} & 15.010 &&\\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}c@{}} LLM-based \end{tabular}}
+& \textsc{GA}  & 16.535 & 0.391 & 54.131 && -5.631 & -0.199 & 37.213 && -3.176 & -1.574 & 3.155 && -31.821 & -1.414 & 39.808 &&\\
+& \textsc{FinGPT}  & 1.549 & 0.044 & 42.400 && -29.811 & -1.810 & 29.671 && -4.959 & -0.121 & 37.344 && 21.535 & 1.315 & 16.503 && \\
+& \textsc{FinMem}  & \textcolor{darkblue}{34.624} & \textcolor{darkblue}{1.552} & 15.674 && -18.011 & -0.773 & 36.825 && -48.437 & -1.180 & 64.144 && -22.036 & -1.247 & 29.435 && \\
+& \textsc{FinAgent} & 11.960 & 0.271 & 55.734 && -24.588 & -1.493 & 33.074 && \textcolor{darkblue}{0.933} & \textcolor{darkblue}{0.051} & 19.181  && -27.534 & -1.247 & 39.544 && \\
+\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}} DRL-based\end{tabular}}
+& A2C   & -35.644 & -0.805 & 61.502 && -12.560 & -0.444 & 37.106 && -91.910 & -1.728 & 68.911 && 21.397 & 0.962 & 21.458 &&\\
+& PPO   & 1.409 & 0.032 & 49.740 && 3.863 & 0.138 & 28.085 && -72.119 & -1.352 & 62.093 && -4.761 & -0.214 & 30.950 &&\\
+& DQN  & -1.296 & -0.029 & 58.150 && \textcolor{darkblue}{11.171 }& \textcolor{darkblue}{0.398} & 31.174 && -35.419 & -0.662 & 56.905 && 27.021 & 1.216 & 21.458 &&\\
+
+\bottomrule
+\end{tabular}
+}
+\end{threeparttable}
+\label{table1_baselines}
+%\caption*{Table 1 Part I: \justifying{\footnotesize{Comparison of key performance metrics during the testing period for the single-asset trading task involving TSLA, AMZN, and NIO, between \textsc{FinCon} and other algorithmic agents.  \textit{Note that all results are statistically significant under Wilcoxon signed-rank test.}}}}
+\vspace{-0.2cm}
+\end{table*}
+
+\begin{table*}[thbp]
+\renewcommand{\arraystretch}{1}
+\footnotesize
+\vspace{-0.2cm}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\begin{threeparttable}
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\linewidth}{!}{ 
+\begin{tabular}{clccclccclccclccclccclccc}
+\toprule
+\centering
+\multirow{3}{*}{\textbf{Categories}} & \multirow{3}{*}{\textbf{Models}} & \multicolumn{3}{c}{AAPL} & & \multicolumn{3}{c}{GOOG} & & \multicolumn{3}{c}{NFLX}  & &  \multicolumn{3}{c}{COIN}  \\ 
+\cmidrule{3-5}\cmidrule{7-9}\cmidrule{11-13}\cmidrule{15-17}
+&& CR$\%\uparrow$ & SR$\uparrow$  & MDD$\%\downarrow$  & & CR $\%\uparrow$ & SR$\uparrow$  & MDD$\%\downarrow$  & & CR$\%\uparrow$  & SR$\uparrow$  & MDD$\%\downarrow$ & & CR$\%\uparrow$  & SR$\uparrow$  & MDD$\%\downarrow$\\
+\midrule
+Market 
+& B\&H & \textcolor{darkblue}{22.315} & 1.107 & 20.659 && \textcolor{darkblue}{22.420} & \textcolor{darkblue}{0.891} & 21.191 && 57.338 & 1.794 & 20.926  && -21.756 & -0.311 & 60.187 \\
+\midrule
+\multirow{1}{*}{\begin{tabular}[c]{@{}c@{}} Our Model\end{tabular}}
+& \textsc{FinCon} & \textcolor{red}{27.352} & \textcolor{red}{1.597} & 15.266 && \textcolor{red}{25.077} & \textcolor{red}{1.052} & 17.530 && \textcolor{red}{69.239} & \textcolor{red}{2.370} & 20.792 && \textcolor{red}{57.045} & \textcolor{red}{0.825} & 42.679 \\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}c@{}} LLM-based \end{tabular}}
+& \textsc{GA} & 5.694 & 0.372 & 14.161 && -1.515 & -0.192 & 8.210 && 41.770 & 1.485 & 20.926 && \textcolor{darkblue}{19.271} & \textcolor{darkblue}{0.277} & 67.532  \\
+& \textsc{FinGPT}  & 20.321 & \textcolor{darkblue}{1.161} & 16.759 && 0.242 & 0.011 & 26.984 && 11.925 & 0.472 & 20.201 && -99.553 & -1.807 & 74.967 \\
+& \textsc{FinMem}  & 12.397 & 0.994 & 11.268 && 0.311 & 0.018 & 21.503 && -10.306 & -0.478 & 27.692 && 0.811 & 0.017 & 50.390  \\
+& \textsc{FinAgent} & 20.757 & 1.041 & 19.896 && -7.440 & -1.024 & 10.360 && \textcolor{darkblue}{61.303} & \textcolor{darkblue}{1.960} & 20.926 && -5.971 & -0.106 & 56.882 \\
+\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}} DRL-based\end{tabular}}
+& A2C   & 13.781  & 0.683 & 14.226 && 8.562 & 0.340 & 21.191 && -8.176 & -0.258 & 49.579 && - & - & - \\
+& PPO   & 14.041 & 0.704 & 22.785 && 2.434 & 0.097 & 25.202 && -33.144 & -1.049 & 33.377 && - & - & - \\
+& DQN  & 21.125 & 1.048 & 16.131 && 20.690 & 0.822 & 21.191 && 21.753 & 0.687 & 39.733 && - & - & - \\
+\bottomrule
+\end{tabular}
+}
+\end{threeparttable}
+\caption{ \justifying{\footnotesize{Comparison of key performance metrics during the testing period for the single-asset trading tasks involving eight stocks, between \textsc{FinCon} and other algorithmic agents. \textit{Note that the highest and second highest CRs and SRs have been tested and found statistically significant using the Wilcoxon signed-rank test. The highest CRs and SRs are highlighted in red, while the second highest are marked in blue.}}}}
+\vspace{-0.2cm}
+\end{table*}

@@ -1,0 +1,101 @@
+\section{Architecture of \textsc{FinCon}}
+
+In this section, we present the architecture of \textsc{FinCon} using a two-level hierarchy. First, we describe the hierarchical framework for coordinating the agents' synchronous work and communication. Then, we elaborate on the functionalities of each module that constitutes each agent in \textsc{FinCon}. Finally, we aim to elaborate on how \textsc{FinCon} solves the objective function expressed as Equation~(\ref{objective}) through a verbal reinforcement approach.
+
+\subsection{Synthesized Multi-agent Hierarchical Structure Design}
+The agent system of \textsc{FinCon} consists of two main components: the Manager-Analyst Agent Group component and the Risk-Control component. 
+
+\begin{figure}[ht]
+  \centering
+  \begin{minipage}{\linewidth}
+    \centering
+    \includegraphics[height=10.5cm, width=0.8\linewidth]{figure/multi_agent_Architecture.jpg}
+    \caption{\justifying{The detailed architecture of \textsc{FinCon} contains two key components: Manager-Analyst agent group and Risk Control. It also presents the between-component interaction of \textsc{FinCon} and decision-making flow. }}
+    \label{fig:FinCon_structure}
+  \end{minipage}
+\end{figure}
+
+\subsubsection{Manager-Analyst Agent Group} 
+
+Analogous to human investment firm, \textsc{FinCon} establishes a unique hierarchical structure to organize its multi-agent system, synthesizing their efforts to achieve superior decision-making outcomes. The primary goal is to enhance information presentation and comprehension while minimizing unnecessary communication costs. The working mechanism of each agent is illustrated in Figure~\ref{fig:FinCon_structure}.
+
+\textbf{\textit{Analyst Agents}}. In \textsc{FinCon}, analyst agents distill concise investment insights from large volumes of multi-source market data, each focused on a specific trading target. To ensure high-quality reasoning by reducing task load and sharpening focus, each agent processes information from a single source in a uni-modal fashion, providing pre-specified outputs based on prompts. This setup mimics an efficient human team, where each analyst specializes in a specific function, filtering out market noise and extracting key insights. These agents assist the manager agent by consolidating denoised investment information from multiple perspectives. We implement seven distinct types of analyst agents using LLMs, each producing unique investment insights, as shown in the upper section of Figure~\ref{fig:FinCon_structure}. Based on input modalities, three textual data processing agents extract insights and sentiments from daily news and financial reports. An audio agent uses the Whisper API to interpret investment signals from earnings call recordings. Additionally, a data analysis agent and a stock selection agent compute critical financial metrics, such as momentum and CVaR, using tabular time series data. The stock selection agent also oversees portfolio selection by applying the classic risk diversification method in quantitative finance \cite{markowitz1952portfolio}.
+
+\textbf{\textit{Manager Agent}}. In \textsc{FinCon}, the manager agent acts as the sole decision-maker, responsible for generating trading actions for sequential financial tasks. For portfolio management, it calculates portfolio weights using convex optimization techniques constrained by directional trading decisions (see optimization problem as presented in Formula~(\ref{mean-variance})). Four key mechanisms support each decision: 1) Consolidating distilled insights from multiple analyst agents. 2) Receiving timely risk alerts and conceptual investment updates from the risk control component. 3) Refining its investment beliefs about the influence of different information sources on trading decisions for specific targets. 4) Conducting self-reflection by reviewing reasoning outcomes from previous trading actions.
+
+%\textbf{\textit{Analyst Agents}}. In \textsc{FinCon}, analyst agents distill concise investment insights from large volumes of multi-source market information for one specific trading target. To ensure high reasoning quality by reducing task load and enhancing analysis focus, each agent processes a single information source in a uni-modal manner, delivering pre-specified outputs based on prompts. This setup mirrors an effective human team structure, where each analyst specializes in a specific function and synchronously filters market noise to extract essential insights. These agents support the manager agent in making informed decisions by consolidating denoised investment information from multiple perspectives. We design seven distinct types of analyst agents using LLMs, each producing diverse investment insights, as shown in the upper part of Figure~\ref{fig:FinCon_structure}. Differentiated by input modalities, three textual data processing agents distill insights and sentiments from daily news and financial reports. An audio agent extracts investment tendencies from earnings call recordings using the Whisper API. Additionally, a data analysis agent and a stock selection agent compute key financial metrics, such as momentum and CVaR, based on tabular time series data. The stock selection agent also manages portfolio selection following the classic risk diversification method in quantitative finance \cite{markowitz1952portfolio}, as detailed in Appendix.~\ref{explain_portfolio_selection}.
+
+%\textbf{\textit{Manager Agent}}. In the \textsc{FinCon}\ system, the manager agent is the sole decision maker, generating trading actions for sequential financial tasks. For portfolio management, it computes portfolio weights using convex optimization techniques constrained by the direction of actions (see Equation. (\ref{mean-variance})). Four mechanisms support each decision: 1) Consolidating distilled investment insights from multiple analyst agents. 2) Receiving timely risk alerts and conceptual investment updates from the risk control component. 3) Refining investment beliefs about the impact of various information sources on the manager's decisions regarding a specific trading target. 4) Retrieving self-reflections based on the reasoning outcomes of previous trading actions.
+
+\subsubsection{Risk-Control Component} 
+We have innovatively designed a dual-level risk-control mechanism consisting of within-episode and over-episode risk management. The within-episode mechanism detects market risk within a single training episode, allowing the manager agent to promptly adjust trading actions to mitigate potential losses by accounting for short-term trading performance and market fluctuations. This mechanism also operates during the testing phase. In contrast, the over-episode mechanism functions exclusively during the training stage, providing prompt optimization guidance by comparing the trading performance of the current episode with the previous one. This reflection enables the manager agent to update its investment beliefs based on performance differences. By drawing on prior observations of market risk and profitability patterns, these two mechanisms help avoid repeated investment errors, thereby enhancing future returns.
+
+\textbf{\textit{Within-Episode Risk Control:}} The within-episode risk alert is triggered by a sudden drop in the CVaR value. Conditional Value at Risk (\textbf{CVaR}) represents the average of the worst-performing 1\% of daily trading Profits and Losses (\textbf{PnLs}). A decrease in CVaR typically indicates that recent trading decisions have led to PnLs within this bottom percentile, signaling a potentially high-risk market condition. When this occurs, the manager agent adopts a risk-averse stance for that day's trading actions, regardless of the prior risk status.
+
+\textbf{\textit{Over-Episode Risk Control:}} The over-episode investment belief updates facilitate adjustments in the emphasis placed on analysts' information distillation and the manager's action generation. Through the \textit{\textbf{Actor-Critic}} mechanism, \textsc{FinCon} episodically optimizes its investment strategy for a given trading target, as defined by objective (Equation~(\ref{objective})), by reflecting on a series of winning and losing actions. This episodic reflection is powered by a unique \textit{\textbf{Conceptual Verbal Reinforcement (CVRF)}}. CVRF assesses the performance of consecutive training episodes by analyzing the information perspectives provided by analysts and reflected in the manager's decision-making. It then conceptualizes and attributes the evaluation outcomes to these specific aspects. By comparing the conceptualized insights from more profitable versus less profitable episodes, the system informs both the manager and analyst agents about necessary belief adjustments, helping prioritize the most relevant market information for increased profitability, as detailed in Algorithm \ref{alg:concept_VF}. CVRF leverages text-based gradient descent to offer optimal conceptual investment guidance for the manager agent, refining prompts with the latest investment beliefs. The guidance is organized according to perspectives provided by the respective analyst agents, key financial indicators (such as historical momentum), or other crucial viewpoints.
+
+\begin{table*}[ht]
+\centering
+\begin{adjustbox}{max width=\dimexpr\columnwidth,center}
+\begin{tabular}{l|l|l}
+\toprule
+\textbf{Factor} & \textbf{Gradient-based model optimizer} & \textbf{LLM-based prompt optimizer}  \\
+\midrule
+Upgrade direction
+    & Model value gradient momentum & Prompt reflection trajectory  \\
+\midrule
+Update method 
+    & Learning rate descent & Overlapping percentage of trading decisions \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{\footnotesize{Analogy between glossaries in model optimizer and prompt optimizer.}}
+\label{CVRF_compare}
+\end{table*}
+
+These belief updates are first received by the manager agent and then selectively propagated to relevant agents, minimizing over-communication. Unlike the text-based gradient descent proposed by Tang et al.\cite{tang2024unleashing}, which uses prompt editing distance as a learning rate, we derive investment belief updates by measuring the overlapping percentage of trading actions between two consecutive training trajectories at each belief update, as presented in Table~\ref{CVRF_compare}. This approach has proven effective in improving the performance of a synthesized agent system, where each worker has a clearly defined and specialized role. The above describes the workflow of \textsc{FinCon} during the training stage, while the workflow during the testing stage is detailed in the Appendix \ref{Testing_Algo}.
+
+
+%\textbf{\textit{Over-Episode Risk Control: }} The over-episode investment belief updates facilitate timely adjustments in the emphasis placed on the analyst's information distillation and the manager's action generation. Through the \textit{\textbf{Actor-Critic}} mechanism, \textsc{FinCon}\ episodically optimizes its investment strategy for a given trading target by deeply reflecting on continuous winning and losing actions. The episodic reflection of investment beliefs is generated by a unique \textit{\textbf{Conceptual Verbal Reinforcement (CVRF)}}. CVRF evaluates the performance of every two adjacent training episodes based on the information perspectives provided by analysts and available in the manager's trading reasoning. It then conceptualizes and attributes the evaluation outcomes to these aspects. By comparing the conceptualized aspects of investment insights from both more profitable and less profitable episodes, the system informs the manager and analyst agents about the necessary belief adjustments for each market information aspect to prioritize for greater profit, following the steps of Algorithm \ref{alg:concept_VF}. CVRF utilizes text-based gradient descent to provide optimal conceptual investment guidance on a given target asset, substantially refining prompts with the latest investment beliefs for the manager agent. The obtained guidance is also meticulously organized from perspectives corresponding to insights from specific analyst agents, key financial indicators such as historical momentum, or other necessary perspectives.
+
+%These investment belief updates are initially received by the manager agent and selectively propagated to relevant agent nodes, thereby minimizing over-communication. Additionally, unlike the text-based gradient descent proposed by Tang et al.\cite{tang2024unleashing}, which uses prompt editing distance as the learning rate, we obtain investment belief prompt updates by measuring the overlapping percentage of trading actions between two adjacent training trajectories achieved at each investment belief update. This approach has proven effective in enhancing the performance of a synthesized agent system, where each worker has a clearly defined and specialized responsibility.
+
+\begin{algorithm}[ht]
+\caption{\small Training Stage Algorithm of \textsc{FinCon}: Conceptual Verbal Reinforcement using Textual-based Gradient Descent}
+\label{alg:concept_VF}
+\begin{algorithmic}
+\footnotesize{
+\STATE Initialize manager-analysts component $\{M_{pr}^i\}^{I}_{i=1} \& M_a$, and risk-control component $M_r$.
+\STATE Initialize trading start date $s$, stock pool of portfolio and portfolio weights $w_0=\textbf{0}$.
+\STATE Initialize Prompts $\bm{\theta}$, policy $\Pi_{\bm{\theta}}$.
+\WHILE{episode $k < Max$}
+    \FOR{$0\leq t \leq T$}
+        \STATE Run policy $\Pi_{\bm{\theta}}$ (collecting daily PnL $r_t$, portfolio weights $w_t$ and daily CVaR value $\rho_t$).
+        \IF{$\rho_t < \rho_{t-1}$ \OR $r_t < 0$}
+            \STATE Trigger $M_a$ self-reflection and generate self-reflection text $B_t$.
+        \ENDIF
+        \STATE Get the investment trajectory $\mathcal{H}_k$ and calculate the objective function value (Function~(\ref{objective})).
+    \ENDFOR
+    
+    \STATE Compare the objective function values of episodes $k-1$ \& $k$, and decide which episode has higher performance;
+    \STATE Pass sustained profitable and losing trades from two episodes $\mathcal{H}_{k-1}$ \& $\mathcal{H}_k$ into risk-control component $M_r$;\par
+    \STATE Guide $M_r$ to summarize conceptualized investment insights $\{c_{k-1}^1,\cdots,c_{k-1}^n\}$ \& $\{c_k^1,\cdots,c_k^m\}$;
+    \STATE Compare two sets of conceptualized insights and give the reasoning for higher performance (providing textual optimization direction, i.e. $meta~prompt$);
+    \STATE Calculate the overlapping percentage between trading decision sequences from two episodes (providing the learning rate $\tau$);
+    \STATE Update the prompts by textual gradient-descent:
+    \begin{center}
+        $\bm{\theta} \longleftarrow M_r(\bm{\theta},\tau,meta~prompt).$
+    \end{center}
+\ENDWHILE
+}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Modular Design of \textsc{FinCon}\ Agents}
+Here, we explain the modular design of \textsc{FinCon} agents. Inspired by the recent works of Park et al. \cite{sumers2023cognitive} and Sumers et al. \cite{zhang2023exploring} on developing the cognitive structure of language agents for human-like behavior, agents in \textsc{FinCon}\ integrate four modules to support their necessary functionalities, along with a shared general configuration, as detailed in Appendix~\ref{detailed_modules}:
+
+\textit{\textbf{General Configuration and Profiling Module}}. This module defines task types (e.g., stock trading, portfolio management) and specifies trading targets, including sector and performance details. The profiling module outlines each agent’s roles and responsibilities. The concatenated textual content from these parts is used to query investment-related events from the agents' memory databases. \textit{\textbf{Perception Module}}. This module defines how each agent interacts with the market, specifying the information they perceive, receive, and communicate, with interactions tailored to each agent's role. In detail, it converts raw market data, feedback from other agents, and information retrieved from the memory module into formats compatible with large language models, enabling them to process these inputs effectively.
+\textit{\textbf{Memory Module}}. The memory module comprises three key components: \textit{working memory}, \textit{procedural memory}, and \textit{episodic memory}. Much like how humans process events in their working memory \cite{wagner1999working}, \textsc{FinCon} agents leverage their working memory to perform a range of tasks, including observation, distillation, and refinement of available memory events, all tailored to the specific roles of the agents. \textit{Procedural memory} and \textit{episodic memory} are critical for recording historical actions, outcomes, and reflections during sequential decision-making. Procedural memory is generated after each decision step within an episode, storing data as memory events. For trading inquiries, top events are retrieved from procedural memory and ranked based on recency, relevance, and importance, following a simplified version of the method proposed by Yu et al. \cite{yu2023finmem}, with further details provided in Appendix~\ref{memory_rankings}. Each functional analyst agent has distinct procedural memory decay rates, reflecting the timeliness of various financial data sources, which is crucial for aligning multi-type data influencing specific time points and supporting informed decision-making. The manager agent enhances the procedural memory of analyst agents by providing feedback through an access counter. Both analyst and manager agents maintain procedural memory, but they keep different records, as illustrated in Appendix~\ref{detailed_modules}. \textit{Episodic memory}, exclusive to the manager agent, stores actions, PnL series from previous episodes, and updated conceptual investment beliefs from the risk control component.
+
+%The memory module contains three key components: \textit{working memory}, \textit{procedural memory}, and \textit{episodic memory}. Similar to how humans process events in their working memory \cite{wagner1999working}, \textsc{FinCon}\ agents utilize a working memory component to perform a series of operations, including observation, distillation, and refinement on available memory events, tailored to the agents' specific roles. \textit{Procedural memory} and \textit{episodic memory} are essential for recording historical actions, outcomes, and reflections during sequential decision-making. Procedural memory is created after each decision step within an episode, storing data as memory events. For a trading inquiry, top events are retrieved from procedural memory, which are ranked based on recency, relevancy, and importance, which is the simplified version based on Yu et al. \cite{yu2023finmem} and detailed in Appendix \ref{memory_rankings}. Different functional analyst agents possesses distinct procedural memory decay rates, reflecting the timeliness of various financial data sources, which is crucial for aligning multi-type data impacting a specific time point and facilitating informed decision-making. The manager agent augments the procedural memory of analyst agents by providing feedback through access counter. Procedural memory is maintained by both analyst and manager agents, each keeping different records, as shown in Figure~\ref{fig2:modular_design}. The \textit{episodic memory}, exclusive to the manager agent, retains actions, PnL series of the previous episodes and conceptualized updated investment beliefs from the risk control component.
+

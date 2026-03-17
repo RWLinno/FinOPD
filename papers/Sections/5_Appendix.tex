@@ -1,0 +1,502 @@
+\section{Appendix}
+
+\subsection{Related Work}
+\label{related_work}
+\textbf{LLM Agents for Financial Decision Making.} There are considerable efforts towards developing general-purpose LLM agent for sequential decision-making \cite{shinn2023reflexion, zhao2024expel}, and such type of tasks often involve episodic interactions with environment and verbal reflections for action refinement, such as coding competition \cite{li2022competition, chen2022codet}, software development \cite{qian2023communicative, hong2023metagpt}, game-playing \cite{xu2023language, ma2023large}. Furthermore, researchers have started to exploit how LLM agents can perform better in harder decision-making tasks from finance \cite{de2023llm,zhao2024revolutionizing, liu2024fmdllama, cao2024risklabs, xie2024open}, in which there are more volatile environments, leading to that the numerous unpredictable elements can obscure an agent's ability to reflect accurately on the reasons for poor decision outcomes. {FinMem} \cite{yu2023finmem} enhances single stock trading performance by embedding memory modules with LLM agent for reflection-refinement, 
+and FinAgent \cite{zhang2024finagent} improved trading profits via using external quantitative tool to fight against volatile environment. %Compared to those previous work, our system possess more delicate-structured cognitive modules, especially memory module, and more specific-designed tools
+
+\textbf{Multi-Agent System and Communication Structures.}
+In traditional multi-agent systems \cite{canese2021multi,zhang2021multi}, the way for agents' communication is pre-determined, like sharing data or state observations \cite{foerster2016learning,lin2021learning,kim2020communication,zhu2022survey, yao2024reinforcement, li2022impact}. The emergence of large language model brings flexibility for human-understandable communications \cite{wang2023adapting,park2023generative,hong2023metagpt,mandi2023roco}, so some work tries to elevate decision-making ability of LLM-based multi-agent system by letting agents engage in discussions \cite{zhang2023building,wu2023autogen} or debates \cite{du2023improving, chan2023chateval}. The similar peer-communication strategy was as well utilized by the multi-agent system for financial tasks \cite{xing2024designing,de2024optimized,wan2024enhancing}. However, such approach are not optimal for unified-goal financial tasks that prioritize profits \cite{liuai2024}, because they suffer from potentially ambiguous optimization objectives and are unable to control the unnecessary communication costs \cite{bolton1994firm}.
+
+\textbf{Prompt Optimization and Verbal Reinforcement.} To enhance the reasoning or decision-making of LLM agents, many prompt optimization techniques have been proposed, like ReAct \cite{yao2022react}, Chain of Thought (CoT) \cite{wei2022chain}, Tree of Thoughts (ToT) \cite{yao2024tree}, ART \cite{paranjape2023art}, intended for that LLM agents can automatically generate intermediate reasoning steps as an iterative program. In addition, to make LLM agents make decisions like humans and generate more understandable reasoning texts, some researchers recommend incorporating cognitive structures \cite{hao2023reasoning, zhu2023ghost, sumers2023cognitive, wang2024survey}. Inspired by these previous work and DRL algorithms \cite{kaelbling1996reinforcement, xiong2024personalized, xiong2024dopl, yao2024reinforcement, yao2024control}, verbal reinforcement \cite{yao2023retroformer,shinn2024reflexion, zhang2023controlling,guo2024embodied} was developed for LLM agents such that they can update actions based on iterative self-reflection while integrating additional LLM as a prompt optimizer \cite{pryzant2023automatic, tang2024unleashing}.
+
+\subsection{Textual Gradient-Descent}
+\label{Textual Gradient-Descent}
+In an LLM-based prompt optimizer, a meta-prompt \cite{pryzant2023automatic, tang2024unleashing} is used to refine the task prompt for better performance. For example, for a mathematical reasoning task, the task prompt might be "Let’s solve the problem," while the meta-prompt could be "Improve the prompt to help a model better perform mathematical reasoning."
+
+Although prompt optimization lacks explicit gradients to control the update direction, we can simulate ``textual gradient'' by using LLMs' reflection capabilities. By generating feedback from past successes and failures on trading decisions, LLMs can produce "semantic" gradient signals that guide the optimization process.
+
+Adjusting the optimization process's direction is crucial, similar to tuning the learning rate in traditional parameter optimization. An inappropriate learning rate can cause the process to oscillate or converge too slowly. Similarly, without proper control, the LLM-based optimizer might overshoot or oscillate during prompt optimization.
+
+To mimic learning rate effects, we measure the overlapping percentage between trading decision sequences from consecutive iterations. We then directly edit the previous task prompt to enhance performance. The meta-prompt instructs the LLM to modify the current prompt based on feedback, ensuring a stable and incremental improvement process. This method allows for effective exploitation of existing prompts, leading to gradual performance enhancement.
+
+% \begin{table*}[ht]
+% \centering
+% \begin{adjustbox}{max width=\dimexpr\columnwidth,center}
+% \begin{tabular}{l|l|l}
+% \toprule
+% \textbf{Factor} & \textbf{Gradient-based model optimizer} & \textbf{LLM-based prompt optimizer}  \\
+% \midrule
+% Upgrade direction
+%     & Model value gradient momentum & Prompt reflection trajectory  \\
+% \midrule
+% Update method 
+%     & Learning rate descent & Overlapping percentage of trading decisions \\
+% \bottomrule
+% \end{tabular}
+% \end{adjustbox}
+% \caption{\footnotesize{Analogy between glossaries in model optimizer and prompt optimizer.}}
+% \label{CVRF_compare}
+% \end{table*}
+
+\newpage
+\subsection{\textsc{FinCon} Testing Stage Workflow}
+\label{Testing_Algo}
+During the testing stage, \textsc{FinCon} will utilize the investment beliefs learned from the training stage, and the over-episode risk control mechanism will no longer operate. However, the within-episode risk control mechanism will still function, allowing the manager agent to adjust trading actions in real-time based on short-term trading performance and market fluctuations. This ensures that even during testing, \textsc{FinCon} can promptly respond to market risks and potentially prevent losses while leveraging the knowledge gained during training.
+
+\label{alg:test_phase}
+\begin{algorithm}[ht]
+\caption{Testing Stage Algorithm of \textsc{FinCon}}
+\begin{algorithmic}
+\footnotesize{
+\STATE Initialize trading start date $s$, stock pool of portfolio and portfolio weights $w_0=\textbf{0}$.
+\STATE Inherit manager-analysts component $\{M_{pr}^i\}^{I}_{i=1} \& M_a$.
+\STATE Inherit the reflections $B$, learned prompts $\bm{\theta}$, the trained policy $\Pi_{\bm{\theta}}$.
+\FOR{$T+1\leq t \leq S$}
+    \STATE Run policy $\Pi_{\bm{\theta}}$ (collecting daily PnL $r_t$, portfolio weights $w_t$ and daily CVaR value $\rho_t$).
+    \IF{$\rho_t < \rho_{t-1}$ \OR $r_t < 0$}
+        \STATE Trigger $M_a$ self-reflection.
+    \ENDIF
+    \STATE Get one investment trajectory $\mathcal{H}$.
+\ENDFOR
+\STATE Output performance metrics calculation results based on $\mathcal{H}$.
+}
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+\subsection{Figure of Modular Design of Agents in \textsc{FinCon}}
+\label{detailed_modules}
+
+\begin{figure}[ht]
+\centering
+\begin{tcbraster}[raster columns=1] 
+% raster equal height
+    \begin{tcolorbox}[colback=white, colframe=lightblue, title=General Configuration, boxsep=2pt, top=2pt, bottom=2pt]
+    1. Investment task introduction \quad \qquad 
+    2. Trading target background \\
+    3. Trading sectors \quad \quad \quad \quad \quad \quad \quad \quad \
+    4. Historical financial performance overview
+    \end{tcolorbox}
+    \begin{tcolorbox}[colback=white, colframe=lightpurple, title=Profiling Module , boxsep=2pt, top=2pt, bottom=2pt]
+    \raggedright
+    \textbf{Manager Agent:}\\
+    1. Role assignment: You are an experienced 
+    trading manager in the investment firm ...\\
+    2. Role description: Your responsibilities are to consolidate investment insights from analysts and make trading actions on  \textcolor{red}{\{asset symbols\}} ...\\
+    \textbf{Analyst Agents:}\\
+    1. Role assignment: You are the investment analysts for news/ market data/ Form 10-K (Q)/ ECC audio recording ...\\
+    2. Role duty description: Your responsibilities are to distill 
+   investment insights and other indicators like financial sentiment for  \textcolor{red}{\{asset symbols\}} ...
+    \end{tcolorbox}
+    \begin{tcolorbox}[colback=white, colframe=lightorange, title=Perception Module, boxsep=2pt, top=2pt, bottom=2pt]
+    \raggedright
+    \textbf{Manager Agent:}\\
+    1. Perceive: Investment insights from analyst agents; daily risk alert and episode-level investment belief updates from the risk control component.\\
+    2. Send: Feedback to analyst agents about their contribution to significant investment earnings \& losses.\\     
+    \textbf{Analyst Agents:}\\
+    1. Perceive: Market information from certain information sources.\\
+    2. Send: Relevant market insights to manager agent.\\
+    3. Receive: Feedback from the manager agent.
+    \end{tcolorbox}
+    \begin{tcolorbox}[colback=white, colframe=lightyellow, title=Memory Module, boxsep=2pt, top=2pt, bottom=2pt]
+    \raggedright
+    \textbf{Manager Agent:}\\   
+    1. Working:   \; \; \quad \quad   - Consolidation \qquad \qquad \qquad \,\, -Refinement\\
+    2. Procedural: \ \quad \quad - Trading action records  \qquad \quad  - Reflection records\\      
+    3. Episodic:  \; \, \quad \quad   - Trajectory history \\   
+    \textbf{Analyst Agents:}\\
+    1. Working: \ \; \; \quad \quad - Observation \qquad \quad - Retrieval \qquad \quad - Distillation\\
+    2. Procedural:  \, \quad \quad - Distilled Investment-related insights   \; \
+    - Financial sentiment\\
+    \qquad \qquad \qquad \qquad \;  - Investment report recommended actions 		   
+    \end{tcolorbox}
+    \begin{tcolorbox}[colback=white, colframe=lightred, title=Action Module, boxsep=2pt, top=2pt, bottom=2pt]
+    \textbf{Manager Agent:}\\
+    1. Conduct: Trading actions. \\
+    2. Reflect:  Trading reasons and analyst agents' contribution assessment.
+    \end{tcolorbox}
+\end{tcbraster}
+\caption{\justifying{The detailed modular design of the manager and analyst agents. {The general configuration and profiling modules generate text-based queries to retrieve investment-related information from the agents' memory databases. The perceptual and memory modules interact with LLMs via prompts to extract key investment insights. The action module of the manager agent consolidates these insights to facilitate informed trading decisions.}}}
+\label{fig2:modular_design}
+\end{figure}
+
+\newpage
+\subsection{Experimental Setup}
+\label{Experimental Setup}
+\textit{\textbf{Multi-Modal Datasets.}} We collect a comprehensive multi-modal dataset to simulate a realistic market environment. This dataset includes stock price data, daily financial news, company filing reports (10K and 10Q), and ECC (Earnings Call Conference) audio recordings spanning from January 3, 2022, to June 10, 2023. Each data source is assigned to specific analyst agents based on the timeliness of the information. For example, annual filings (10K) exhibit longer-term persistence, quarterly filings (10Q) and ECC data have medium-term relevance, and daily financial news provides the most immediate information.
+
+\textit{\textbf{Evaluation Metrics.}} We evaluate \textsc{FinCon} and benchmark it against other state-of-the-art LLM-based and DRL-based agent systems using three key financial performance metrics: Cumulative Return (CR\%) \cite{hull2007risk}, Sharpe Ratio (SR) \cite{sharpe1994sharpe}, and Max Drawdown (MDD\%) \cite{ang2003downside}. These metrics help quantify each model's profitability, risk-adjusted returns, and risk management performance, respectively.
+
+\textit{\textbf{Comparative Methods.}} In the single-stock trading task, we compare \textsc{FinCon} against seven algorithmic agents and the widely accepted Buy-and-Hold (B \& H) baseline. The three DRL-based agents—A2C, PPO, and DQN—are from the FinRL framework \cite{liu2020finrl}, while the four state-of-the-art LLM-based agents include \textsc{Generative Agent} \cite{park2023generative}, \textsc{FinGPT} \cite{liu2023fingpt}, \textsc{FinMem} \cite{yu2023finmem}, and \textsc{FinAgent} \cite{zhang2024finagent}. For portfolio management, we benchmark \textsc{FinCon} against the classical Markowitz MV portfolio selection strategy \cite{markowitz1952portfolio}, the RL-based FinRL-A2C agent \cite{liu2020finrl}, and the B \& H strategy, which holds an equal-weighted position across all assets (equal-weighted ETF). Our focus on classical, RL-based, and B \& H methods is due to the current lack of mature LLM-based agents for portfolio management tasks.
+
+\textit{\textbf{Implementation Details.}} In our experiments, all LLM-based agent systems, including \textsc{FinCon}, use GPT-4-Turbo as the backbone model, with the temperature parameter set at 0.3 to balance response consistency with creative reasoning. \textsc{FinCon} is trained on financial data from January 3, 2022, to October 4, 2022, and tested on data from October 5, 2022, to June 10, 2023. Since deep reinforcement learning (DRL) agents require extensive data for convergence, their training period is extended to nearly five years (January 1, 2018, to October 4, 2022) to ensure fair comparison. The testing period remains the same across all models. The final performance metrics are based on the test trajectory with the median CR and SR values from five repeated epochs. If the median CR and SR occur in different epochs, performance is assessed based on the trajectory with the median CR value.
+\newpage
+\subsection{Single Stock Trading Result Graphs}
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/TSLA.png}
+    % \caption{Caption for plot 1}
+    \label{fig:tsla}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/AMZN.png}
+    % \caption{Caption for plot 2}
+    \label{fig:amzn}
+\end{minipage}
+
+\vspace{0.05mm}
+
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/NIO.png}
+    % \caption{Caption for plot 3}
+    \label{fig:nio}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/MSFT.png}
+    % \caption{Caption for plot 3}
+    \label{fig:msft}
+\end{minipage}
+\vspace{0.05mm}
+
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/AAPL.png}
+    % \caption{Caption for plot 4}
+    \label{fig:aapl}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.483\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/GOOG_v2.png}
+    % \caption{Caption for plot 5}
+    \label{fig:goog}
+\end{minipage}
+\vspace{0.05mm}
+
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/NFLX.png}
+    % \caption{Caption for plot 4}
+    \label{fig:nflx}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/COIN.png}
+    % \caption{Caption for plot 6}
+    \label{fig:coin}
+\end{minipage}
+\caption{\justifying{\footnotesize{CRs over time for single-asset trading tasks. \textsc{FinCon}  outperformed other comparative strategies, achieving the highest CRs across all six stocks by the end of the testing period, regardless of market conditions.}}}
+\label{fig:aing_stock_all_plots}
+\end{figure}
+
+\subsection{Detailed Ablation Study}
+\label{ablation_study}
+
+\include{Sections/ablation_study}
+
+\newpage
+\subsection{Raw Data Sources}
+\label{appendix:data}
+We assessed the performance of \textsc{FinCon} using multi-modal financial data from January 3, 2022, to June 10, 2022, sourced from reputable databases and APIs including Yahoo Finance (via yfinance), Alpaca News API, and Capital IQ, detailed explained in Table. These data, initially stored in the Raw Financial Data Warehouse as available observations of the financial market environment, are diverged into the corresponding \textsc{FinCon}'s Analysts' Procedural Memory Databases based on timeliness through working memory's summarization operation. 
+
+\begin{table}[h]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{adjustbox}{max width=\dimexpr\columnwidth-0.1cm,center}
+    \begin{tabular}{|m{15cm}|}
+    \hline
+    % \toprule
+    \textbf{Data Sources} \\ % Adjust height here
+    \hline
+    % \midrule
+    \textbf{\textit{News data associated with ticker:}} News data is sourced from REFINITIV REAL-TIME NEWS mainly contains news from Reuters.\\ 
+    \hline
+    % \midrule
+    
+    \textbf{\textit{Form 10-Q, Part 1 Item 2 (Management’s Discussion and Analysis of Financial Condition and Results of Operations):}}  Quarterly reports (Form 10-Q) are required by the U.S. Securities and Exchange Commission (SEC). \\ 
+    \hline
+    % \midrule
+    
+     \textbf{\textit{Form 10-k, Section 7 (Management’s Discussion and Analysis of Financial Condition and Results of Operations):}} Annual reports (Form 10-K) are required by the U.S. Securities and Exchange Commission (SEC), sourced from EDGAR, and downloaded via SEC API.  \\ 
+    \hline
+
+    \textbf{\textit{Historical stock price:}} Daily open price, high price, close price, adjusted close price, and volume data from Yahoo Finance.\\ 
+    \hline
+
+    \textbf{\textit{Zacks Equity Research:}} \\
+    \textbf{Zacks Rank:} The Zacks Rank is a short-term rating system that is most effective over the one- to three-month holding horizon. The underlying driver for the quantitatively determined Zacks Rank is the same as the Zacks Recommendation and reflects trends in earnings estimate revisions.\\ 
+    \textbf{Zacks Analyst:} Reason to Sell, Reason to Buy, and potential risks.\\
+    \hline
+
+    \textbf{\textit{Earning Conference Calls (ECC):}} ECC is a type of unstructured financial data (audio) that is crucial for understanding market dynamics and investor sentiment. The company executive board delivers ECC about recent financial outcomes, future projections, and strategic directions. Recent studies have underscored the importance of not only the textual content of these calls but also the audio feature. Analyses have revealed that the audio elements—such as tone, pace, and inflections—offer significant predictive value regarding company performance and stock movements~\cite{qin2019you, yang2020html, cao2024ecc}.
+\\
+    \hline
+    
+    \end{tabular}
+    \end{adjustbox}
+    
+    \caption{Raw data and memory warehouses of \textsc{FinCon}}
+    \label{tab:data_summary}
+\end{table}
+
+\subsection{Distribution of Data}
+\label{Distribution}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{appendix_figure/news.png}
+  \caption{The distribution of news from REFINITIV REAL-TIME NEWS for the 42 stocks in the experiments}
+  \label{fig:news_counts} 
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{appendix_figure/10k10q.PNG}
+  \caption{The distribution of 10k10q from Securities and Exchange Commission (SEC) for the 42 stocks in the experiments}
+  \label{fig:kq_counts} 
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{appendix_figure/zacks.PNG}
+  \caption{The distribution of Analyst Report from Zacks Equity Research for the 42 stocks in the experiments}
+  \label{fig:zacks_counts} 
+\end{figure}
+
+\subsection{Formulas of Classic Financial Metrics for Risk Estimator and Decision-making Task Performance Evaluation}
+\label{appendix:metrics}
+The risk estimator uses the following metrics:\par
+\textbf{Profit and Loss (PnL)}\cite{hull2017options}: PnL quantifies the net outcome of trading activities over a specified period by accounting for the realized gains and losses from financial instruments like stocks and derivatives. 
+
+\textbf{Value at Risk (VaR)} of PnL\cite{hull2017options}: VaR is a statistical tool used to estimate the potential loss in a portfolio, within a defined confidence interval. Mathematically, it is defined as Equation~\ref{eq:VaR}:
+\begin{equation}
+\text{VaR}_{\alpha}(PnL) = \inf \left\{ l \in \mathbb{R} : \mathbb{P}(PnL \leq l) \geq \alpha \right\}
+\label{eq:VaR}
+\end{equation}
+where \(\alpha\) is the confidence level.
+
+\textbf{Conditional Value at Risk (CVaR)} of PnL\cite{hull2017options}: CVaR is a statistical tool used to estimate the expected potential loss worse than the VaR value in a portfolio, within a defined confidence interval. Mathematically, it is defined as Equation~\ref{eq:CVaR}:
+\begin{equation}
+\text{CVaR}_{\alpha}(PnL) = \mathbb{E}\Big\{ PnL| PnL\leq\text{VaR}_{\alpha}(PnL)\Big\}
+\label{eq:CVaR}
+\end{equation}
+where \(\alpha\) is the confidence level.
+
+The performance evaluation of algorithmic trading agents incorporates the following metrics:\par
+\textbf{Cumulative Return of PnL} \cite{hull2007risk}: Cumulative Return is a key trading performance metric because it provides a comprehensive insight into investment performance, especially for strategies that emphasize long-term growth and reinvestment. The effectiveness of different investment strategies is evaluated based on their Cumulative Returns, which reflect the total change in value over time. In this study, we compute Cumulative Returns over the specified period by summing daily logarithmic returns, as outlined in Equation~\ref{eq:cum_return}. This method is widely accepted in the finance area due to its ability to precisely capture minor price fluctuations and symmetrically address gains and losses. In essence, a higher Cumulative Return typically indicates a more effective strategy.
+
+\begin{align}
+    \textbf{Cumulative Return} &= \sum_{t=1}^{n} r_i \nonumber \\
+                                   &= \sum_{t=1}^{n} \left[ \ln\left(\frac{p_{t+1}}{p_t}\right) \cdot \text{action}_t \right],
+    \label{eq:cum_return}
+\end{align}
+
+where $r_i$ represents the PnL for day $t+1$, $p_t$ is the closing price on day $t$, $p_{t+1}$ is the closing price on day $t+1$, and $\text{action}_t$ denotes the trading decision made by the model for that day.
+
+\textbf{Portfolio Value}: Portfolio value represents the total worth of all the investments held in a portfolio at a given point in time. It is a metric used only in the portfolio management task.
+\begin{equation}
+    \textbf{Cumulative Simple Return}_t =  \prod_{k=1}^{t} (1 + \textbf{Daily Simple Return}_t) - 1
+    \label{eq:cr_simple}
+\end{equation}
+
+\begin{equation}
+    \textbf{Portfolio Value}_t = \textbf{Initial Investment Amount} \times (1 + \textbf{Cumulative Simple Return}_t)
+    \label{eq:portfolio_value}
+\end{equation}
+, where the initial amount is set as $\$1,000,000$.
+
+
+\textbf{Sharpe Ratio of PnL} \cite{sharpe1994sharpe}: Sharpe Ratio is another core metric for evaluating investment performance and adjusting returns for risk. It is calculated by dividing the portfolio's average PnL ($R_p$) over the risk-free rate ($R_f$) by its volatility ($\sigma_p$), as shown in Equation~\ref{eq:sharpe}. This metric adjusts returns for risk, with a higher ratio indicating better risk-adjusted performance. Essential in comparing different portfolios or strategies, it contextualizes performance against similar investments. Although a Sharpe Ratio above 1 is typically considered favorable and above 2 as excellent, these benchmarks can vary depending on the context of comparison.
+  
+  \begin{equation}
+    % \textbf{Sharpe Ratio} = ({R_{p} - R_{f}})/\sigma_{p}
+    \textbf{Sharpe Ratio} = \frac{R_p - R_f}{\sigma_p}
+    \label{eq:sharpe}
+  \end{equation}  
+
+% \textbf{Annualized Volatility and Daily Volatility of PnL} \cite{cochrane1988volatility}: Annualized Volatility (Annum-Volatility) is calculated as the \textbf{Daily Volatility} (standard deviation of daily logarithmic returns) multiplied by the square root of the typical number of trading days in a year (252) as outlined in Equation~\ref{eq:annuaVol}, is vital for assessing investment risk. This measure reflects the extent of fluctuation in a security or market index's returns over a year, indicating potential deviations from average returns. It's especially relevant for investors with specific risk profiles, such as those who are risk-averse, who may prefer portfolios demonstrating lower annualized volatility.  
+
+%    \begin{align}
+%    \label{eq:annuaVol}
+%     \textbf{Annum-Volatility} &= \textbf{Daily Volatility} \times \sqrt{252} 
+%    \end{align} 
+  
+\textbf{Max Drawdown of PnL} \cite{ang2003downside}: Max Drawdown is a metric for assessing risk. It represents the most significant decrease in a portfolio's value, from its highest ($P_{\text{peak}}$) to its lowest point ($P_{\text{trough}}$) until a new peak emerges, detailed in Equation~\ref{eq:maxdrawdown}. Indicative of investment strategy robustness, a smaller Max Drawdown suggests reduced risk.
+% Notably, while Max Drawdown offers a retrospective view of risk exposure, it does not forecast future risk probabilities. 
+  
+    \begin{align}
+    \label{eq:maxdrawdown}
+    \textbf{Max Drawdown} = \text{max}(\frac{P_{\text{peak}} - P_{\text{trough}}}{P_{\text{peak}}})
+    \end{align}
+
+
+
+\subsection{Baseline and Comparative Models on Single Stock Trading Task}
+\label{appendix:model_set}
+
+
+\textbf{Buy-and-Hold strategy (B\&H)}: 
+
+A passive investment approach, where an investor purchases stocks and holds onto them for an extended period regardless of market fluctuations, is commonly used as a baseline for comparison of stock trading strategies. 
+
+\textbf{LLM trading agents:} 
+
+We evaluate \textsc{FinCon} against four LLM agents in the context of stock trading. 
+
+% The first LLM agent - FinGPT, a leading-edge LLM in trading, has been acclaimed for its promising performance in stock market operations. The second agent - \textsc{FinMem}, an innovative LLM-based trading agent, \textsc{FinMem} excels with its novel layered memory system and dynamic character design, processing multi-source financial data and adapting character settings to volatile markets.
+\begin{itemize}
+   \item \textbf{\textsc{General-purpose Generative Agents -- GA:}}The generative AI agent by Park et al. \cite{park2023generative}, originally intended to simulate realistic human behavior and make everyday decisions, has been adapted here for specific stock trading tasks. This agent's architecture includes a memory module that employs recency, relevance, and importance metrics to extract pivotal memory events for informed decision-making. However, it does not provide a layered memory module to effectively differentiate the time sensitivities unique to various types of financial data. Additionally, although it features a profiling module to define agent attributes like professional background, the model does not specify the agent's persona. In our experiments, we modified the original prompt template created by Park et al., which was intended for general daily tasks, to suit financial investment tasks. 
+ \item \textbf{\textsc{FinGPT}:} A novel open-source LLM framework specialized for converting incoming textual and numeric information into informed financial decision-making, introduced by Yang et al\cite{yang2023fingpt}. It claims superiority over the traditional buy-and-hold strategy.
+
+ \item \textbf{\textsc{FinMem}:}\textsc{FinMem} employs a specialized profiling module and self-adaptive risk settings for enhanced market robustness. Its memory module integrates working memory and layered long-term memory, enabling effective data processing. This allows \textsc{FinMem} to leverage market insights and improve trading decisions \cite{yu2023finmem}.
+ 
+  \item \textbf{\textsc{FinAgent}:}\textsc{FinAgent} developed upon \textsc{FinMem}, which leverages the use of tool-using capabilities of LLMs to incorporate multi-modal financial data  \cite{zhang2024finagent}. It claims an further improved trading performance on single asset trading (stocks and cryptocurrencies).
+
+\end{itemize}
+
+
+\textbf{DRL trading agents:} 
+
+As the \textsc{FinMem} is practiced and examined on the basis of single stock trading and discrete trading actions, we choose three advanced DRL algorithms fitting into the same scenarios according to the previous and shown expressive performance in the work of Liu et al \cite{liu2021finrl, liu2022finrl}. The DRL training agents only take numeric features as inputs.
+
+\begin{itemize}
+\item \textbf{Advantage Actor-Critic (\textsc{A2C}):} \textsc{A2C} (\cite{mnih2016asynchronous}) is applied to optimize trading actions in the financial environment. It operates by simultaneously updating both the policy (actor) and the value (critic) functions, providing a balance between exploration and exploitation. 
+\item \textbf{Proximal Policy Optimization (\textsc{PPO}):} \textsc{PPO} (\cite{schulman2017proximal}) is employed in stock trading due to its stability and efficiency. One salient advantage of PPO is that it maintains a balance between exploration and exploitation by bounding the policy update, preventing drastic policy changes. 
+\item \textbf{Deep Q-Network (\textsc{DQN}):} \textsc{DQN} (\cite{mnih2013playing}) is an adaptation of Q-learning, that can be used to optimize investment strategies. Unlike traditional Q-learning that relies on a tabular approach for storing Q-values, DQN generalizes Q-value estimation across states using deep learning, making it more scalable for complex trading environments. 
+\end{itemize}
+
+
+\subsection{Portfolio Management}
+\label{explain_portfolio_selection}
+\textbf{Markowitz Portfolio Selection} \cite{markowitz1952portfolio}: introduced by Harry Markowitz in 1952, is a framework for constructing portfolios that optimize expected return for a given level of risk or minimize risk for a given level of expected return. This method uses expected returns, variances, and covariances of asset returns to determine the optimal asset allocation, thereby balancing risk and return through diversification.
+
+\textbf{FinRL-A2C} \cite{liu2020finrl}: is an RL algorithm proposed to address single stock trading and portfolio optimization problems in Liu et al.. The RL models make trading decisions (i.e., portfolio weights) based on the observation of previous market conditions and the brokerage information of the RL agents. The implementation of this algorithm \footnote{\url{https://github.com/AI4Finance-Foundation/FinRL-Meta}} is provided and is used as baselines in our study. 
+
+\textbf{Equal-Weighted ETF} \cite{plyakha2012does}: is a portfolio giving equal allocation to all stocks, similar to a buy-and-hold strategy in single-stock trading, can provide a benchmark on market trends.
+
+\subsection{Ranking Metrics for Procedural Memory in \textsc{FinCon}}
+\label{memory_rankings}
+Upon receiving an investment inquiry, each agent in \textsc{FinCon}\ retrieves the top-$K$ pivotal memory events from its procedural memory, where $K$ is a hyperparameter. These events are selected based on their information retrieval score. For any given memory event $E$, its information retrieval score $\gamma^E$ is defined by
+\begin{equation}  \label{eqn:eq4}
+\gamma^{E} = S_{\text{Relevancy}}^{E} + S_{\text{Importance}}^{E}
+\end{equation}
+ which is adpated from Park et al \cite{park2023generative} but with modified relevancy and importance computations, and is scaled to $[0,1]$ before summing up. Upon the arrival of a trade inquiry $P$ in processing memory event $E$ via LLM prompts, the agent computes the relevancy score $S_{\text{Relevancy}}^{E}$ that measures the \textit{cosine similarity} between the embedding vectors of the memory event textual content $\mathbf{m_{E}}$ and the LLM prompt query $\mathbf{m_{P}}$, which is defined as follows: 
+\begin{equation} \label{eqn:eq5}
+S_{\text{Relevancy}}^{E} = \frac{\mathbf{m_{E}} \cdot \mathbf{m_{P}}}{\|\mathbf{m_{E}}\|_2 \times \|\mathbf{m_{P}}\|_2}
+\end{equation}
+Note that the LLM prompt query inputs trading inquiry and trader characteristics. On the other hand, the importance score $S_{\text{Importance}}^{E}$ is inversely correlates with the time gap between the inquiry and the event's memory timestamp $\delta t = t_{\text{P}} - t_{E}$, mirroring Ebbinghaus's forgetting curve \cite{murre2015replication}. More precisely, if we denote the initial score value of memory event $v^E$ and degrading ratio $\theta\in(0,1)$, then the importance score is computed via
+\begin{equation}
+    S_{\text{Importance}}^E = v^{E} \times \theta^{\delta t}
+\end{equation}
+Note that the ratio $\theta$ measures the diminishing importance of an event over time, which is inspired by design of \cite{park2023generative}. But in our design, the factors of recency and importance are handled by one equation. Different agents in \textsc{FinCon}\ admit different choices of $\{v^E,\theta\}$ for memory event $E$.
+ 
+ %The modification is to achieve the layered processing function and represent the various periodicity of the financial environment. 
+ %Upon a trade inquiry $P$ arrival in processing memory event $E$ via LLM prompts, the agent computes the recency score $S_{\text{Recency}}^{E}$ (see Equation.\ref{eqn:eq1}), which inversely correlates with the time gap between the inquiry and the event's memory timestamp, mirroring Ebbinghaus's forgetting curve \cite{murre2015replication}. The stability constant $Q$ (in Equation.\ref{eqn:eq1}) partially controls memory decay rates, indicating longer memory persistence with a higher stability value. The relevancy score $S_{\text{relevancy}}^{E}$ measures the \textit{cosine similarity} between the embedding vectors of memory event textual content $\mathbf{m_{E}}$ and the LLM prompt query $\mathbf{m_{P}}$ depicted, as shown by Equation.\ref{eqn:eq2}). The LLM prompt query inputs trading inquiry and trader characteristics. The importance scores $S_{\text{Importance}}^{E}$ is the product of two constants:  $v^{E}$ and degrading ratio $\theta$ as shown in Equation~\ref{eqn:eq5}. The constant $\theta$ measures the diminishing importance of an event over time, which has a close form design of \cite{park2023generative}. Memory events are purged when $S_{\text{Recency}}^{E}$ is below 0.05 or $S_{\text{Importance}}^{E}$ is under 20 (pre-scaling). Note that different agents in \textsc{FinCon} admits different set of constants $\{Q,v^E,\theta\}$.
+
+% One memory event $E$ can only be located in one memory layer $l$. 
+Additionally, an access counter function facilitates memory event augmentation, so that critical events impacting trading decisions can be augmented by \textsc{FinCon}, while trivial events are gradually faded. This is achieved by using the LLM validation tool Guardrails AI \cite{guardrailsai} to track critical memory ID. A memory ID deemed critical to investment gains receives $+5$ to its importance score $S_{\text{Importance}}^{E}$. This access counter implementation enables \textsc{FinCon}\ to capture and prioritize crucial events based on type and retrieval frequency.
+
+
+
+
+
+\subsection{Detailed Configurations in Experiments}
+\label{app:exp_figure}
+The training period was chosen to account for the seasonal nature of corporate financial reporting and the duration of data retention in \textsc{FinCon}'s memory module. The selected training duration ensures the inclusion of at least one publication cycle of either Form 10-Q, ECC, or Form 10-K. This strategy ensures that the learned conceptualized investment guidance considers a more comprehensive scope of factors. Additionally, the training duration allowed \textsc{FinCon} sufficient time to establish inferential links between financial news, market indicators, and stock market trends, thereby accumulating substantial experience. Furthermore, we set the number of top memory events retrieved for each agent at 5. We ran \textsc{FinCon}. The reported performance outcomes are based on the setting that achieved the highest cumulative return during the testing phase.
+
+
+
+To maintain consistency in the comparison, the training and testing phases for the other three LLM-based agents were aligned with those of \textsc{FinMem}. For parameters of other LLM-based agents that are not encompassed by \textsc{FinMem}'s configuration, they were kept in accordance with their original settings as specified in their respective source codes.
+
+
+
+% Considering that DRL algorithms need extensive training data for stable and converged results, and given our daily evaluation of trading performance, we extended the DRL agents' training period to roughly a 10-year span, from January 1, 2012, to October 05, 2022, for a fair comparison. The testing period was kept consistent with the other models. The DRL algorithms were implemented using Stable Baselines 3 \cite{stable-baselines3}.
+
+% \textsc{FinMem} was evaluated against the best-performing comparative model based on the most crucial metric, Cumulative Return. The significance of \textsc{FinMem}'s performance advantage was validated using the non-parametric Wilcoxon signed-rank test, an appropriate choice given the non-Gaussian distribution of the outcome data.
+
+\textsc{FinCon}'s performance was benchmarked against that of the most effective comparative model, using Cumulative Return and Sharpe Ratio as the primary evaluation metrics. The statistical significance of \textsc{FinCon}'s superior performance was ascertained through the non-parametric Wilcoxon signed-rank test, which is particularly apt for the non-Gaussian distributed data.
+
+
+
+\subsection{\textsc{FinCon} performance on extreme market conditions}
+\label{app:extreme_market}
+To further illustrate the robustness of \textsc{FinCon}'s performance, we assess its effectiveness in two distinct scenarios: (1) a single-asset trading task using TSLA and (2) a portfolio management task involving a combination of TSLA, MSFT, and PFE. Our evaluation focuses on key financial metrics, including Cumulative Returns (CRs), Sharpe Ratios (SRs), and Maximum Drawdown (MDD). The training period spanned from January 17, 2022, to March 31, 2022, while the testing phase covered April 1, 2022, to October 15, 2022. This specific timeframe was chosen due to the elevated levels of the CBOE Volatility Index (VIX), which averaged above 20, signaling greater market volatility during these months.
+
+As demonstrated in Table~\ref{subfig:single_asset_baselines} and Figure~\ref{subfig:single_asset_cr}, \textsc{FINCON} is the sole agent system to achieve positive Cumulative Returns (CRs) and Sharpe Ratios (SRs) in single stock trading tasks. Regarding portfolio management tasks, the results of all baselines (four benchmarks) are detailed in Table~\ref{subfig:portfolio_baselines} and Figure~\ref{subfig:portfolio_management_cr}. In these comparisons, \textsc{FINCON} consistently attained the highest scores in the primary performance metrics.
+
+\begin{figure*}[ht]
+\centering
+\begin{minipage}[b]{0.45\textwidth}
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lccc}
+    \toprule
+    \textbf{Models} & \textbf{CR \%} $\uparrow$ & \textbf{SR}$\uparrow$  & \textbf{MDD \%}$\downarrow$ \\
+    \midrule
+    B\&H & -56.738 & -1.625 & 52.077 \\
+    \midrule
+    \textsc{FinCon} &   \textcolor{red}{22.460} & \textcolor{red}{0.695}& 45.215 \\
+    \midrule
+    \textsc{GA} & -51.251 & -1.547 & 48.763  \\
+    \textsc{FinGPT} & -20.035 & \textcolor{blue}{-0.805} & 32.199 \\
+    \textsc{FinMem} & -47.809 & -1.549 & 49.560 \\
+    \textsc{FinAgent} & -31.119 & -1.933 & 33.224 \\
+    \midrule
+    A2C & -73.251 & -2.142 & 56.998 \\
+    PPO & -78.007 & -2.284 & 59.003 \\
+    DQN & \textcolor{blue}{-8.452} & -1.328 & 8.463 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \captionof{table}{\justifying{\footnotesize{Key performance comparison for single asset trading under the high volatility condition using TSLA as an example. \textsc{FinCon} leads all performance metrics.}}}
+    \label{subfig:single_asset_baselines}
+\end{minipage}%
+\hfill
+\begin{minipage}[b]{0.52\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/TSLA_extreme_markets.png}
+    \caption{\justifying{\footnotesize{CR changes over time across all the strategies under the high volatility condition using TSLA as an example of the single asset trading task.}}}
+    \label{subfig:single_asset_cr}
+\end{minipage}
+\label{fig:single_stock_trading_comparison}
+\end{figure*}
+
+
+\begin{figure*}[ht]
+\centering
+\begin{minipage}[b]{0.45\textwidth}
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lccc}
+    \toprule
+    \textbf{Models} & \textbf{CR \%} $\uparrow$ & \textbf{SR}$\uparrow$  & \textbf{MDD \%}$\downarrow$ \\
+    \midrule
+    \textsc{FinCon} &   \textcolor{red}{-8.429} & \textcolor{red}{-0.294}& 26.176 \\
+    Markowitz MV  & -28.996 & -1.805 & 31.831 \\
+    \textsc{FinRL}-A2C & \textcolor{blue}{-15.932} & \textcolor{blue}{-1.195} & 21.569  \\
+    Equal-Weighted ETF & -28.008 & -1.731 & 30.070 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \captionof{table}{\justifying{\footnotesize{Key performance comparison among all portfolio management strategies of Portfolio1 under the high volatility condition. \textsc{FinCon} leads all performance metrics.}}}
+    \label{subfig:portfolio_baselines}
+\end{minipage}%
+\hfill
+\begin{minipage}[b]{0.52\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figure/portfolio_extreme_market_condition.png}
+    \caption{\justifying{\footnotesize{Portfolio1 value changes over time for all the strategies under the high volatility condition.}}}
+    \label{subfig:portfolio_management_cr}
+\end{minipage}
+\label{fig:portfolio_trading_comparison}
+\end{figure*}

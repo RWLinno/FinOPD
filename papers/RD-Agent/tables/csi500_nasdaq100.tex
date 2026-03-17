@@ -1,0 +1,44 @@
+\setlength{\textfloatsep}{10pt}
+\begin{table*}[h]
+\caption{Out-of-sample experimental results on the CSI~500 and NASDAQ~100 (both tested from 2024 to June 2025), including factor predictive metrics (IC, ICIR) and strategy performance metrics (IR, MDD). Visual cues indicate ranking groups: \colorbox{top1}{\textbf{Best}}, \colorbox{top2}{\ul{Second Best}}, \colorbox{good}{Good (3--5)}, \colorbox{average}{Average (6--10)}, \colorbox{poor}{Poor (11--15)}, and \colorbox{worse}{Worse (16--19)}.}
+\label{results-csi-nasdaq}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llcccccccc}
+\toprule
+\multicolumn{2}{c}{\multirow{3}{*}{\textbf{Models}}}  & 
+\multicolumn{4}{c}{\textbf{CSI500}} & 
+\multicolumn{4}{c}{\textbf{NASDAQ100}} \\ 
+\cmidrule(lr){3-6} \cmidrule(lr){7-10}
+\multicolumn{2}{c}{} & \textbf{IC} & \textbf{ICIR} & \textbf{IR (SHR*)} & \textbf{MDD} & \textbf{IC} & \textbf{ICIR} & \textbf{IR (SHR*)} & \textbf{MDD} \\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Machine-Learning\\ Models\end{tabular}}
+& LightGBM         & \cellcolor{worse}0.0181 & \cellcolor{worse}0.1271 & \cellcolor{worse}-0.3178 & \cellcolor{worse}-0.2089 & \cellcolor{average}0.0080 & \cellcolor{good}0.0652  & \cellcolor{worse}-0.2603 & \cellcolor{poor}-0.1342 \\
+& XGBoost          & \cellcolor{average}0.0240 & \cellcolor{average}0.1675 & \cellcolor{worse}0.0634  & \cellcolor{poor}-0.1766   & \cellcolor{average}0.0076 & \cellcolor{average}0.0527 & \cellcolor{poor}0.1544   & \cellcolor{poor}-0.1211 \\
+& CatBoost         & \cellcolor{average}0.0241 & \cellcolor{average}0.1629 & \cellcolor{worse}0.1438  & \cellcolor{worse}-0.1799  & \cellcolor{good}0.0095    & \cellcolor{average}0.0614 & \cellcolor{worse}-0.0735 & \cellcolor{average}-0.1148 \\
+& DoubleEnsemble   & \cellcolor{average}0.0248 & \cellcolor{average}0.1705 & \cellcolor{poor}0.2500   & \cellcolor{worse}-0.2094  & \cellcolor{poor}0.0047    & \cellcolor{poor}0.0360    & \cellcolor{worse}-0.0046 & \cellcolor{poor}-0.1404 \\
+\midrule
+\multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}Deep-Learning\\ Models\end{tabular}}
+& Transformer      & \cellcolor{poor}0.0194   & \cellcolor{poor}0.1355   & \cellcolor{average}0.2898 & \cellcolor{average}-0.1331 & \cellcolor{worse}-0.0011  & \cellcolor{worse}-0.0077  & \cellcolor{worse}-0.0343 & \cellcolor{worse}-0.1553 \\
+& GRU              & \cellcolor{poor}0.0188   & \cellcolor{worse}0.1022  & \cellcolor{average}0.3716 & \cellcolor{poor}-0.1602    & \cellcolor{poor}0.0064     & \cellcolor{average}0.0457  & \cellcolor{poor}0.2930   & \cellcolor{worse}-0.1504 \\
+& LSTM             & \cellcolor{average}0.0219 & \cellcolor{poor}0.1434   & \cellcolor{good}0.6900    & \cellcolor{average}-0.1075 & \cellcolor{poor}0.0062     & \cellcolor{poor}0.0409     & \cellcolor{average}0.4526 & \cellcolor{poor}-0.1204 \\
+& GATs             & \cellcolor{worse}0.0162  & \cellcolor{worse}0.1013  & \cellcolor{good}0.5168    & \cellcolor{poor}-0.1569    & \cellcolor{worse}-0.0004   & \cellcolor{worse}-0.0023   & \cellcolor{average}0.5772 & \cellcolor{worse}-0.1491 \\
+& iTransformer     & \cellcolor{worse}0.0161  & \cellcolor{worse}0.1031  & \cellcolor{worse}0.0985   & \cellcolor{poor}-0.1496    & \cellcolor{average}0.0076  & \cellcolor{poor}0.0421     & \cellcolor{poor}0.3612   & \cellcolor{worse}-0.1991 \\
+& TRA              & \cellcolor{good}0.0260   & \cellcolor{good}0.1813   & \cellcolor{good}0.6040    & \cellcolor{poor}-0.1461    & \cellcolor{poor}0.0058     & \cellcolor{average}0.0446  & \cellcolor{average}0.4608 & \cellcolor{poor}-0.1351 \\
+\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}l@{}}Factor\\ Libraries\end{tabular}}
+& Alpha 158        & \cellcolor{poor}0.0192   & \cellcolor{poor}0.1353   & \cellcolor{poor}0.2515    & \cellcolor{worse}-0.1771   & \cellcolor{worse}0.0040    & \cellcolor{poor}0.0324     & \cellcolor{poor}0.0303   & \cellcolor{average}-0.1140 \\
+& Alpha 360        & \cellcolor{poor}0.0195   & \cellcolor{poor}0.1331   & \cellcolor{poor}0.2527    & \cellcolor{average}-0.1270 & \cellcolor{worse}0.0042    & \cellcolor{poor}0.0327     & \cellcolor{average}0.5890 & \cellcolor{average}-0.1182 \\
+& AutoAlpha        & \cellcolor{worse}0.0184  & \cellcolor{poor}0.1529   & \cellcolor{average}0.5728 & \cellcolor{good}-0.1006    & \cellcolor{poor}0.0046     & \cellcolor{worse}0.0265    & \cellcolor{poor}0.0974   & \cellcolor{average}-0.1165 \\
+\midrule
+\multirow{6}{*}{\begin{tabular}[c]{@{}l@{}}R\&D-Agent Series\\ Framework*\end{tabular}}
+& R\&D-Factor (GPT-4o)    & \cellcolor{poor}0.0201   & \cellcolor{good}0.1709   & \cellcolor{good}1.3730    & \cellcolor{good}-0.0787    & \cellcolor{average}0.0070  & \cellcolor{average}0.0446  & \cellcolor{good}1.0985    & \cellcolor{good}-0.0977 \\
+& R\&D-Factor (o4-mini)   & \cellcolor{good}0.0264   & \cellcolor{top1}\textbf{0.2652} & \cellcolor{average}1.0014 & \cellcolor{average}-0.1215 & \cellcolor{top2}\uline{0.0166} & \cellcolor{top2}\uline{0.1017} & \cellcolor{good}1.1169 & \cellcolor{top2}\uline{-0.0650} \\
+& R\&D-Model (GPT-4o)     & \cellcolor{good}0.0259   & \cellcolor{average}0.1649 & \cellcolor{good}1.0941    & \cellcolor{average}-0.1367 & \cellcolor{good}0.0128     & \cellcolor{good}0.0831     & \cellcolor{average}1.0742 & \cellcolor{good}-0.0842 \\
+& R\&D-Model (o4-mini)    & \cellcolor{top2}\uline{0.0265} & \cellcolor{good}0.1825   & \cellcolor{good}1.4021    & \cellcolor{top2}\uline{-0.0735} & \cellcolor{average}0.0081 & \cellcolor{average}0.0484  & \cellcolor{good}1.2671    & \cellcolor{good}-0.0741 \\
+& R\&D-Agent(Q) (GPT-4o)  & \cellcolor{average}0.0241 & \cellcolor{average}0.1532 & \cellcolor{top2}\uline{1.4227} & \cellcolor{good}-0.0803    & \cellcolor{top1}\textbf{0.0172} & \cellcolor{good}0.0908     & \cellcolor{top2}\uline{1.3312} & \cellcolor{average}-0.1044 \\
+& R\&D-Agent(Q) (o4-mini) & \cellcolor{top1}\textbf{0.0288} & \cellcolor{top2}\uline{0.1828} & \cellcolor{top1}\textbf{2.1721} & \cellcolor{top1}\textbf{-0.0656} & \cellcolor{good}0.0162 & \cellcolor{top1}\textbf{0.1035} & \cellcolor{top1}\textbf{1.7737} & \cellcolor{top1}\textbf{-0.0634} \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}

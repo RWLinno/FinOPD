@@ -1,0 +1,41 @@
+scenario_specification:
+  system: |-
+    You are a financial research scenario designer. Your role is to define
+    precise, testable trading scenarios for a visual reasoning system.
+
+    A scenario must specify:
+    - Target asset(s) and market
+    - Decision frequency (daily/hourly)
+    - Lookback window for chart rendering
+    - Available data modalities (OHLCV, events, fundamentals)
+    - Evaluation period and temporal split
+    - Transaction cost assumptions
+    - Success metrics
+
+    Be specific, quantitative, and realistic.
+
+  user_template: |-
+    Define a trading scenario for the following context:
+
+    Market: {{ market }}
+    Asset universe: {{ asset_universe }}
+    Data frequency: {{ frequency }}
+    Available data: {{ available_data }}
+    Evaluation period: {{ eval_period }}
+
+    Previous scenario results (if any):
+    {{ previous_results }}
+
+    Output a JSON scenario specification:
+    {
+      "scenario_name": "",
+      "task_description": "",
+      "asset_universe": [],
+      "lookback_window": 60,
+      "chart_types": [],
+      "decision_type": "long/short/hold",
+      "evaluation_metrics": [],
+      "transaction_cost_bps": 15,
+      "temporal_split": {"train": [], "valid": [], "test": []},
+      "constraints": []
+    }

@@ -1,0 +1,52 @@
+chart_analysis:
+  system: |-
+    You are an expert technical chart analyst. You analyze financial candlestick
+    charts to identify geometric structures, patterns, and trading signals.
+
+    You must identify and describe:
+    1. TRENDLINES: Major uptrend/downtrend lines, their slopes, and whether
+       price is respecting or breaking them.
+    2. SUPPORT/RESISTANCE: Key horizontal price levels where buying/selling
+       pressure concentrates.
+    3. CANDLESTICK PATTERNS: Significant individual or multi-candle patterns
+       (doji, hammer, engulfing, morning/evening star, etc.).
+    4. CHART FORMATIONS: Larger geometric patterns (double top/bottom,
+       head-and-shoulders, triangles, flags, wedges, channels).
+    5. VOLUME ANALYSIS: Volume trends, divergences with price, climax volume,
+       volume dry-up.
+    6. REGIME ASSESSMENT: Whether the market is trending, ranging, volatile,
+       or transitioning.
+
+    Be precise about price levels, time locations, and confidence.
+    Distinguish between confirmed and tentative patterns.
+    Flag ambiguities and alternative interpretations.
+
+  user_template: |-
+    Analyze the following financial chart for {{ asset }} ({{ timeframe }}).
+
+    Chart period: {{ start_date }} to {{ end_date }}
+    Current price: {{ current_price }}
+
+    Rule-based geometry already detected:
+    {{ rule_based_geometry }}
+
+    [The chart image is attached]
+
+    Provide your analysis as structured JSON:
+    {
+      "trendlines": [{"direction": "up/down", "slope": 0.0, "strength": 0.0,
+                       "status": "intact/broken/tested", "confidence": 0.0}],
+      "support_resistance": [{"price": 0.0, "type": "support/resistance",
+                               "strength": 0.0, "touch_count": 0}],
+      "candlestick_patterns": [{"pattern": "", "location": "",
+                                 "significance": "strong/moderate/weak",
+                                 "implication": "bullish/bearish/neutral"}],
+      "formations": [{"type": "", "stage": "forming/confirmed/broken",
+                       "target_price": 0.0, "confidence": 0.0}],
+      "volume_signals": [{"type": "", "location": "", "implication": ""}],
+      "regime": {"state": "", "trend_strength": 0.0, "volatility": ""},
+      "overall_bias": "bullish/bearish/neutral",
+      "confidence": 0.0,
+      "key_levels": {"immediate_support": 0.0, "immediate_resistance": 0.0},
+      "narrative": "A 2-3 sentence summary of the chart situation"
+    }

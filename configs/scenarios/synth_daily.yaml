@@ -1,0 +1,24 @@
+name: "synth_daily"
+market: "synthetic"
+asset_universe: ["SYNTH"]
+frequency: "daily"
+lookback_window: 60
+
+temporal_split:
+  train_start: "2022-01-03"
+  train_end: "2022-12-31"
+  valid_start: "2023-01-01"
+  valid_end: "2023-06-30"
+  test_start: "2023-07-01"
+  test_end: "2023-11-30"
+
+transaction_cost_bps: 15
+slippage_bps: 5
+execution_delay_days: 1
+
+metrics:
+  - sharpe_ratio
+  - annualized_return
+  - max_drawdown
+  - directional_accuracy
+  - win_rate

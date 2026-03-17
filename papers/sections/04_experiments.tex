@@ -1,0 +1,87 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Setup}
+
+\paragraph{Datasets.}
+We evaluate on two markets: (1)~\textbf{CSI300} (Chinese A-shares, daily, 2008--2020), widely used in quantitative finance research~\cite{rdagent2025}; and (2)~\textbf{S\&P500} (US equities, daily, 2000--2023), providing international comparison.
+
+\paragraph{Temporal splits.}
+We use strict walk-forward evaluation with no data leakage. For CSI300: train 2008--2014, validation 2015--2016, test 2017--2020. For S\&P500: train 2000--2015, validation 2016--2018, test 2019--2023. All features and chart renderings use only data up to and including the decision date (point-in-time alignment).
+
+\paragraph{Baselines.}
+We compare against: (1)~Buy-and-Hold; (2)~PatchTST~\cite{nie2023patchtst} numerical encoder; (3)~Single-Agent VLM (chart image $\rightarrow$ single prompt $\rightarrow$ decision); (4)~FinCon-style multi-agent LLM (text only)~\cite{fincon2024}; (5)~Traditional quantitative strategies (MA crossover, momentum).
+
+\paragraph{Metrics.}
+Annualized return, Sharpe ratio (with and without 15bps round-trip transaction costs), maximum drawdown, Calmar ratio, information coefficient (IC), rank IC, and directional accuracy. All metrics computed on the test period.
+
+\subsection{Main Results}
+
+% Table 1: Main results
+\begin{table}[h]
+\centering
+\caption{Main results on CSI300 daily test set (2017--2020). TC = transaction costs (15bps). Bold indicates best.}
+\label{tab:main_results}
+\begin{tabular}{lccccc}
+\toprule
+Method & Ann.~Return & Sharpe & Sharpe (TC) & MaxDD & Dir.~Acc. \\
+\midrule
+Buy-and-Hold & --- & --- & --- & --- & --- \\
+PatchTST & --- & --- & --- & --- & --- \\
+Single-Agent VLM & --- & --- & --- & --- & --- \\
+FinCon & --- & --- & --- & --- & --- \\
+\textbf{FinVL-MAS (ours)} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} & \textbf{---} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Analysis paragraphs (to be filled with results)
+
+\subsection{Ablation Study}
+
+We conduct ablations to isolate the contribution of each component (Table~\ref{tab:ablation}).
+
+\begin{table}[h]
+\centering
+\caption{Ablation study on CSI300 test set. Each row removes one component.}
+\label{tab:ablation}
+\begin{tabular}{llccc}
+\toprule
+ID & Configuration & Sharpe & IC & MaxDD \\
+\midrule
+A1 & Full \textsc{FinVL-MAS} & --- & --- & --- \\
+A2 & No visual reasoning & --- & --- & --- \\
+A3 & Raw chart (no geometry) & --- & --- & --- \\
+A4 & Single agent & --- & --- & --- \\
+A5 & No gated memory & --- & --- & --- \\
+A6 & No event context & --- & --- & --- \\
+A7 & No risk controller & --- & --- & --- \\
+A8 & Rule-based only (no VLM) & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Regime-Conditioned Analysis}
+
+We analyze performance conditioned on market regime to test whether visual reasoning is especially valuable during volatile or pattern-rich periods (Table~\ref{tab:regime}).
+
+\begin{table}[h]
+\centering
+\caption{Regime-conditioned performance comparison (Sharpe ratio).}
+\label{tab:regime}
+\begin{tabular}{lccc}
+\toprule
+Regime & Full System & No Visual & $\Delta$ \\
+\midrule
+Trending & --- & --- & --- \\
+Volatile & --- & --- & --- \\
+Ranging & --- & --- & --- \\
+Event-heavy & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Qualitative Analysis}
+
+% Figure 3: Decision trace example (to be generated)
+We present qualitative examples of the full reasoning pipeline, showing how chart geometry is extracted, interpreted by the Pattern Reasoner, risk-adjusted, and integrated into a final decision. See Appendix for additional examples.

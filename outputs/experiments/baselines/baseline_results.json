@@ -1,0 +1,29 @@
+{
+  "Buy-and-Hold": {
+    "sharpe_ratio": 0.7697979012768372,
+    "annualized_return": 0.2190691053956786,
+    "max_drawdown": 0.2796339646733342,
+    "calmar_ratio": 0.7834137947140759,
+    "annualized_volatility": 0.32666757855146533,
+    "total_return": 0.4803000000000044,
+    "num_trades": 499
+  },
+  "SMA-Crossover": {
+    "sharpe_ratio": -0.2827901240075869,
+    "annualized_return": -0.12988731030755363,
+    "max_drawdown": 0.47340022297357787,
+    "calmar_ratio": -0.2743710374526019,
+    "annualized_volatility": 0.3159972448742363,
+    "total_return": -0.23238138374946382,
+    "num_trades": 479
+  },
+  "Momentum": {
+    "sharpe_ratio": 0.8537416542751864,
+    "annualized_return": 0.24946018369442702,
+    "max_drawdown": 0.262303987965806,
+    "calmar_ratio": 0.951034658790421,
+    "annualized_volatility": 0.320595048758943,
+    "total_return": 0.554267430653943,
+    "num_trades": 499
+  }
+}

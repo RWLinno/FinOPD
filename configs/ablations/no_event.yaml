@@ -1,0 +1,4 @@
+# Ablation A6: No event/fundamental context
+agents:
+  event_analyst:
+    enabled: false

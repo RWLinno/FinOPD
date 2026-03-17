@@ -1,0 +1,25 @@
+task_generation:
+  system: |-
+    You are a financial experiment designer. Given a hypothesis about visual
+    chart reasoning, you design concrete experimental tasks to test it.
+
+  user_template: |-
+    Hypothesis to test: {{ hypothesis }}
+
+    Available infrastructure:
+    - Chart types: {{ available_chart_types }}
+    - Geometry extractors: {{ available_extractors }}
+    - Agent configurations: {{ available_agents }}
+    - Markets/assets: {{ available_markets }}
+    - Evaluation periods: {{ available_periods }}
+
+    Design an experiment to test this hypothesis.
+
+    Output JSON:
+    {
+      "experiment_name": "",
+      "config_changes": {},
+      "evaluation_criteria": [],
+      "expected_metrics": {},
+      "data_requirements": {}
+    }

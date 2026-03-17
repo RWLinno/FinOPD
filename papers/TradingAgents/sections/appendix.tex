@@ -1,0 +1,317 @@
+\definecolor{lightblue}{rgb}{0.85, 0.92, 1.0}   % soft light blue, for background or highlights
+\definecolor{lightgray}{rgb}{0.95, 0.95, 0.95}   % very light gray, for subtle contrasts
+\definecolor{lightgreen}{rgb}{0.80, 0.92, 0.80}  % soft light green, for positive highlights
+\definecolor{lightyellow}{rgb}{1.0, 1.0, 0.85}   % pale light yellow, for attention-catching highlights
+\definecolor{lightpink}{rgb}{1.0, 0.85, 0.90}    % soft pink, for gentle emphasis
+\definecolor{lightpurple}{rgb}{0.75, 0.65, 1.0}  % muted light purple, for distinguishing sections
+\definecolor{lightorange}{rgb}{1.0, 0.90, 0.80}  % light orange, for calls to action or warnings
+\definecolor{lightred}{rgb}{1.0, 0.80, 0.80}     % light red, for critical notes or errors
+\definecolor{brightblue}{rgb}{0.45, 0.65, 1.0}   % medium bright blue, for links or links to references
+\definecolor{lightlilac}{rgb}{0.85, 0.75, 1.0}  % soft lilac, for decorative or neutral accents
+
+
+\lstdefinestyle{agent1}{
+    backgroundcolor=\color{lightblue}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent2}{
+    backgroundcolor=\color{lightgray}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent3}{
+    backgroundcolor=\color{lightgreen}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent4}{
+    backgroundcolor=\color{lightyellow}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent5}{
+    backgroundcolor=\color{lightpink}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent6}{
+    backgroundcolor=\color{lightpurple}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent7}{
+    backgroundcolor=\color{lightorange}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent8}{
+    backgroundcolor=\color{lightred}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent9}{
+    backgroundcolor=\color{brightblue}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+\lstdefinestyle{agent10}{
+    backgroundcolor=\color{lightlilac}, 
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    rulecolor=\color{black},
+    xleftmargin=0.5cm,
+    framexleftmargin=0.5cm,
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    stepnumber=1,
+    numbersep=5pt,
+    lineskip=1pt,
+    breaklines=true,
+    breakatwhitespace=false
+}
+
+
+
+% \newpage
+\onecolumn
+
+\section{Supplementary Materials for \model}
+
+\subsection{Baseline Models}\label{appendix:baselines}
+
+We compare our \model framework against several baselines:
+\begin{itemize}
+
+    \item \textbf{Buy and Hold}: Investing equal amounts in all selected stocks and holding them throughout the simulation period.
+
+    \item \textbf{MACD (Moving Average Convergence Divergence)}: A trend-following momentum strategy that generates buy and sell signals based on the crossover points between the MACD line and signal line.
+
+    \item \textbf{KDJ and RSI (Relative Strength Index)}: A momentum strategy combining KDJ (stochastic oscillator) and RSI (relative strength index) indicators to identify overbought and oversold conditions for trading signals.
+
+    \item \textbf{ZMR (Zero Mean Reversion)}: A mean reversion trading strategy that generates signals based on price deviations from and subsequent reversions to a zero reference line.
+
+    \item \textbf{SMA (Simple Moving Average)}: A trend-following strategy that generates trading signals based on crossovers between short-term and long-term moving averages.
+\end{itemize}
+
+
+
+\subsection{Evaluation Metrics}\label{appendix:eval_metrics}
+
+
+To thoroughly evaluate the performance of our \model framework, we use widely recognized metrics to assess the risk management, profitability, and safety of the \model strategy in comparison to baseline approaches. Here we describe these metrics:
+
+\subsubsection{Cumulative Return (CR)}
+
+The cumulative return measures the total return generated over the simulation period. It is calculated as:
+
+\begin{equation}
+\text{CR} = \left( \frac{V_{\text{end}} - V_{\text{start}}}{V_{\text{start}}} \right) \times 100\%
+\end{equation}
+
+where $V_{\text{end}}$ is the portfolio value at the end of the simulation, and $V_{\text{start}}$ is the initial portfolio value.
+
+\subsubsection{Annualized Return (AR)}
+
+The annualized return normalizes the cumulative return over the number of years:
+
+\begin{equation}
+\text{AR} = \left( \left( \frac{V_{\text{end}}}{V_{\text{start}}} \right)^{\frac{1}{N}} - 1 \right) \times 100\%
+\end{equation}
+
+where $N$ is the number of years in the simulation.
+
+\subsubsection{Sharpe Ratio (SR)}
+
+The Sharpe ratio measures risk-adjusted return by comparing a portfolio's excess return over the risk-free rate to its volatility:
+
+\begin{equation}
+\text{SR} = \frac{\bar{R} - R_f}{\sigma}
+\end{equation}
+
+where $\bar{R}$ is the average portfolio return, $R_f$ is the risk-free rate (e.g., yield of 3-month Treasury bills), and $\sigma$ is the standard deviation of the portfolio returns.
+
+\subsubsection{Maximum Drawdown (MDD)}
+
+Maximum drawdown measures the largest peak-to-trough decline in the portfolio value:
+
+\begin{equation}
+\text{MDD} = \max_{t \in [0, T]} \left( \frac{\text{Peak}_t - \text{Trough}_t}{\text{Peak}_t} \right) \times 100\%
+\end{equation}
+
+
+
+
+
+\subsection{Cumulative Returns (CR) and Transaction History for AMZN and GOOGL}
+
+We present additional figures for \verb|$AMZN| and \verb|$GOOGL| stocks to complement the AAPL data discussed in the main body of this paper. These supplementary visuals provide a broader perspective on the performance of our trading framework across multiple stocks, highlighting the consistency and robustness of \model's results.
+
+
+
+\begin{figure}[htbp]
+\vskip 0.2in
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figures/AMZN/details.pdf}
+\caption{\textbf{\textcolor{brown}{\model}}: Transaction History for AMZN.
+Detailed transaction history with 
+\textcolor{arr_green}{\texttt{Green}} \textcolor{brown}{\textbf{/}} \textcolor{arr_red}{\texttt{Red}} 
+arrows for \textcolor{arr_green}{\texttt{Long}} \textcolor{brown}{\textbf{/}} \textcolor{arr_red}{\texttt{Short}} 
+positions.}
+\label{fig:amzn-performance-details}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+
+
+\begin{figure}[htbp]
+\vskip 0.2in
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figures/AMZN/compare.pdf}
+\caption{\textbf{\textcolor{brown}{\model}}: Cumulative Returns for AMZN.
+Performance comparison showing cumulative returns.}
+\label{fig:amzn-performance-comparison}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+
+\begin{figure}[htbp]
+\vskip 0.2in
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figures/GOOGL/details.pdf}
+\caption{\textbf{\textcolor{brown}{\model}}: Transaction History for GOOGL.
+Detailed transaction history with 
+\textcolor{arr_green}{\texttt{Green}} \textcolor{brown}{\textbf{/}} \textcolor{arr_red}{\texttt{Red}} 
+arrows for \textcolor{arr_green}{\texttt{Long}} \textcolor{brown}{\textbf{/}} \textcolor{arr_red}{\texttt{Short}} 
+positions.}
+\label{fig:googl-performance-details}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+
+\begin{figure}[htbp]
+\vskip 0.2in
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figures/GOOGL/compare.pdf}
+\caption{\textbf{\textcolor{brown}{\model}}: Cumulative Returns for GOOGL.
+Performance comparison showing cumulative returns.}
+\label{fig:googl-performance-comparison}
+\end{center}
+\vskip -0.2in
+\end{figure}
+
+By including detailed analyses for AMZN and GOOGL, we aim to demonstrate the versatility of our approach in diverse market environments, thereby reinforcing the overall effectiveness and generalizability of our methodology.
+
+% \newpage
+
+
+\subsection{\model Workflow: Role Specification and Cooperation} \label{app:trade_log}
+
+We offer a comprehensive overview of the various agent roles that collaborate within the \model. These roles include the Analyst Team, Researcher Team, Trader, Risk Management Team, and Fund Manager, each dedicated to different aspects of the trading process for Apple Inc. (Ticker: AAPL) as of November 19, 2024, a recent date chosen for demonstration purposes.
+
+By detailing the responsibilities and interactions of each agent, we demonstrate how \model ensures thorough analysis, strategic trading decisions, and effective risk management. The collaborative structure not only enhances the system's overall performance but also reinforces the transparency and explainability of \model, aligning with the objectives discussed in the main text. The following sections provide specific role specifications and illustrate how these agents work together to achieve robust and interpretable trading outcomes.
+
+\input{sections/cases}
+

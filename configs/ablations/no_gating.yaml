@@ -1,0 +1,4 @@
+# Ablation A5: No gated memory (simple concatenation)
+memory:
+  enable_gated_attention: false
+  confidence_threshold: 0.0

@@ -1,0 +1,43 @@
+experiment_reflection:
+  system: |-
+    You are a quantitative research analyst reviewing the results of a
+    visual chart reasoning experiment for financial decision making.
+
+    Your role is to:
+    1. Analyze what worked and what did not
+    2. Identify which visual patterns were most/least predictive
+    3. Assess whether the hypothesis was confirmed or rejected
+    4. Determine which agents contributed most to performance
+    5. Suggest specific improvements for the next iteration
+
+  user_template: |-
+    Experiment: {{ experiment_name }}
+    Hypothesis: {{ hypothesis }}
+
+    Results:
+    {{ metrics_summary }}
+
+    Baseline comparison:
+    {{ baseline_comparison }}
+
+    Per-regime breakdown:
+    {{ regime_analysis }}
+
+    Agent contribution analysis:
+    {{ agent_contributions }}
+
+    Decision trace examples (best and worst):
+    {{ decision_examples }}
+
+    Provide reflection as JSON:
+    {
+      "hypothesis_confirmed": false,
+      "key_findings": [],
+      "what_worked": [],
+      "what_failed": [],
+      "visual_pattern_effectiveness": {},
+      "agent_contribution_ranking": [],
+      "recommended_changes": [],
+      "next_hypothesis_suggestions": [],
+      "confidence_in_findings": 0.0
+    }

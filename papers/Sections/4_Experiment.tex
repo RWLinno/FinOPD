@@ -1,0 +1,148 @@
+\section{Experiments}
+Our experiment answers the key research questions (RQs): \textbf{RQ1:} Does \textsc{FinCon} demonstrate robustness across multiple financial decision-making tasks, especially single-asset trading and portfolio management? \textbf{RQ2:} Is the within-episode risk control mechanism in \textsc{FinCon} effective in maintaining superior decision-making performance? \textbf{RQ3:} Is the over-episode risk control mechanism in \textsc{FinCon} effective in timely updating the manager agent's beliefs to enhance trading performance?
+
+\subsection{Experimental Setup}
+
+\textit{\textbf{(i) Multi-Modal Datasets.}} We construct a market environment representation using real-world financial data, including stock prices, daily news, company filings (Form 10-Q, Form 10-K, etc.), and ECC audio from January 3, 2022, to June 10, 2023, as detailed in Appendix.~\ref{appendix:data}. Each data source is assigned to specific analyst agents based on its timeliness. \textit{\textbf{(ii) Evaluation Metrics.}} We evaluate \textsc{FinCon} and other state-of-the-art (SOTA) agents using metrics such as Cumulative Return (CR\%), Sharpe Ratio (SR), and Max Drawdown (MDD\%). CR and SR are prioritized because they provide comprehensive insights into overall performance and risk-adjusted returns, essential for informed investment decisions. In contrast, MDD focuses on evaluating the potential for significant losses, making it a secondary consideration in this context. Details are provided in Appendix~\ref{appendix:metrics}. \textit{\textbf{(iii) Comparative Methods.}} For single-stock trading, we compare \textsc{FinCon} with DRL agents (A2C, PPO, DQN) and LLM-based agents (\textsc{Generative Agent (GA)}, \textsc{FinGPT}, \textsc{FinMem}, \textsc{FinAgent}) as well as the Buy-and-Hold (B \& H) strategy. For portfolio management, we compare \textsc{FinCon} with Markowitz MV, FinRL-A2C, and Equal-Weighted ETF strategy, with further details provided in Appendix~\ref{explain_portfolio_selection}. The detailed experiment parameter configurations of the above agent systems are articulated in Appendix.~\ref{app:exp_figure}. \textit{\textbf{(iv) Implementation Details.}} All LLM-based agents use GPT-4-Turbo, with temperature set at 0.3. \textsc{FinCon} is trained from January 3, 2022, to October 4, 2022, and tested from October 5, 2022, to June 10, 2023. DRL agents are trained over the period from January 1, 2018, to October 4, 2022, to ensure that there is sufficient data available for model convergence. Performance is based on the median CR and SR from five repeated epochs. For a more detailed explanation of the experimental setup, please refer to the Appendix~\ref{Experimental Setup}.
+
+%\textit{\textbf{Multi-Modal Datasets.}} We collect a multi-modal dataset from real-world financial information to construct a representation of the market environment. It is composed of stock price information, daily financial news, company filing reports, and ECC audio recordings ranging from August 1, 2020, to August 14, 2023, as detailed in Appendix.~\ref{appendix:data}. Each data source features distinct timeliness and is assigned to separate analyst agents to process. Typically, the time-sensitivity of annual filing reports (Form 10K's) is more persistent, that of quarterly filing reports (Form 10Q's) and ECC are secondary, and the daily financial news is the most instantaneous.
+
+%\textit{\textbf{Evaluation Metrics.}} We evaluate the performance of \textsc{FinCon}\ and compare it with other state-of-the-art (SOTA) LLM-based and DRL-based agent systems using three standard financial performance metrics: Cumulative Return (CR\%) \cite{hull2007risk}, the Sharpe Ratio (SR) \cite{sharpe1994sharpe} and Max Drawdown (MDD\%) \cite{ang2003downside}. Detailed definitions can be found in Appendix \ref{appendix:metrics}.
+
+%\textit{\textbf{Comparative Methods.}} %For the single stock trading task, we assess \textsc{FinCon}'s trading performance compared to seven algorithmic agents and the Buy-and-Hold (B \& H) strategy, a commonly accepted baseline strategy. These include three DRL-based agents in FinRL \cite{liu2020finrl} framework: A2C, PPO, DQN. four SOTA LLM-based agent frameworks with similar design or application domains: \textsc{Generative Agent} by Park et al. \cite{park2023generative}, \textsc{FinGPT} \cite{liu2023fingpt}, \textsc{FinMem} \cite{yu2023finmem}, and \textsc{FinAgent} \cite{zhang2024finagent}. For the portfolio management task, we compare the performance of \textsc{FinCon}\ against RL-based trading agent FinRL-A2C \cite{liu2020finrl} and B \& H strategy.The B \& H strategy represents a passive investment approach where an equal-weighted position is held in an exchange-traded fund (ETF). We currently focus on compare our method with RL and B \& H methods due to the limited availability of mature LLM agent for portfolio management.
+%For the single stock trading task, we assess \textsc{FinCon}'s performance against seven algorithmic agents and the Buy-and-Hold (B \& H) strategy, a widely accepted baseline. These include three DRL-based agents from the FinRL framework \cite{liu2020finrl}: A2C, PPO, and DQN, and four SOTA LLM-based agents: \textsc{Generative Agent} by Park et al. \cite{park2023generative}, \textsc{FinGPT} \cite{liu2023fingpt}, \textsc{FinMem} \cite{yu2023finmem}, and \textsc{FinAgent} \cite{zhang2024finagent}. For the portfolio management task, \textsc{FinCon} competes against the classical Markowitz MV portfolio selection strategy \cite{markowitz1952portfolio}, the RL-based FinRL-A2C agent \cite{liu2020finrl} and the B \& H strategy that is to hold an equal-weighted position in all trading assets (so-called equal-weighted ETF). Our focus on classical portfolio strategy, RL methods and B \& H methods is due to the limited availability of mature LLM agents for portfolio management.
+%The detailed experiment parameter configuration is detailed articulated in Appendix.~\ref{app:exp_figure}.
+
+%\textit{\textbf{Implementation Details.}} In our experiments, all large language model (LLM)-based agent systems employ GPT-4-Turbo as their backbone algorithm, with the temperature parameter set at 0.3 to balance response consistency and reasoning creativity. \textsc{FinCon}\ is trained on financial data from January 3, 2022, to October 4, 2022, and is tested with data from  October 5, 2022, to June 10, 2023. Given that deep reinforcement learning (DRL) algorithms require extensive training data for convergence, we extend the DRL agents' training period to approximately five years, from January 1, 2018, to October 4, 2022, ensuring a fair comparison. The testing period remains consistent across all models. The performance metrics are reported for the test trajectory with the median CR and SR from five repeated epochs. (If the median CR and SR do not belong to the same epoch, the performance is based on the trajectory with the median CR.)
+
+\subsection{Main Results}
+In response to \textbf{RQ1}, we analyze \textsc{FinCon}'s performance on two types of financial decision-making tasks: single-asset trading and portfolio management. The system's ability to manage these sequentially complex decisions is thoroughly evaluated in the following sections.
+
+\subsubsection{Single Asset Trading Task}
+In this task, we evaluate \textsc{FinCon}’s performance against other leading algorithmic trading models by trading eight different stocks. As presented in the tables above, \textsc{FinCon} significantly outperforms both LLM-based and DRL-based approaches in terms of CRs and SRs. Additionally, \textsc{FinCon} achieves one of the lowest MDD values across most trading assets, demonstrating effective risk management while still delivering the highest investment returns. For detailed performance comparisons across all models and metrics, refer to Table 1.
+
+Overall, even with extended training periods, DRL-based models tend to underperform, with the A2C algorithm lagging significantly behind other agents in general. Notably, the training periods for Nio Inc. (NIO) and Coinbase Global Inc. (COIN) require clarification. NIO, which completed its IPO in September 2018, has a slightly shorter training period than other tickers, yet the DRL algorithms for NIO still achieved convergence. In contrast, Coinbase Global Inc. (COIN), which completed its IPO in April 2021, presented a more significant challenge due to the limited available trading data, causing DRL algorithms to struggle with convergence. This limitation underscores a major drawback for DRL agents when trading recently listed IPOs. Consequently, our analysis of COIN focuses on comparisons between \textsc{FinCon}, LLM-based agents, and the buy-and-hold (B \& H) strategy. In this context, \textsc{FinCon} demonstrates a clear advantage, achieving a cumulative return of over 57\% and a Sharpe ratio of 0.825. Furthermore, LLM-based agents, which can leverage diverse data types and require minimal training, effectively mitigate the challenges faced by DRL algorithms.
+
+\input{Sections/table1}
+
+In alignment with market trends, \textsc{FinCon} consistently exhibits superior decision-making quality compared to other LLM-based agents, regardless of market conditions—whether bullish (e.g., GOOG, MSFT), bearish (e.g., NIO), or mixed (e.g., TSLA). We attribute this performance to its high-quality distillation of information through a synthesized multi-agent collaboration mechanism, combined with its dual-level risk control design, positioning \textsc{FinCon} as a leader in the space. By contrast, \textsc{FinGPT} primarily relies on sentiment analysis of financial information, failing to fully exploit the potential of LLMs to integrate nuanced textual insights with numerical financial indicators. Similarly, \textsc{GA} and \textsc{FinMem} use single-agent frameworks without sophisticated information distillation processes or a diverse toolset, placing heavy cognitive demand on the agent to process multi-source information, especially when dealing with large and varied data modalities. Moreover, their static or minimal investment belief systems result in weak filtering of market noise. As illustrated in Figure~\ref{fig:allplot_belief} (a) \& (b) of Appendix~\ref{over-episode-risk-control}, this limitation leads these models to consistently hold lower positions and hesitate between `buy' or `sell' decisions, ultimately resulting in suboptimal performance.
+
+\textsc{FinCon} overcomes these challenges through its innovative multi-agent synthesis, enabling it to deliver superior outcomes. Although \textsc{FinAgent} performs well when integrating images and tabular data, it struggles to remain competitive when incorporating audio data, such as ECC recordings, which are critical in real-world trading. Additionally, \textsc{FinAgent} relies on similarity-based memory retrieval, which can lead to decisions based on outdated information, often resulting in errors. In contrast, \textsc{FinCon}'s memory structure accounts for the varying timeliness of multi-source financial data, significantly enhancing decision quality and overall performance.
+
+%Moreover, in alignment with market trends, \textsc{FinCon} consistently exhibits superior sequential decision-making quality compared to other LLM-based financial agents, irrespective of whether the market conditions are bullish (e.g., GOOG, MSFT), bearish (e.g., NIO), or mixed (e.g., TSLA). We attribute this performance to its high-quality distillation process through a synthesized multi-agent collaboration mechanism and its dual-functional risk control design, which collectively position \textsc{FinCon} as a leader in this space. Compared to \textsc{FinCon}, \textsc{FinGPT} primarily bases its trading decisions on the LLMs' ability to interpret sentiment in financial information. This approach does not fully capitalize on the LLMs' capacity to synthesize nuanced investment-related textual insights with numerical financial indicators. \textsc{GA} and \textsc{FinMem}, on the other hand, utilize single-agent frameworks that do not incorporate sophisticated information distillation processes or a diverse set of tools. This lack of complexity places considerable demand on the agent to process and reason through multi-sourced information, particularly when faced with large and varied data modalities. Additionally, they employ a static or minimal investment belief system. As a result, their ability to filter noise from mixed market data is relatively weak. As illustrated in Figure~\ref{fig:allplot_belief} (a) \& (b), this limitation leads them to consistently maintain a lower position and exhibit hesitation regarding `buy' or `sell' decisions, ultimately resulting in suboptimal performance. \textsc{FinCon} overcomes these limitations through its innovative multi-agent synthesis, enabling it to deliver better outcomes. While \textsc{FinAgent} positions itself as a foundational framework capable of utilizing multi-modal data, its performance is robust with images and tabular data but does not exhibit a competitive edge when integrating audio data, such as ECC audio, which is crucial in real-world trading. Additionally, its decision-relevant memory retrieval process is based on similarity, leading the agent to make current decisions based on outdated memories, often resulting in errors. In contrast, the memory structure of \textsc{FinCon} is designed to account for the varying timeliness of multi-sourced financial data, ultimately delivering significantly superior decision quality.
+
+\subsubsection{Portfolio Management Task}
+\label{ssec:protfolio}
+In this task, we compare \textsc{FinCon}'s performance with the Markowitz Mean-Variance (MV) portfolio \cite{markowitz2000mean} and \textsc{FinRL} \cite{liu2020finrl} in managing two small portfolios: Portfolio 1 (TSLA, MSFT, and PFE) and Portfolio 2 (AMZN, GM, and LLY). These assets were selected by the stock selection agent from a pool of 42 stocks, each with sufficient news data (over 800 news articles during the combined training and testing periods), as illustrated in Figure~\ref{fig:news_counts} in Appendix~\ref{Distribution}. The training and testing periods, the backbone model and the parameter settings are consistent with those used in the single-asset trading task. For the Markowitz MV portfolio, we estimate the covariance matrix and expected returns using the same training data. In the case of \textsc{FinRL}, we use five years of training data prior to the test period. As detailed in Table~\ref{table:trading_comparison} and Figure~\ref{fig:trading_comparison}, our results show that \textsc{FinCon} outperforms both the Markowitz MV portfolio and \textsc{FinRL} as well as the market baseline -- Equal-Weighted ETF, achieving significantly higher CRs and SRs, as well as MDDs.
+
+%In this task, we compare \textsc{FinCon}'s performance with the Markowitz Mean-Variance (MV) portfolio \cite{markowitz2000mean} and \textsc{FinRL} \cite{liu2020finrl} in managing two small portfolio Portfolio1(TSLA, MSFT, and PFE) and Portfolio2(AMZN, GM, LLY). Those assets are chosen by the stock selection agent from 42 stocks with sufficient amount of news data (over $800$ new messages in the training and test periods together), referring to Figure~\ref{fig:news_counts} in Appendix~\ref{Distribution}. The training \& testing periods and backbone algorithm are consistent with those used in the single-asset trading task. For the Markowitz MV portfolio, we estimate the covariance matrix and expected returns using the same training data. For \textsc{FinRL}, we use 5-year training data before the test period. Our results, detailed in Table~\ref{subfig:table2_baselines}, show that \textsc{FinCon} outperforms both the Markowitz MV portfolio and \textsc{FinRL}, achieving significantly higher cumulative returns and Sharpe Ratio, and lower Maximum Drawdown (MDD). 
+
+However, managing multi-asset portfolios introduces more complexity, leading to a higher likelihood of hallucination compared to single-asset trading. This is due to the increased input length and complexity involved in multi-asset decision-making. While \textsc{FinCon} mitigates this issue by distributing tasks across specialized agents that focus on critical investment insights, it occasionally generates incorrect information, such as non-existent indices of memory events. Handling multi-asset decision-making requires sophisticated logic and substantial market information, which poses a significant challenge for LLMs when processing extended contexts. This complexity has left portfolio management relatively unexplored in previous language agent studies. Nonetheless, \textsc{FinCon} demonstrates considerable potential by constructing agent systems that can tackle complex financial tasks through effective resource optimization, even when managing relatively compact portfolios.
+
+\begin{figure*}[ht]
+\centering
+\begin{minipage}[b]{0.49\textwidth}
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lccc}
+    \toprule
+    \textbf{Models} & \textbf{CR \%} $\uparrow$ & \textbf{SR}$\uparrow$  & \textbf{MDD \%}$\downarrow$ \\
+    \midrule
+    \textsc{FinCon} &   \textcolor{red}{113.836} & \textcolor{red}{3.269}& 16.163 \\
+    Markowitz MV  & 12.636 & 0.614 & 17.842 \\
+    \textsc{FinRL}-A2C & \textcolor{darkblue}{19.461} & \textcolor{darkblue}{0.831} & 26.917  \\
+    Equal-Weighted ETF & 9.344 & 0.492 & 21.223 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{minipage}%
+\hfill
+\begin{minipage}[b]{0.49\textwidth}
+    \centering
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lccc}
+    \toprule
+    \textbf{Models} & \textbf{CR \%} $\uparrow$ & \textbf{SR}$\uparrow$  & \textbf{MDD \%}$\downarrow$ \\
+    \midrule
+    \textsc{FinCon} &   \textcolor{red}{32.922} & \textcolor{red}{1.371}& 21.502 \\
+    Markowitz MV  & 10.289 & 0.540 & 25.099 \\
+    \textsc{FinRL}-A2C & 11.589 & 0.649 & 15.787  \\
+    Equal-Weighted ETF & \textcolor{darkblue}{15.061} & \textcolor{darkblue}{0.867} & 14.662 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{minipage}
+\captionof{table}{\justifying{\footnotesize{Key performance metrics comparison among all portfolio management strategies of Portfolio 1 \& 2. \textsc{FinCon} leads all performance metrics.}}}
+\label{table:trading_comparison}
+\end{figure*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}[ht]
+\centering
+\begin{minipage}[b]{0.475\textwidth}
+    \centering
+    \includegraphics[height=4cm, width=\textwidth]{figure/portfolio_tsla_msft_pfe.png}
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[height=4cm, width=\textwidth]{figure/portfolio_amzn_gm_lly.png}
+\end{minipage}
+\caption{\justifying{\footnotesize{Portfolio values of Portfolio 1 \& 2 changes over time for all the strategies. The computation of portfolio value refers to Equation~\ref{eq:portfolio_value} in Appendix~\ref{appendix:metrics}.}}}
+\label{fig:trading_comparison}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Ablation Studies}
+%In this section, we conduct a comprehensive evaluation of our uniquely designed risk control component through two ablation studies. The first study assesses its ability to control risk within episodes using conditional value at risk (CVaR). The second study underscores the importance of the over-episode risk control mechanism by updating the trading manager agent’s beliefs to gain a holistic understanding of the current trading circumstances for the targeted asset. In the following two studies, we maintain consistency in the choice of training and testing periods with the main experiments for both single stock trading and portfolio management tasks.
+In response to \textbf{RQ2} and \textbf{RQ3}, we conduct a comprehensive evaluation of our unique risk control component through two ablation studies. Both studies maintain consistency with the training and testing periods used in the main experiments. The first study examines the effectiveness of the within-episode risk control mechanism, which leverages Conditional Value at Risk (CVaR) to manage risk in real-time, as detailed in Table~\ref{tab:performance_overview_cvar}. Comparisons on primary metrics illustrate that the success of utilizing CVaR for within-episode risk control is evident in both bullish and bearish market environments in the single asset trading case. Moreover, in portfolio trading with mixed
+price trends, our within-episode risk control mechanism performs robustly by monitoring the entire portfolio’s value fluctuations. The second study focuses on the over-episode risk control mechanism, demonstrating its critical role in updating the trading manager agent’s beliefs to provide a more comprehensive understanding of current trading conditions, as articulated in Table~\ref{exp2:performance_overview_belief}. The markedly improved CRs and SRs in both decision-making scenarios underscore the effectiveness of using CVRF to update investment beliefs episodically, guiding the agent towards more profitable investment strategies. Additionally, \textsc{FinCon} demonstrates significant learning gains, achieving these results after only four training episodes—substantially fewer than what is typically required by traditional RL algorithmic trading agents. More visualizations and analysis are provided in the Appendix~\ref{ablation_study}.  
+
+\begin{table*}[ht]
+\centering
+\begin{adjustbox}{max width=\dimexpr\textwidth,center}
+\begin{tabular}{p{2cm}p{1.8cm}lcccc}
+\toprule
+\textbf{Task} & \textbf{Assets} & \textbf{Market Trend} & \textbf{Models} & \textbf{CR \%}$\uparrow$ & \textbf{SR}$\uparrow$ & \textbf{MDD \%}$\downarrow$ \\
+\midrule
+\multirow{4}{=}{Single Stock} 
+    & \multirow{2}{=}{GOOG} & \multirow{2}{*}{General Bullish $\nearrow$} & w/ CVaR & \textcolor{red}{25.077} & \textcolor{red}{1.052} & 17.530\\
+    & & & w/o CVaR & -1.461 & -0.006 & 27.079\\
+    & \multirow{2}{=}{NIO} & \multirow{2}{*}{General Bearish $\searrow$} & w/ CVaR & \textcolor{red}{17.461} & \textcolor{red}{0.335} & 40.647\\
+    & & & w/o CVaR & -52.887 & -1.002 & 70.243\\
+\midrule
+\multirow{2}{=}{Portfolio Management} 
+    & \multirow{2}{=}{(TSLA, MSFT, PFE)} & \multirow{2}{*}{Mixed} & w/ CVaR & \textcolor{red}{113.836} & \textcolor{red}{3.269}& 16.163 \\
+    & & & w/o CVaR & 14.699 & 1.142 & 17.511  \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{\justifying{\footnotesize{Key metrics \textsc{FinCon} with vs. without implementing \textbf{CVaR for within-episode risk control.} The performance of \textsc{FinCon} with the implementation of CVaR won a leading performance in both single-asset trading and portfolio management tasks.}}}
+\label{tab:performance_overview_cvar}
+\end{table*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}[ht]
+\centering
+\begin{adjustbox}{max width=\dimexpr\textwidth,center}
+\begin{tabular}{p{2cm}p{1.8cm}lcccc}
+\toprule
+\textbf{Task} & \textbf{Assets} & \textbf{Market Trend} & \textbf{Models} & \textbf{CR \%}$\uparrow$ & \textbf{SR}$\uparrow$ & \textbf{MDD \%}$\downarrow$ \\
+\midrule
+\multirow{4}{=}{Single Stock} 
+    & \multirow{2}{=}{GOOG} & \multirow{2}{*}{General Bullish $\nearrow$} & w/ belief  & \textcolor{red}{25.077} & \textcolor{red}{1.052} & 17.530 \\
+    & & & w/o belief & -11.944 & -0.496 & 29.309\\
+    & \multirow{2}{=}{NIO} & \multirow{2}{*}{General Bearish $\searrow$} & w/ belief & \textcolor{red}{17.461} & \textcolor{red}{0.335} & 40.647 \\
+    & & & w/o belief & 8.197 & 0.156 & 55.688\\
+\midrule
+\multirow{2}{=}{Portfolio Management} 
+    & \multirow{2}{=}{(TSLA, MSFT, PFE)} & \multirow{2}{*}{Mixed} & w/ belief & \textcolor{red}{113.836} & \textcolor{red}{3.269}& 16.163\\
+    & & & w/o belief & 28.432 & 1.181 & 27.535  \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{\justifying{\footnotesize{Key metrics \textsc{FinCon} with vs. without implementing \textbf{belief updates for over-episode risk control.} The performance of \textsc{FinCon} with the implementation of CVRF won a leading performance in both single-asset trading and portfolio management tasks.}}}
+\label{exp2:performance_overview_belief}
+\end{table*}
+

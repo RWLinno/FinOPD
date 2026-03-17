@@ -1,0 +1,37 @@
+\section{Preliminaries}
+Here, we outline the mathematical notations for the two major financial decision-making tasks that will be explicitly discussed in our work. We also formally present the generalized modeling formulation using a Partially Observable Markov Decision Process (\textbf{POMDP}) \cite{spaan2012partially} for financial decision-making tasks.  
+
+\subsection{Financial Decision-making Tasks Formulation}
+\textbf{Single Stock Trading Tasks}. \textsc{FinCon} uses analyst agents group $\{M_{pr}^i\}_{i=1}^{I}$ to process multi-modal market information sources. The processed information is then used by a manager agent $M_a$ to make trading decisions (buy, sell, hold), and to provide relevant reasoning texts. Note that the ``sell'' signal means the system makes a ``short-selling'' decision, that is, a negative trading position is allowed. Additionally, \textsc{FinCon} evaluates the daily investment risk, followed by prompt-optimization for the manager agent from risk-control component $M_r$.
+
+\textbf{Portfolio Trading Tasks}. In addition to processing multi-modal market information, the analyst agents also construct a stock pool for portfolio management by considering the statistical correlations between stock returns. The manager agent then makes trading decisions for each stock in the pool. Finally, the manager agent determines the portfolio weights for all stocks using an external optimization solver that applies the mean-variance optimization described below \cite{fabozzi2008portfolio}:
+% \begin{equation*} 
+% \label{mean-variance}
+%  \max_{\textbf{w}} \langle \textbf{w},\mu \rangle-\langle \textbf{w},\Sigma \textbf{w}\rangle \quad
+% \text{s.t.}~ w_n = \begin{cases} 
+% \in [0,1], & \text{``long''} \\
+% \in [-1, 0], & \text{``short''} \\
+% =0, & \text{``neutral''} 
+% \end{cases},~~\forall n\in\{1,\cdots,N\}\nonumber
+% \hfill ()
+% \end{equation*}
+
+\begin{equation}
+\label{mean-variance}
+\max_{\textbf{w}} \langle \textbf{w},\mu \rangle-\langle \textbf{w},\Sigma \textbf{w}\rangle \quad
+\text{s.t.}~ w_n = \begin{cases} 
+\in [0,1], & \text{``buy''} \\
+\in [-1, 0], & \text{``sell''} \\
+=0, & \text{``hold''} 
+\end{cases},~~\forall n\in\{1,\cdots,N\}
+\end{equation}
+where $\textbf{w}=(w_1\cdots,w_N)\in\mathbb{R}^N$ is portfolio weights vector, $\mu$ and $\Sigma$ are the shrinkage estimators of $N$-dimensional sample expected return and $N\times N$ sample covariance matrix of chosen stocks' daily return sequences respectively \cite{fabozzi2010quantitative}. We note that portfolio weights are rebalanced on daily basis. In our implementation, we begin by calculating the portfolio weights through solving the aforementioned optimization problem. Next, the target positions are determined by linearly scaling these portfolio weights from the previous step.
+
+\subsection{Modeling Quantitative Trading as POMDP}
+Formally, we model quantitative trading task as an infinite horizon POMDP \cite{liu2020adaptive,kabbani2022deep} with time index $\mathbb{T}=\{0,1,2,\cdots\}$ and discount factor $\alpha\in(0,1]$. The components of this model are as follows: (1) a state space $\mathcal{X}\times\mathcal{Y}$ where $\mathcal{X}$ is the observable component and $\mathcal{Y}$ is unobservable component of the financial market; (2) the action space of analyst agents group is $\mathcal{A}=\prod_{i=1}^{I}\mathcal{A}^i$, where $\mathcal{A}^i$ represents the collection of processed market information in textual format done by agent $i$ (total $I$ analyst agents), and for manager agent, its action space is $\mathbb{A}$, which is modeled as {$\{\textit{``buy",~``sell",~``hold"}\}$ for single stock trading task and as $(\{\textit{``buy",~``sell",~``hold"}\}\times[-1,1])^{\otimes N}$ for portfolio management task among $N$-stocks}; (3) the reward function $\mathcal{R}(o,b,a):\mathcal{X}\times\mathcal{Y}\times\mathbb{A}\to\mathbb{R}$ uses daily profit \& loss (PnL) as the output; (4) the observation process $\{O_t\}_{t\in\mathbb{T}}\subseteq\mathcal{X}$ is an $I$-dimensional process, with the $i^{th}$ entry $\{O_t^i\}_{t\in\mathbb{T}}$ representing one type of uni-modal information flow solely processed by the analyst agent $i$; (5) the reflection process $\{B_t\}_{t\in\mathbb{T}}\subseteq\mathcal{Y}$ represents the manager agent's self-reflection, which is updated from $B_t$ to $B_{t+1}$ on daily basis \cite{griffiths2023bayes}); (7) the processed information flow $\hat{O}_t=(\hat{O}_t^1,\cdots,\hat{O}_t^{I})\in\mathcal{A},\forall~t\in\mathbb{T}$, which represents the information processing outputs from analyst agents group. 
+
+Then, our multi-agent system is supposed to learn the policies of all agents: the policies of analyst agents $\pi_{\theta^i}^i:\mathcal{X}\to\mathcal{A}^i, i\in\{1,\cdots, I\}$ ({the ways to process information, i.e. $\hat{O}_t^i\sim\pi_{\theta^i}^i(\cdot|O_t^{i})$}), and the policy of manager agent $\pi_{\theta^a}:\mathcal{A}\times\mathcal{Y}\to \mathbb{A}$ ({the ways to make trading decisions, i.e. $A_t\sim\pi_{\theta^a}(\cdot|\hat{O}_t,B_t)$}) such that the system maximizes cumulative trading reward while controlling risk \cite{rao2022foundations}. All policies $\Pi_{\bm{\theta}}=(\{\pi_{\theta^i}^i\}_{i=1}^I,\pi_{\theta^a})$ are parameterized by textual prompts $\bm{\theta}=(\{\theta^i\}_{i=1}^I,\theta^a)$. By updating prompts via the risk-control component $M_r$, the whole system optimizes policies $\Pi_{\bm{\theta}}$ in a verbal reinforcement manner. By denoting daily profit \& loss (PnL) by $R^{\Pi_{\bm{\theta}}}_t=\mathcal{R}(O_t, B_t, A_t)$, the optimization objective for the whole system can be written as:
+\begin{equation} \label{objective}
+\max_{\bm{\theta}}\mathbb{E}\Big[\sum\limits_{t\in\mathbb{T}}\alpha^tR^{\Pi^{\bm{\theta}}}_t\Big]
+\end{equation}
+is a risk-sensitive optimization problem that leverages textual gradient descent, fundamentally differing from DRL algorithms designed for POMDPs. Further details on the textual gradient descent approach are provided in the Appendix \ref{Textual Gradient-Descent}.

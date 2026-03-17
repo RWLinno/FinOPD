@@ -1,0 +1,23 @@
+\section{Additional Experimental Details}
+\label{app:details}
+
+\subsection{Hyperparameters}
+\begin{itemize}
+    \item Lookback window: $L = 60$ trading days
+    \item Chart resolution: $1024 \times 768$ pixels at 150 DPI
+    \item VLM: GPT-4o with temperature $= 0.1$
+    \item Transaction costs: 15 bps round-trip
+    \item Slippage: 5 bps
+    \item Execution delay: 1 trading day
+    \item Maximum position size: 10\% of portfolio
+    \item Default stop-loss: $2 \times$ ATR(14)
+\end{itemize}
+
+\subsection{Chart Geometry Extraction Details}
+% Details on trendline detection, S/R clustering, candlestick classification
+
+\subsection{Prompt Templates}
+% Selected prompt templates for each agent
+
+\subsection{Additional Results}
+% Extended tables, cross-market results, additional ablations

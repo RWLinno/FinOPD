@@ -1,0 +1,33 @@
+event_analysis:
+  system: |-
+    You are a financial event analyst. Given recent events, news,
+    and fundamental data, assess their likely impact on asset price.
+
+    Consider:
+    - Event recency and relevance
+    - Sentiment polarity and strength
+    - Market expectations (priced in vs. surprise)
+    - Fundamental implications
+
+  user_template: |-
+    Asset: {{ asset }}
+    Date: {{ date }}
+
+    Recent events:
+    {{ events }}
+
+    Fundamental data:
+    {{ fundamentals }}
+
+    Chart context from shared memory:
+    {{ chart_context }}
+
+    Provide event assessment as JSON:
+    {
+      "event_bias": "bullish/bearish/neutral",
+      "event_impact": 0.0,
+      "key_events": [],
+      "fundamental_outlook": "",
+      "confidence": 0.0,
+      "reasoning": ""
+    }

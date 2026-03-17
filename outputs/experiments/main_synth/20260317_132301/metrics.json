@@ -1,0 +1,16 @@
+{
+  "sharpe_ratio": -1.2055085176825604,
+  "annualized_return": -0.014075206456295897,
+  "max_drawdown": 0.009779488731180081,
+  "calmar_ratio": -1.4392579042930658,
+  "annualized_volatility": 0.011701577828730717,
+  "total_return": -0.006056670368072337,
+  "num_trades": 108,
+  "information_coefficient": 0.08075449623918582,
+  "rank_ic": 0.09589348634559919,
+  "directional_accuracy": 0.17592592592592593,
+  "win_rate": 0.17592592592592593,
+  "profit_factor": 0.7204346854655695,
+  "sharpe_no_cost": -1.1210321821686975,
+  "return_no_cost": -0.013155099621375621
+}

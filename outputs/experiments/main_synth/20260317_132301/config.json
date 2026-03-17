@@ -1,0 +1,102 @@
+{
+  "scenario": {
+    "market": "synthetic",
+    "frequency": "daily",
+    "lookback_window": 60,
+    "decision_type": "long_short_hold"
+  },
+  "data": {
+    "provider": "csv",
+    "data_dir": "data/processed",
+    "ohlcv_file": "synth_daily.csv"
+  },
+  "chart": {
+    "renderer": "mplfinance",
+    "chart_type": "candle",
+    "volume": true,
+    "overlays": [
+      {
+        "type": "sma",
+        "periods": [
+          5,
+          20
+        ]
+      }
+    ],
+    "image_size": [
+      1024,
+      768
+    ],
+    "dpi": 150
+  },
+  "geometry": {
+    "trendline": {
+      "min_touches": 2,
+      "window": 60
+    },
+    "support_resistance": {
+      "tolerance_pct": 0.02,
+      "min_touches": 2
+    },
+    "candlestick": {
+      "enabled": true
+    },
+    "formations": {
+      "enabled": true,
+      "min_bars": 10
+    }
+  },
+  "vlm": {
+    "backend": "openai",
+    "model": "gpt-4o",
+    "temperature": 0.1,
+    "max_tokens": 2048
+  },
+  "agents": {
+    "chart_analyst": {
+      "enabled": true,
+      "use_vlm": false,
+      "use_rule_based": true
+    },
+    "pattern_reasoner": {
+      "enabled": true
+    },
+    "event_analyst": {
+      "enabled": true,
+      "stub": true
+    },
+    "risk_controller": {
+      "enabled": true,
+      "max_position_pct": 0.1,
+      "default_stop_loss_pct": 0.05
+    },
+    "decision_pm": {
+      "enabled": true,
+      "integration_mode": "confidence_weighted"
+    }
+  },
+  "memory": {
+    "d_model": 512,
+    "enable_gated_attention": true,
+    "confidence_threshold": 0.3
+  },
+  "evaluation": {
+    "temporal_split": {
+      "train_start": "2022-01-03",
+      "train_end": "2022-12-31",
+      "valid_start": "2023-01-01",
+      "valid_end": "2023-06-30",
+      "test_start": "2023-07-01",
+      "test_end": "2023-11-30"
+    },
+    "transaction_cost_bps": 15,
+    "slippage_bps": 5,
+    "execution_delay_days": 1
+  },
+  "logging": {
+    "level": "INFO",
+    "log_dir": "outputs/logs",
+    "save_artifacts": true
+  },
+  "seed": 42
+}

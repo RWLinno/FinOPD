@@ -1,0 +1,233 @@
+\begin{thebibliography}{43}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bai et~al.(2023)Bai, Bai, Chu, Cui, Dang, Deng, Fan, Ge, Han, Huang, Hui, Ji, Li, Lin, Lin, Liu, Liu, Lu, Lu, Ma, Men, Ren, Ren, Tan, Tan, Tu, Wang, Wang, Wang, Wu, Xu, Xu, Yang, Yang, Yang, Yang, Yao, Yu, Yuan, Yuan, Zhang, Zhang, Zhang, Zhang, Zhou, Zhou, Zhou, and Zhu]{bai2023qwentechnicalreport}
+J.~Bai, S.~Bai, Y.~Chu, Z.~Cui, K.~Dang, X.~Deng, Y.~Fan, W.~Ge, Y.~Han, F.~Huang, B.~Hui, L.~Ji, M.~Li, J.~Lin, R.~Lin, D.~Liu, G.~Liu, C.~Lu, K.~Lu, J.~Ma, R.~Men, X.~Ren, X.~Ren, C.~Tan, S.~Tan, J.~Tu, P.~Wang, S.~Wang, W.~Wang, S.~Wu, B.~Xu, J.~Xu, A.~Yang, H.~Yang, J.~Yang, S.~Yang, Y.~Yao, B.~Yu, H.~Yuan, Z.~Yuan, J.~Zhang, X.~Zhang, Y.~Zhang, Z.~Zhang, C.~Zhou, J.~Zhou, X.~Zhou, and T.~Zhu.
+\newblock Qwen technical report, 2023.
+\newblock URL \url{https://arxiv.org/abs/2309.16609}.
+
+\bibitem[Chowdhery et~al.(2022)Chowdhery, Narang, Devlin, Bosma, Mishra, Roberts, Barham, Chung, Sutton, Gehrmann, Schuh, Shi, Tsvyashchenko, Maynez, Rao, Barnes, Tay, Shazeer, Prabhakaran, Reif, Du, Hutchinson, Pope, Bradbury, Austin, Isard, Gur-Ari, Yin, Duke, Levskaya, Ghemawat, Dev, Michalewski, Garcia, Misra, Robinson, Fedus, Zhou, Ippolito, Luan, Lim, Zoph, Spiridonov, Sepassi, Dohan, Agrawal, Omernick, Dai, Pillai, Pellat, Lewkowycz, Moreira, Child, Polozov, Lee, Zhou, Wang, Saeta, Diaz, Firat, Catasta, Wei, Meier-Hellstern, Eck, Dean, Petrov, and Fiedel]{chowdhery2022palm}
+A.~Chowdhery, S.~Narang, J.~Devlin, M.~Bosma, G.~Mishra, A.~Roberts, P.~Barham, H.~W. Chung, C.~Sutton, S.~Gehrmann, P.~Schuh, K.~Shi, S.~Tsvyashchenko, J.~Maynez, A.~Rao, P.~Barnes, Y.~Tay, N.~Shazeer, V.~Prabhakaran, E.~Reif, N.~Du, B.~Hutchinson, R.~Pope, J.~Bradbury, J.~Austin, M.~Isard, G.~Gur-Ari, P.~Yin, T.~Duke, A.~Levskaya, S.~Ghemawat, S.~Dev, H.~Michalewski, X.~Garcia, V.~Misra, K.~Robinson, L.~Fedus, D.~Zhou, D.~Ippolito, D.~Luan, H.~Lim, B.~Zoph, A.~Spiridonov, R.~Sepassi, D.~Dohan, S.~Agrawal, M.~Omernick, A.~M. Dai, T.~S. Pillai, M.~Pellat, A.~Lewkowycz, E.~Moreira, R.~Child, O.~Polozov, K.~Lee, Z.~Zhou, X.~Wang, B.~Saeta, M.~Diaz, O.~Firat, M.~Catasta, J.~Wei, K.~Meier-Hellstern, D.~Eck, J.~Dean, S.~Petrov, and N.~Fiedel.
+\newblock Palm: Scaling language modeling with pathways, 2022.
+\newblock URL \url{https://arxiv.org/abs/2204.02311}.
+
+\bibitem[Ding et~al.(2023)Ding, Jia, Ma, Mao, Zhou, Li, and Han]{ding2023integratingstockfeaturesglobal}
+Y.~Ding, S.~Jia, T.~Ma, B.~Mao, X.~Zhou, L.~Li, and D.~Han.
+\newblock Integrating stock features and global information via large language models for enhanced stock return prediction, 2023.
+\newblock URL \url{https://arxiv.org/abs/2310.05627}.
+
+\bibitem[Du et~al.(2023)Du, Li, Torralba, Tenenbaum, and Mordatch]{du2023improvingfactualityreasoninglanguage}
+Y.~Du, S.~Li, A.~Torralba, J.~B. Tenenbaum, and I.~Mordatch.
+\newblock Improving factuality and reasoning in language models through multiagent debate, 2023.
+\newblock URL \url{https://arxiv.org/abs/2305.14325}.
+
+\bibitem[Fatouros et~al.(2024{\natexlab{a}})Fatouros, Metaxas, Soldatos, and Kyriazis]{beatunveiling}
+G.~Fatouros, K.~Metaxas, J.~Soldatos, and D.~Kyriazis.
+\newblock Can large language models beat wall street? unveiling the potential of ai in stock selection, 2024{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2401.03737}.
+
+\bibitem[Fatouros et~al.(2024{\natexlab{b}})Fatouros, Metaxas, Soldatos, and Kyriazis]{fatouros2024largelanguagemodelsbeat}
+G.~Fatouros, K.~Metaxas, J.~Soldatos, and D.~Kyriazis.
+\newblock Can large language models beat wall street? unveiling the potential of ai in stock selection, 2024{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2401.03737}.
+
+\bibitem[Havrilla et~al.(2024)Havrilla, Du, Raparthy, Nalmpantis, Dwivedi-Yu, Zhuravinskyi, Hambro, Sukhbaatar, and Raileanu]{havrilla2024teachinglargelanguagemodels}
+A.~Havrilla, Y.~Du, S.~C. Raparthy, C.~Nalmpantis, J.~Dwivedi-Yu, M.~Zhuravinskyi, E.~Hambro, S.~Sukhbaatar, and R.~Raileanu.
+\newblock Teaching large language models to reason with reinforcement learning, 2024.
+\newblock URL \url{https://arxiv.org/abs/2403.04642}.
+
+\bibitem[Hong et~al.(2024)Hong, Zhuge, Chen, Zheng, Cheng, Zhang, Wang, Wang, Yau, Lin, Zhou, Ran, Xiao, Wu, and Schmidhuber]{hong2024metagptmetaprogrammingmultiagent}
+S.~Hong, M.~Zhuge, J.~Chen, X.~Zheng, Y.~Cheng, C.~Zhang, J.~Wang, Z.~Wang, S.~K.~S. Yau, Z.~Lin, L.~Zhou, C.~Ran, L.~Xiao, C.~Wu, and J.~Schmidhuber.
+\newblock Metagpt: Meta programming for a multi-agent collaborative framework, 2024.
+\newblock URL \url{https://arxiv.org/abs/2308.00352}.
+
+\bibitem[Ji et~al.(2023)Ji, Yu, Xu, Lee, Ishii, and Fung]{ji2023mitigatinghallucinationlargelanguage}
+Z.~Ji, T.~Yu, Y.~Xu, N.~Lee, E.~Ishii, and P.~Fung.
+\newblock Towards mitigating hallucination in large language models via self-reflection, 2023.
+\newblock URL \url{https://arxiv.org/abs/2310.06271}.
+
+\bibitem[Kirtac and Germano(2024)]{sentitrade}
+K.~Kirtac and G.~Germano.
+\newblock Sentiment trading with large language models.
+\newblock \emph{Finance Research Letters}, 62:\penalty0 105227, 2024.
+\newblock ISSN 1544-6123.
+\newblock \doi{https://doi.org/10.1016/j.frl.2024.105227}.
+\newblock URL \url{https://www.sciencedirect.com/science/article/pii/S1544612324002575}.
+
+\bibitem[Koa et~al.(2024)Koa, Ma, Ng, and Chua]{Koa_2024}
+K.~J. Koa, Y.~Ma, R.~Ng, and T.-S. Chua.
+\newblock Learning to generate explainable stock predictions using self-reflective large language models, May 2024.
+\newblock URL \url{http://dx.doi.org/10.1145/3589334.3645611}.
+
+\bibitem[Li et~al.(2023{\natexlab{a}})Li, Yu, Li, Chen, and Khashanah]{li2023tradinggpt}
+Y.~Li, Y.~Yu, H.~Li, Z.~Chen, and K.~Khashanah.
+\newblock Tradinggpt: Multi-agent system with layered memory and distinct characters for enhanced financial trading performance.
+\newblock \emph{arXiv preprint arXiv:2309.03736}, 2023{\natexlab{a}}.
+
+\bibitem[Li et~al.(2023{\natexlab{b}})Li, Yu, Li, Chen, and Khashanah]{li2023tradinggptmultiagentlayeredmemory}
+Y.~Li, Y.~Yu, H.~Li, Z.~Chen, and K.~Khashanah.
+\newblock Tradinggpt: Multi-agent system with layered memory and distinct characters for enhanced financial trading performance, 2023{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2309.03736}.
+
+\bibitem[Lopez-Lira and Tang(2023)]{lopezlira2023chatgptforecaststockprice}
+A.~Lopez-Lira and Y.~Tang.
+\newblock Can chatgpt forecast stock price movements? return predictability and large language models, 2023.
+\newblock URL \url{https://arxiv.org/abs/2304.07619}.
+
+\bibitem[Lu et~al.(2023)Lu, Wu, Liang, Xu, He, Geng, Han, Xin, and Xiao]{lu2023bbtfin}
+D.~Lu, H.~Wu, J.~Liang, Y.~Xu, Q.~He, Y.~Geng, M.~Han, Y.~Xin, and Y.~Xiao.
+\newblock Bbt-fin: Comprehensive construction of chinese financial domain pre-trained language model, corpus and benchmark, 2023.
+\newblock URL \url{https://arxiv.org/abs/2302.09432}.
+
+\bibitem[OpenAI(2024)]{openai2024o1}
+OpenAI.
+\newblock Learning to reason with llms - openai o1 model.
+\newblock \url{https://openai.com/index/learning-to-reason-with-llms/}, 2024.
+\newblock Accessed: 2024-11-21.
+
+\bibitem[OpenAI et~al.(2024)OpenAI, Achiam, Adler, Agarwal, Ahmad, Akkaya, Aleman, Almeida, Altenschmidt, Altman, Anadkat, Avila, Babuschkin, Balaji, Balcom, Baltescu, Bao, Bavarian, Belgum, Bello, Berdine, Bernadett-Shapiro, Berner, Bogdonoff, Boiko, Boyd, Brakman, Brockman, Brooks, Brundage, Button, Cai, Campbell, Cann, Carey, Carlson, Carmichael, Chan, Chang, Chantzis, Chen, Chen, Chen, Chen, Chen, Chess, Cho, Chu, Chung, Cummings, Currier, Dai, Decareaux, Degry, Deutsch, Deville, Dhar, Dohan, Dowling, Dunning, Ecoffet, Eleti, Eloundou, Farhi, Fedus, Felix, Fishman, Forte, Fulford, Gao, Georges, Gibson, Goel, Gogineni, Goh, Gontijo-Lopes, Gordon, Grafstein, Gray, Greene, Gross, Gu, Guo, Hallacy, Han, Harris, He, Heaton, Heidecke, Hesse, Hickey, Hickey, Hoeschele, Houghton, Hsu, Hu, Hu, Huizinga, Jain, Jain, Jang, Jiang, Jiang, Jin, Jin, Jomoto, Jonn, Jun, Kaftan, Łukasz Kaiser, Kamali, Kanitscheider, Keskar, Khan, Kilpatrick, Kim, Kim, Kim, Kirchner, Kiros, Knight, Kokotajlo, Łukasz Kondraciuk, Kondrich,
+  Konstantinidis, Kosic, Krueger, Kuo, Lampe, Lan, Lee, Leike, Leung, Levy, Li, Lim, Lin, Lin, Litwin, Lopez, Lowe, Lue, Makanju, Malfacini, Manning, Markov, Markovski, Martin, Mayer, Mayne, McGrew, McKinney, McLeavey, McMillan, McNeil, Medina, Mehta, Menick, Metz, Mishchenko, Mishkin, Monaco, Morikawa, Mossing, Mu, Murati, Murk, Mély, Nair, Nakano, Nayak, Neelakantan, Ngo, Noh, Ouyang, O'Keefe, Pachocki, Paino, Palermo, Pantuliano, Parascandolo, Parish, Parparita, Passos, Pavlov, Peng, Perelman, de~Avila Belbute~Peres, Petrov, de~Oliveira~Pinto, Michael, Pokorny, Pokrass, Pong, Powell, Power, Power, Proehl, Puri, Radford, Rae, Ramesh, Raymond, Real, Rimbach, Ross, Rotsted, Roussez, Ryder, Saltarelli, Sanders, Santurkar, Sastry, Schmidt, Schnurr, Schulman, Selsam, Sheppard, Sherbakov, Shieh, Shoker, Shyam, Sidor, Sigler, Simens, Sitkin, Slama, Sohl, Sokolowsky, Song, Staudacher, Such, Summers, Sutskever, Tang, Tezak, Thompson, Tillet, Tootoonchian, Tseng, Tuggle, Turley, Tworek, Uribe, Vallone, Vijayvergiya,
+  Voss, Wainwright, Wang, Wang, Wang, Ward, Wei, Weinmann, Welihinda, Welinder, Weng, Weng, Wiethoff, Willner, Winter, Wolrich, Wong, Workman, Wu, Wu, Wu, Xiao, Xu, Yoo, Yu, Yuan, Zaremba, Zellers, Zhang, Zhang, Zhao, Zheng, Zhuang, Zhuk, and Zoph]{openai2024gpt4technicalreport}
+OpenAI, J.~Achiam, S.~Adler, S.~Agarwal, L.~Ahmad, I.~Akkaya, F.~L. Aleman, D.~Almeida, J.~Altenschmidt, S.~Altman, S.~Anadkat, R.~Avila, I.~Babuschkin, S.~Balaji, V.~Balcom, P.~Baltescu, H.~Bao, M.~Bavarian, J.~Belgum, I.~Bello, J.~Berdine, G.~Bernadett-Shapiro, C.~Berner, L.~Bogdonoff, O.~Boiko, M.~Boyd, A.-L. Brakman, G.~Brockman, T.~Brooks, M.~Brundage, K.~Button, T.~Cai, R.~Campbell, A.~Cann, B.~Carey, C.~Carlson, R.~Carmichael, B.~Chan, C.~Chang, F.~Chantzis, D.~Chen, S.~Chen, R.~Chen, J.~Chen, M.~Chen, B.~Chess, C.~Cho, C.~Chu, H.~W. Chung, D.~Cummings, J.~Currier, Y.~Dai, C.~Decareaux, T.~Degry, N.~Deutsch, D.~Deville, A.~Dhar, D.~Dohan, S.~Dowling, S.~Dunning, A.~Ecoffet, A.~Eleti, T.~Eloundou, D.~Farhi, L.~Fedus, N.~Felix, S.~P. Fishman, J.~Forte, I.~Fulford, L.~Gao, E.~Georges, C.~Gibson, V.~Goel, T.~Gogineni, G.~Goh, R.~Gontijo-Lopes, J.~Gordon, M.~Grafstein, S.~Gray, R.~Greene, J.~Gross, S.~S. Gu, Y.~Guo, C.~Hallacy, J.~Han, J.~Harris, Y.~He, M.~Heaton, J.~Heidecke, C.~Hesse, A.~Hickey,
+  W.~Hickey, P.~Hoeschele, B.~Houghton, K.~Hsu, S.~Hu, X.~Hu, J.~Huizinga, S.~Jain, S.~Jain, J.~Jang, A.~Jiang, R.~Jiang, H.~Jin, D.~Jin, S.~Jomoto, B.~Jonn, H.~Jun, T.~Kaftan, Łukasz Kaiser, A.~Kamali, I.~Kanitscheider, N.~S. Keskar, T.~Khan, L.~Kilpatrick, J.~W. Kim, C.~Kim, Y.~Kim, J.~H. Kirchner, J.~Kiros, M.~Knight, D.~Kokotajlo, Łukasz Kondraciuk, A.~Kondrich, A.~Konstantinidis, K.~Kosic, G.~Krueger, V.~Kuo, M.~Lampe, I.~Lan, T.~Lee, J.~Leike, J.~Leung, D.~Levy, C.~M. Li, R.~Lim, M.~Lin, S.~Lin, M.~Litwin, T.~Lopez, R.~Lowe, P.~Lue, A.~Makanju, K.~Malfacini, S.~Manning, T.~Markov, Y.~Markovski, B.~Martin, K.~Mayer, A.~Mayne, B.~McGrew, S.~M. McKinney, C.~McLeavey, P.~McMillan, J.~McNeil, D.~Medina, A.~Mehta, J.~Menick, L.~Metz, A.~Mishchenko, P.~Mishkin, V.~Monaco, E.~Morikawa, D.~Mossing, T.~Mu, M.~Murati, O.~Murk, D.~Mély, A.~Nair, R.~Nakano, R.~Nayak, A.~Neelakantan, R.~Ngo, H.~Noh, L.~Ouyang, C.~O'Keefe, J.~Pachocki, A.~Paino, J.~Palermo, A.~Pantuliano, G.~Parascandolo, J.~Parish, E.~Parparita,
+  A.~Passos, M.~Pavlov, A.~Peng, A.~Perelman, F.~de~Avila Belbute~Peres, M.~Petrov, H.~P. de~Oliveira~Pinto, Michael, Pokorny, M.~Pokrass, V.~H. Pong, T.~Powell, A.~Power, B.~Power, E.~Proehl, R.~Puri, A.~Radford, J.~Rae, A.~Ramesh, C.~Raymond, F.~Real, K.~Rimbach, C.~Ross, B.~Rotsted, H.~Roussez, N.~Ryder, M.~Saltarelli, T.~Sanders, S.~Santurkar, G.~Sastry, H.~Schmidt, D.~Schnurr, J.~Schulman, D.~Selsam, K.~Sheppard, T.~Sherbakov, J.~Shieh, S.~Shoker, P.~Shyam, S.~Sidor, E.~Sigler, M.~Simens, J.~Sitkin, K.~Slama, I.~Sohl, B.~Sokolowsky, Y.~Song, N.~Staudacher, F.~P. Such, N.~Summers, I.~Sutskever, J.~Tang, N.~Tezak, M.~B. Thompson, P.~Tillet, A.~Tootoonchian, E.~Tseng, P.~Tuggle, N.~Turley, J.~Tworek, J.~F.~C. Uribe, A.~Vallone, A.~Vijayvergiya, C.~Voss, C.~Wainwright, J.~J. Wang, A.~Wang, B.~Wang, J.~Ward, J.~Wei, C.~Weinmann, A.~Welihinda, P.~Welinder, J.~Weng, L.~Weng, M.~Wiethoff, D.~Willner, C.~Winter, S.~Wolrich, H.~Wong, L.~Workman, S.~Wu, J.~Wu, M.~Wu, K.~Xiao, T.~Xu, S.~Yoo, K.~Yu, Q.~Yuan,
+  W.~Zaremba, R.~Zellers, C.~Zhang, M.~Zhang, S.~Zhao, T.~Zheng, J.~Zhuang, W.~Zhuk, and B.~Zoph.
+\newblock Gpt-4 technical report, 2024.
+\newblock URL \url{https://arxiv.org/abs/2303.08774}.
+
+\bibitem[Park et~al.(2023)Park, O'Brien, Cai, Morris, Liang, and Bernstein]{park2023generativeagentsinteractivesimulacra}
+J.~S. Park, J.~C. O'Brien, C.~J. Cai, M.~R. Morris, P.~Liang, and M.~S. Bernstein.
+\newblock Generative agents: Interactive simulacra of human behavior, 2023.
+\newblock URL \url{https://arxiv.org/abs/2304.03442}.
+
+\bibitem[Qian et~al.(2024)Qian, Liu, Liu, Chen, Dang, Li, Yang, Chen, Su, Cong, Xu, Li, Liu, and Sun]{qian2024chatdevcommunicativeagentssoftware}
+C.~Qian, W.~Liu, H.~Liu, N.~Chen, Y.~Dang, J.~Li, C.~Yang, W.~Chen, Y.~Su, X.~Cong, J.~Xu, D.~Li, Z.~Liu, and M.~Sun.
+\newblock Chatdev: Communicative agents for software development, 2024.
+\newblock URL \url{https://arxiv.org/abs/2307.07924}.
+
+\bibitem[Schulman et~al.(2017)Schulman, Wolski, Dhariwal, Radford, and Klimov]{ppo}
+J.~Schulman, F.~Wolski, P.~Dhariwal, A.~Radford, and O.~Klimov.
+\newblock Proximal policy optimization algorithms, 2017.
+\newblock URL \url{https://arxiv.org/abs/1707.06347}.
+
+\bibitem[Talebirad and Nadiri(2023)]{talebirad2023multiagentcollaborationharnessingpower}
+Y.~Talebirad and A.~Nadiri.
+\newblock Multi-agent collaboration: Harnessing the power of intelligent llm agents, 2023.
+\newblock URL \url{https://arxiv.org/abs/2306.03314}.
+
+\bibitem[Tang et~al.(2024)Tang, Zou, Zhang, Li, Zhao, Zhang, Cohan, and Gerstein]{tang2024medagentslargelanguagemodels}
+X.~Tang, A.~Zou, Z.~Zhang, Z.~Li, Y.~Zhao, X.~Zhang, A.~Cohan, and M.~Gerstein.
+\newblock Medagents: Large language models as collaborators for zero-shot medical reasoning, 2024.
+\newblock URL \url{https://arxiv.org/abs/2311.10537}.
+
+\bibitem[Touvron et~al.(2023)Touvron, Martin, Stone, Albert, Almahairi, Babaei, Bashlykov, Batra, Bhargava, Bhosale, Bikel, Blecher, Ferrer, Chen, Cucurull, Esiobu, Fernandes, Fu, Fu, Fuller, Gao, Goswami, Goyal, Hartshorn, Hosseini, Hou, Inan, Kardas, Kerkez, Khabsa, Kloumann, Korenev, Koura, Lachaux, Lavril, Lee, Liskovich, Lu, Mao, Martinet, Mihaylov, Mishra, Molybog, Nie, Poulton, Reizenstein, Rungta, Saladi, Schelten, Silva, Smith, Subramanian, Tan, Tang, Taylor, Williams, Kuan, Xu, Yan, Zarov, Zhang, Fan, Kambadur, Narang, Rodriguez, Stojnic, Edunov, and Scialom]{touvron2023llama2openfoundation}
+H.~Touvron, L.~Martin, K.~Stone, P.~Albert, A.~Almahairi, Y.~Babaei, N.~Bashlykov, S.~Batra, P.~Bhargava, S.~Bhosale, D.~Bikel, L.~Blecher, C.~C. Ferrer, M.~Chen, G.~Cucurull, D.~Esiobu, J.~Fernandes, J.~Fu, W.~Fu, B.~Fuller, C.~Gao, V.~Goswami, N.~Goyal, A.~Hartshorn, S.~Hosseini, R.~Hou, H.~Inan, M.~Kardas, V.~Kerkez, M.~Khabsa, I.~Kloumann, A.~Korenev, P.~S. Koura, M.-A. Lachaux, T.~Lavril, J.~Lee, D.~Liskovich, Y.~Lu, Y.~Mao, X.~Martinet, T.~Mihaylov, P.~Mishra, I.~Molybog, Y.~Nie, A.~Poulton, J.~Reizenstein, R.~Rungta, K.~Saladi, A.~Schelten, R.~Silva, E.~M. Smith, R.~Subramanian, X.~E. Tan, B.~Tang, R.~Taylor, A.~Williams, J.~X. Kuan, P.~Xu, Z.~Yan, I.~Zarov, Y.~Zhang, A.~Fan, M.~Kambadur, S.~Narang, A.~Rodriguez, R.~Stojnic, S.~Edunov, and T.~Scialom.
+\newblock Llama 2: Open foundation and fine-tuned chat models, 2023.
+\newblock URL \url{https://arxiv.org/abs/2307.09288}.
+
+\bibitem[Wang et~al.(2024{\natexlab{a}})Wang, Li, Bhatt, Xi, Liu, Topcu, and Wang]{wang2024planningabilitiesopenaiso1}
+K.~Wang, J.~Li, N.~P. Bhatt, Y.~Xi, Q.~Liu, U.~Topcu, and Z.~Wang.
+\newblock On the planning abilities of openai's o1 models: Feasibility, optimality, and generalizability, 2024{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2409.19924}.
+
+\bibitem[Wang et~al.(2024{\natexlab{b}})Wang, Izumi, and Sakaji]{wang2024llmfactorextractingprofitablefactors}
+M.~Wang, K.~Izumi, and H.~Sakaji.
+\newblock Llmfactor: Extracting profitable factors through prompts for explainable stock movement prediction, 2024{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2406.10811}.
+
+\bibitem[Wang et~al.(2023)Wang, Yuan, Zhou, Ni, Shum, and Guo]{wang2023alpha}
+S.~Wang, H.~Yuan, L.~Zhou, L.~M. Ni, H.-Y. Shum, and J.~Guo.
+\newblock Alpha-gpt: Human-ai interactive alpha mining for quantitative investment.
+\newblock \emph{arXiv preprint arXiv:2308.00016}, 2023.
+\newblock URL \url{https://arxiv.org/abs/2308.00016}.
+
+\bibitem[Wang et~al.(2024{\natexlab{c}})Wang, Yuan, Ni, and Guo]{wang2024quantagentseekingholygrail}
+S.~Wang, H.~Yuan, L.~M. Ni, and J.~Guo.
+\newblock Quantagent: Seeking holy grail in trading by self-improving large language model, 2024{\natexlab{c}}.
+\newblock URL \url{https://arxiv.org/abs/2402.03755}.
+
+\bibitem[Wu et~al.(2023)Wu, Irsoy, Lu, Dabravolski, Dredze, Gehrmann, Kambadur, Rosenberg, and Mann]{wu2023bloomberggpt}
+S.~Wu, O.~Irsoy, S.~Lu, V.~Dabravolski, M.~Dredze, S.~Gehrmann, P.~Kambadur, D.~Rosenberg, and G.~Mann.
+\newblock Bloomberggpt: A large language model for finance, 2023.
+\newblock URL \url{https://arxiv.org/abs/2303.17564}.
+
+\bibitem[Xie et~al.(2023)Xie, Han, Zhang, Lai, Peng, Lopez-Lira, and Huang]{xie2023pixiu}
+Q.~Xie, W.~Han, X.~Zhang, Y.~Lai, M.~Peng, A.~Lopez-Lira, and J.~Huang.
+\newblock Pixiu: A large language model, instruction data and evaluation benchmark for finance, 2023.
+\newblock URL \url{https://arxiv.org/abs/2306.05443}.
+
+\bibitem[Xing(2024)]{xing2024designingheterogeneousllmagents}
+F.~Xing.
+\newblock Designing heterogeneous llm agents for financial sentiment analysis, 2024.
+\newblock URL \url{https://arxiv.org/abs/2401.05799}.
+
+\bibitem[Yang et~al.(2023{\natexlab{a}})Yang, Xiao, Wang, Zhang, Bian, Yin, Lv, Pan, Wang, Yan, Yang, Deng, Wang, Liu, Ai, Dong, Zhao, Xu, Sun, Zhang, Liu, Ji, Xie, Dai, Fang, Su, Song, Liu, Ru, Ma, Wang, Liu, Lin, Nie, Guo, Sun, Zhang, Li, Li, Cheng, Chen, Zeng, Wang, Chen, Men, Yu, Pan, Shen, Wang, Li, Jiang, Gao, Zhang, Zhou, and Wu]{yang2023baichuan2openlargescale}
+A.~Yang, B.~Xiao, B.~Wang, B.~Zhang, C.~Bian, C.~Yin, C.~Lv, D.~Pan, D.~Wang, D.~Yan, F.~Yang, F.~Deng, F.~Wang, F.~Liu, G.~Ai, G.~Dong, H.~Zhao, H.~Xu, H.~Sun, H.~Zhang, H.~Liu, J.~Ji, J.~Xie, J.~Dai, K.~Fang, L.~Su, L.~Song, L.~Liu, L.~Ru, L.~Ma, M.~Wang, M.~Liu, M.~Lin, N.~Nie, P.~Guo, R.~Sun, T.~Zhang, T.~Li, T.~Li, W.~Cheng, W.~Chen, X.~Zeng, X.~Wang, X.~Chen, X.~Men, X.~Yu, X.~Pan, Y.~Shen, Y.~Wang, Y.~Li, Y.~Jiang, Y.~Gao, Y.~Zhang, Z.~Zhou, and Z.~Wu.
+\newblock Baichuan 2: Open large-scale language models, 2023{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2309.10305}.
+
+\bibitem[Yang et~al.(2023{\natexlab{b}})Yang, Liu, and Wang]{yang2023fingpt}
+H.~Yang, X.-Y. Liu, and C.~D. Wang.
+\newblock Fingpt: Open-source financial large language models, 2023{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2306.06031}.
+
+\bibitem[Yang et~al.(2023{\natexlab{c}})Yang, Yue, and He]{yang2023autogptonlinedecisionmaking}
+H.~Yang, S.~Yue, and Y.~He.
+\newblock Auto-gpt for online decision making: Benchmarks and additional opinions, 2023{\natexlab{c}}.
+\newblock URL \url{https://arxiv.org/abs/2306.02224}.
+
+\bibitem[Yang et~al.(2024)Yang, Zhang, Wang, Guo, Zhang, Lin, Wang, Zhou, Guan, Zhang, and Wang]{yang2024finrobotopensourceaiagent}
+H.~Yang, B.~Zhang, N.~Wang, C.~Guo, X.~Zhang, L.~Lin, J.~Wang, T.~Zhou, M.~Guan, R.~Zhang, and C.~D. Wang.
+\newblock Finrobot: An open-source ai agent platform for financial applications using large language models, 2024.
+\newblock URL \url{https://arxiv.org/abs/2405.14767}.
+
+\bibitem[Yao et~al.(2023)Yao, Zhao, Yu, Du, Shafran, Narasimhan, and Cao]{yao2023reactsynergizingreasoningacting}
+S.~Yao, J.~Zhao, D.~Yu, N.~Du, I.~Shafran, K.~Narasimhan, and Y.~Cao.
+\newblock React: Synergizing reasoning and acting in language models, 2023.
+\newblock URL \url{https://arxiv.org/abs/2210.03629}.
+
+\bibitem[Yu et~al.(2023)Yu, Li, Chen, Jiang, Li, Zhang, Liu, Suchow, and Khashanah]{finmem}
+Y.~Yu, H.~Li, Z.~Chen, Y.~Jiang, Y.~Li, D.~Zhang, R.~Liu, J.~W. Suchow, and K.~Khashanah.
+\newblock Finmem: A performance-enhanced llm trading agent with layered memory and character design, 2023.
+\newblock URL \url{https://arxiv.org/abs/2311.13743}.
+
+\bibitem[Yu et~al.(2024)Yu, Yao, Li, Deng, Cao, Chen, Suchow, Liu, Cui, Zhang, et~al.]{yu2024fincon}
+Y.~Yu, Z.~Yao, H.~Li, Z.~Deng, Y.~Cao, Z.~Chen, J.~W. Suchow, R.~Liu, Z.~Cui, D.~Zhang, et~al.
+\newblock Fincon: A synthesized llm multi-agent system with conceptual verbal reinforcement for enhanced financial decision making.
+\newblock \emph{arXiv preprint arXiv:2407.06567}, 2024.
+
+\bibitem[Zhang et~al.(2023{\natexlab{a}})Zhang, Yang, and Liu]{zhang2023instructfingpt}
+B.~Zhang, H.~Yang, and X.-Y. Liu.
+\newblock Instruct-fingpt: Financial sentiment analysis by instruction tuning of general-purpose large language models, 2023{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2306.12659}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{a}})Zhang, Hua, Xu, Kong, Zuo, and Guo]{unveiling}
+H.~Zhang, F.~Hua, C.~Xu, H.~Kong, R.~Zuo, and J.~Guo.
+\newblock Unveiling the potential of sentiment: Can large language models predict chinese stock price movements?, 2024{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2306.14222}.
+
+\bibitem[Zhang et~al.(2022)Zhang, Roller, Goyal, Artetxe, Chen, Chen, Dewan, Diab, Li, Lin, Mihaylov, Ott, Shleifer, Shuster, Simig, Koura, Sridhar, Wang, and Zettlemoyer]{zhang2022opt}
+S.~Zhang, S.~Roller, N.~Goyal, M.~Artetxe, M.~Chen, S.~Chen, C.~Dewan, M.~Diab, X.~Li, X.~V. Lin, T.~Mihaylov, M.~Ott, S.~Shleifer, K.~Shuster, D.~Simig, P.~S. Koura, A.~Sridhar, T.~Wang, and L.~Zettlemoyer.
+\newblock Opt: Open pre-trained transformer language models, 2022.
+\newblock URL \url{https://arxiv.org/abs/2205.01068}.
+
+\bibitem[Zhang et~al.(2024{\natexlab{b}})Zhang, Zhao, Xia, Sun, Sun, Qin, Li, Zhao, Zhao, Cai, Zheng, Wang, and An]{multimodalfinmem}
+W.~Zhang, L.~Zhao, H.~Xia, S.~Sun, J.~Sun, M.~Qin, X.~Li, Y.~Zhao, Y.~Zhao, X.~Cai, L.~Zheng, X.~Wang, and B.~An.
+\newblock A multimodal foundation agent for financial trading: Tool-augmented, diversified, and generalist, 2024{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2402.18485}.
+
+\bibitem[Zhang et~al.(2023{\natexlab{b}})Zhang, Yang, and Xu]{zhang2023xuanyuan}
+X.~Zhang, Q.~Yang, and D.~Xu.
+\newblock Xuanyuan 2.0: A large chinese financial chat model with hundreds of billions parameters, 2023{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2305.12002}.
+
+\bibitem[Zhong et~al.(2024)Zhong, Liu, Pan, Zhang, Zhou, Liang, Wu, Lyu, Shu, Yu, Cao, Jiang, Chen, Li, Chen, Hu, Liu, Zhao, Xu, Dai, Zhao, Zhang, Zhao, Yang, Chen, Wang, Ruan, Wang, Zhao, Zhang, Ren, Qin, Chen, Li, Zidan, Jahin, Chen, Xia, Holmes, Zhuang, Wang, Xu, Xia, Yu, Tang, Yang, Sun, Yang, Lu, Wang, Chai, Li, Lu, Sun, Zhang, Ge, Hu, Zhang, Zhou, Zhang, Zhang, Liu, Jiang, Kong, Xiang, Ren, Liu, Jiang, Bao, Zhang, Li, Li, Liu, Shen, Sikora, Zhai, Zhu, and Liu]{zhong2024evaluationopenaio1opportunities}
+T.~Zhong, Z.~Liu, Y.~Pan, Y.~Zhang, Y.~Zhou, S.~Liang, Z.~Wu, Y.~Lyu, P.~Shu, X.~Yu, C.~Cao, H.~Jiang, H.~Chen, Y.~Li, J.~Chen, H.~Hu, Y.~Liu, H.~Zhao, S.~Xu, H.~Dai, L.~Zhao, R.~Zhang, W.~Zhao, Z.~Yang, J.~Chen, P.~Wang, W.~Ruan, H.~Wang, H.~Zhao, J.~Zhang, Y.~Ren, S.~Qin, T.~Chen, J.~Li, A.~H. Zidan, A.~Jahin, M.~Chen, S.~Xia, J.~Holmes, Y.~Zhuang, J.~Wang, B.~Xu, W.~Xia, J.~Yu, K.~Tang, Y.~Yang, B.~Sun, T.~Yang, G.~Lu, X.~Wang, L.~Chai, H.~Li, J.~Lu, L.~Sun, X.~Zhang, B.~Ge, X.~Hu, L.~Zhang, H.~Zhou, L.~Zhang, S.~Zhang, N.~Liu, B.~Jiang, L.~Kong, Z.~Xiang, Y.~Ren, J.~Liu, X.~Jiang, Y.~Bao, W.~Zhang, X.~Li, G.~Li, W.~Liu, D.~Shen, A.~Sikora, X.~Zhai, D.~Zhu, and T.~Liu.
+\newblock Evaluation of openai o1: Opportunities and challenges of agi, 2024.
+\newblock URL \url{https://arxiv.org/abs/2409.18486}.
+
+\end{thebibliography}
