@@ -15,6 +15,11 @@ We compare against five baselines spanning traditional and learning-based approa
 \paragraph{Metrics.}
 We report annualised return, Sharpe ratio (both gross and net of 15bps round-trip transaction costs), maximum drawdown, Calmar ratio, information coefficient (IC), rank IC, and directional accuracy. All metrics are computed on the held-out test period. The Sharpe ratio uses an annualisation factor of $\sqrt{252}$ and assumes zero risk-free rate.
 
+
+\paragraph{Aligned training data for visual SFT.}
+For visual SFT, we construct point-in-time aligned triples of financial time series, filing text, and rendered charts. Each chart is accompanied by local bounding boxes mapped to quantitative factors. The training protocol freezes the text and time-series encoders and updates only the visual encoder. This protocol allows direct attribution between local chart evidence and factor-level supervision while keeping non-visual representations stable.
+
+
 \paragraph{Realistic constraints.}
 All experiments incorporate transaction costs (15bps round-trip), slippage (5bps), and execution delay (1 trading day). These conservative assumptions ensure that reported performance reflects achievable trading outcomes.
 

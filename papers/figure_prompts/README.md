@@ -16,3 +16,6 @@ the prompt as a specification.
 | Fig 6 | `fig6_equity_curves.md` | Section 4.2 | Cumulative return comparison |
 | Fig 7 | `fig7_memory_gating.md` | Section 3.4 / 4.5 | Memory gating visualization |
 | Fig 8 | `fig8_rd_loop.md` | Section 3.5 | R&D loop workflow diagram |
+
+| Fig 9 | `fig9_visual_sft_alignment.md` | Section 3.6 / 4.1 | Visual SFT with bbox-factor alignment |
+| Fig 10 | `fig10_gui_mas_replay.md` | Demo / Appendix | GUI replay of multi-agent decision process |

@@ -79,6 +79,21 @@ Inspired by R\&D-Agent~\cite{rdagent2025}, the system supports a closed-loop ite
 \end{equation}
 Each iteration begins with hypothesis generation, where the system formulates testable claims about which visual patterns are most predictive under specific market conditions (e.g., trendline breaks during volatile regimes, or volume divergence preceding reversals). The hypothesis is operationalised as a configuration adjustment (modifying geometry extraction parameters, agent weights, or pattern confidence thresholds), and validated through a walk-forward backtest. The resulting performance metrics are compared against the previous iteration, and a reflection step analyses which changes contributed to improvement or degradation. Accumulated insights are recorded in a persistent trace that informs future hypothesis generation. The loop terminates after a fixed budget of $K$ iterations (default $K{=}5$) or when the improvement in Sharpe ratio between consecutive iterations falls below a threshold $\epsilon{=}0.01$.
 
+
+
+\subsection{Visual Encoder SFT with Frozen Text and Time-Series Encoders}
+\label{sec:visual_sft}
+
+To align visual evidence with heterogeneous financial context while preserving stable semantics from non-visual modalities, we adopt a constrained SFT strategy. For each decision date, we build aligned tuples consisting of a lookback OHLCV window, point-in-time filing text, and a rendered candlestick image with local evidence regions. The text encoder and the time-series encoder remain frozen during SFT. Only the visual encoder is trainable. This design isolates visual adaptation and reduces overfitting risk under limited financial supervision.
+
+Given a sample $x_t$, the frozen text and time-series encoders produce a fixed target representation $z_t^{\text{text-ts}}$. The trainable visual encoder maps the chart image to $z_t^{\text{vis}}$. We optimize a multi-task objective:
+\begin{equation}
+\mathcal{L} = \lambda_{\text{dir}}\mathcal{L}_{\text{dir}} + \lambda_{\text{align}}\mathcal{L}_{\text{align}} + \lambda_{\text{factor}}\mathcal{L}_{\text{factor}},
+\end{equation}
+where $\mathcal{L}_{\text{dir}}$ is direction classification loss, $\mathcal{L}_{\text{align}}$ enforces representation consistency between $z_t^{\text{vis}}$ and $z_t^{\text{text-ts}}$, and $\mathcal{L}_{\text{factor}}$ supervises local bbox-factor predictions.
+
+For local supervision, each rendered chart includes bounding boxes associated with quantitative factors such as trend strength, volatility clustering, momentum, and volume spike. This step injects geometric priors into visual adaptation and encourages the model to focus on financially relevant local structures instead of generic chart texture.
+
 \subsection{Computational Considerations}
 \label{sec:compute}
 

@@ -69,7 +69,7 @@ git clone <repo-url> FinVL-MAS && cd FinVL-MAS
 
 # Option A: Conda (recommended)
 conda env create -f environment.yml
-conda activate finvl
+conda activate finvl-mas-mas
 
 # Option B: Pip
 pip install -e ".[dev]"
@@ -134,7 +134,15 @@ bash experiments/run_all.sh --data data/processed/sample.csv --quick
 ### 5. Launch Dashboard
 
 ```bash
+# one-command setup + validation
+bash todo_exp.sh setup
+bash todo_exp.sh smoke
+
+# launch GUI
 bash experiments/launch_gui.sh
+# or background launch
+bash todo_exp.sh gui
+
 # Open http://localhost:7860 in browser
 ```
 
@@ -204,10 +212,12 @@ Compares FinVL-MAS against baselines on daily stock prediction tasks.
 
 The interactive Gradio dashboard provides:
 
-- **Chart Analysis**: Upload OHLCV CSV → interactive Plotly candlestick chart with geometry overlays
-- **Agent Pipeline**: Visual confidence indicators for each reasoning agent
-- **Experiment Results**: Load and explore experiment metrics with interactive cards
-- **Geometry JSON**: Structured chart geometry output for debugging
+- **Overview**: live project snapshot and latest metrics artifacts
+- **Decision Studio**: upload OHLCV CSV, run full MAS, inspect chart geometry and agent traces
+- **Experiment Control**: launch existing `experiments/*.sh` scripts and tail logs in-app
+- **Results & Analytics**: load `metrics.json` and inspect decisions table
+- **Artifacts & Logs**: browse generated files and runtime traces
+- **System Docs**: in-app architecture and workflow explanations for demos/reviews
 
 Launch with `bash experiments/launch_gui.sh` or `python -m finvl.gui.app`.
 
@@ -260,3 +270,48 @@ Figure drawing prompts (for TikZ/draw.io/AI) are in `papers/figure_prompts/`.
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+
+---
+
+## GUI Troubleshooting
+
+If `bash experiments/launch_gui.sh` fails, check the following in order:
+
+1. Activate the correct conda environment:
+
+```bash
+conda activate finvl-mas-mas
+```
+
+2. Ensure GUI dependencies are installed in the same environment:
+
+```bash
+pip install gradio plotly matplotlib mplfinance
+```
+
+3. Launch from repository root:
+
+```bash
+bash experiments/launch_gui.sh
+```
+
+4. If VLM is enabled but no API key is provided, the system automatically falls back to rule-only visual analysis. To enable VLM calls, export:
+
+```bash
+export OPENAI_API_KEY=your_key
+```
+
+
+---
+
+## Unified Command Pack
+
+You can run setup, smoke tests, experiment launch, and GUI launch from one script:
+
+```bash
+bash todo_exp.sh setup
+bash todo_exp.sh smoke
+bash todo_exp.sh run
+bash todo_exp.sh gui
+```

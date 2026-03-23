@@ -4,20 +4,13 @@
 
 # Data files (raw, processed, synthetic) -- large binaries
 data/
+outputs/
+papers/
+
 !data/.gitkeep
 
 # Experiment outputs and reports
 outputs/
-
-# Reference paper source assets (large figures, compiled PDFs)
-papers/FinCon/figure/
-papers/FinCon/appendix_figure/
-papers/figure/
-papers/appendix_figure/
-papers/RD-Agent/figure/
-papers/MAS4TS/figures/
-papers/TradingAgents/figures/
-papers/TradingAgents/stocks/
 
 # LaTeX build artefacts
 *.aux

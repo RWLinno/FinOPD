@@ -1,8 +1,4 @@
-"""
-VLM (Vision-Language Model) client for chart analysis.
-Sends rendered chart images to a VLM and parses structured responses.
-Includes retry logic, cost tracking, and graceful degradation.
-"""
+"""VLM clients and routing for chart analysis."""
 
 from __future__ import annotations
 
@@ -11,16 +7,13 @@ import json
 import logging
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class VLMClient:
-    """
-    Client for querying VLMs (GPT-4o, Qwen-VL, etc.) with chart images.
-    Uses OpenAI-compatible API format with retry and cost tracking.
-    """
+    """Single backend VLM client using OpenAI-compatible API."""
 
     def __init__(self, config: Dict[str, Any] | None = None):
         config = config or {}
@@ -44,19 +37,21 @@ class VLMClient:
         if self._client is None:
             try:
                 import openai
+
                 kwargs: Dict[str, Any] = {"timeout": self.timeout}
                 if self.api_key:
                     kwargs["api_key"] = self.api_key
                 if self.base_url:
                     kwargs["base_url"] = self.base_url
                 self._client = openai.OpenAI(**kwargs)
-            except ImportError:
-                raise ImportError("openai package required for VLM client")
+            except ImportError as exc:
+                raise ImportError("openai package required for VLM client") from exc
         return self._client
 
     @property
     def usage_summary(self) -> Dict[str, Any]:
         return {
+            "model": self.model,
             "total_calls": self._total_calls,
             "failed_calls": self._failed_calls,
             "total_prompt_tokens": self._total_prompt_tokens,
@@ -69,28 +64,23 @@ class VLMClient:
         image_path: str,
         system_prompt: str,
         user_prompt: str,
+        agent_name: Optional[str] = None,
+        task: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Send a chart image to the VLM for analysis."""
         import asyncio
-        return await asyncio.get_event_loop().run_in_executor(
-            None, self._analyze_sync, image_path, system_prompt, user_prompt
-        )
 
-    def _analyze_sync(
-        self, image_path: str, system_prompt: str, user_prompt: str
-    ) -> Dict[str, Any]:
+        return await asyncio.get_event_loop().run_in_executor(None, self._analyze_sync, image_path, system_prompt, user_prompt)
+
+    def _analyze_sync(self, image_path: str, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
         if not Path(image_path).exists():
-            logger.error(f"Chart image not found: {image_path}")
             return {"error": f"Image not found: {image_path}", "raw": ""}
 
         image_b64 = self._encode_image(image_path)
-
         try:
             client = self._get_client()
-        except (ImportError, Exception) as e:
-            logger.error(f"Cannot initialise VLM client: {e}")
+        except Exception as exc:
             self._failed_calls += 1
-            return {"error": str(e), "raw": ""}
+            return {"error": str(exc), "raw": ""}
 
         messages = [
             {"role": "system", "content": system_prompt},
@@ -98,13 +88,7 @@ class VLMClient:
                 "role": "user",
                 "content": [
                     {"type": "text", "text": user_prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/png;base64,{image_b64}",
-                            "detail": "high",
-                        },
-                    },
+                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_b64}", "detail": "high"}},
                 ],
             },
         ]
@@ -119,26 +103,17 @@ class VLMClient:
                     temperature=self.temperature,
                     max_tokens=self.max_tokens,
                 )
-
                 if response.usage:
                     self._total_prompt_tokens += response.usage.prompt_tokens
                     self._total_completion_tokens += response.usage.completion_tokens
-
                 raw = response.choices[0].message.content or ""
                 return self._parse_response(raw)
-
-            except Exception as e:
-                last_err = e
-                delay = self.retry_base_delay * (2 ** (attempt - 1))
-                logger.warning(
-                    f"VLM call attempt {attempt}/{self.max_retries} failed: {e}. "
-                    f"Retrying in {delay:.1f}s..."
-                )
+            except Exception as exc:
+                last_err = exc
                 if attempt < self.max_retries:
-                    time.sleep(delay)
+                    time.sleep(self.retry_base_delay * (2 ** (attempt - 1)))
 
         self._failed_calls += 1
-        logger.error(f"VLM call failed after {self.max_retries} attempts: {last_err}")
         return {"error": str(last_err), "raw": ""}
 
     @staticmethod
@@ -148,7 +123,6 @@ class VLMClient:
 
     @staticmethod
     def _parse_response(raw: str) -> Dict[str, Any]:
-        """Attempt to parse JSON from VLM response, handling markdown fences."""
         text = raw.strip()
         if text.startswith("```"):
             lines = text.split("\n")
@@ -158,3 +132,56 @@ class VLMClient:
             return json.loads(text)
         except json.JSONDecodeError:
             return {"raw": raw, "parse_error": True}
+
+
+class VLMRouter:
+    """Route chart analysis requests across multiple VLM backends/models."""
+
+    def __init__(self, config: Dict[str, Any] | None = None):
+        config = config or {}
+        self.default_client = VLMClient(config)
+        self.routes = config.get("routes", []) or []
+        self._clients: List[Dict[str, Any]] = []
+        for route in self.routes:
+            client_cfg = dict(config)
+            client_cfg.update(route)
+            self._clients.append(
+                {
+                    "name": route.get("name", route.get("model", "route")),
+                    "agent_names": set(route.get("agent_names", [])),
+                    "tasks": set(route.get("tasks", [])),
+                    "client": VLMClient(client_cfg),
+                }
+            )
+
+    def _select_client(self, agent_name: Optional[str], task: Optional[str]) -> VLMClient:
+        for route in self._clients:
+            if agent_name and agent_name in route["agent_names"]:
+                return route["client"]
+            if task and task in route["tasks"]:
+                return route["client"]
+        return self.default_client
+
+    async def analyze_chart(
+        self,
+        image_path: str,
+        system_prompt: str,
+        user_prompt: str,
+        agent_name: Optional[str] = None,
+        task: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        client = self._select_client(agent_name=agent_name, task=task)
+        return await client.analyze_chart(
+            image_path=image_path,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            agent_name=agent_name,
+            task=task,
+        )
+
+    @property
+    def usage_summary(self) -> Dict[str, Any]:
+        data = {"default": self.default_client.usage_summary, "routes": {}}
+        for route in self._clients:
+            data["routes"][route["name"]] = route["client"].usage_summary
+        return data

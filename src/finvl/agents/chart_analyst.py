@@ -71,7 +71,11 @@ class ChartAnalystAgent(BaseFinAgent):
                         },
                     )
                     vlm_result = await vlm_client.analyze_chart(
-                        inputs["chart_image_path"], sys_prompt, user_prompt
+                        inputs["chart_image_path"],
+                        sys_prompt,
+                        user_prompt,
+                        agent_name=self.name,
+                        task="chart_analysis",
                     )
                     vlm_geometry = parse_vlm_chart_analysis(vlm_result)
                 except Exception as e:

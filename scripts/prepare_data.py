@@ -1,33 +1,26 @@
-"""
-Data preparation script for FinVL-MAS.
-
-Supports:
-  1. Download real OHLCV data from Yahoo Finance
-  2. Generate synthetic test data
-  3. Build tri-modal aligned dataset (JSONL + chart images)
-"""
+"""Data preparation script for FinVL-MAS."""
 
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
+from collections import defaultdict
 from pathlib import Path
+from typing import Callable, Dict, List
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
+from finvl.data.schema import FilingItem, TextualContext
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("finvl.prepare_data")
 
 
 def cmd_synthetic(args):
-    """Generate synthetic test dataset."""
     from finvl.data.synthetic import generate_synthetic_dataset
 
-    logger.info("Generating synthetic dataset...")
     dataset = generate_synthetic_dataset(
         asset=args.asset,
         n_bars=args.n_bars,
@@ -37,55 +30,72 @@ def cmd_synthetic(args):
         seed=args.seed,
         sample_every_n=args.sample_every,
     )
-    logger.info(f"Generated {len(dataset)} samples")
-    logger.info(f"Output: {args.output_dir}/")
-
-    # Print sample structure
-    if dataset.samples:
-        s = dataset.samples[0]
-        logger.info(f"Sample structure:")
-        logger.info(f"  sample_id: {s.sample_id}")
-        logger.info(f"  decision_date: {s.decision_date}")
-        logger.info(f"  time_series: {s.time_series.length} bars" if s.time_series else "  time_series: None")
-        logger.info(f"  chart_image: {s.chart_image.image_path}" if s.chart_image else "  chart_image: None")
-        logger.info(f"  textual_context: {s.textual_context.has_text}" if s.textual_context else "  textual_context: None")
-        logger.info(f"  label: {s.label}")
+    logger.info("Generated %d samples", len(dataset))
 
 
 def cmd_download(args):
-    """Download real OHLCV data from Yahoo Finance."""
     from finvl.data.pipeline import fetch_ohlcv_yfinance
 
     for ticker in args.tickers:
         save_path = f"{args.output_dir}/{ticker}_ohlcv.csv"
         try:
-            df = fetch_ohlcv_yfinance(
-                ticker=ticker,
-                start=args.start,
-                end=args.end,
-                save_path=save_path,
+            df = fetch_ohlcv_yfinance(ticker=ticker, start=args.start, end=args.end, save_path=save_path)
+            logger.info("%s: %d bars saved to %s", ticker, len(df), save_path)
+        except Exception as exc:
+            logger.error("%s: %s", ticker, exc)
+
+
+def _load_filings(path: str) -> Dict[str, List[dict]]:
+    rows: Dict[str, List[dict]] = defaultdict(list)
+    with Path(path).open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            item = json.loads(line)
+            asset = str(item.get("asset") or item.get("ticker") or "").strip()
+            if not asset:
+                continue
+            item["date"] = str(item.get("date", ""))[:10]
+            rows[asset].append(item)
+    for asset in rows:
+        rows[asset].sort(key=lambda x: x.get("date", ""))
+    return rows
+
+
+def _build_text_provider(rows: Dict[str, List[dict]], max_filings_per_date: int) -> Callable[[str, str], TextualContext]:
+    def provider(asset: str, decision_date: str) -> TextualContext:
+        picked = [r for r in rows.get(asset, []) if r.get("date", "") <= decision_date][-max_filings_per_date:]
+        filings = [
+            FilingItem(
+                date=r.get("date", ""),
+                filing_type=r.get("filing_type", "unknown"),
+                section=r.get("section", ""),
+                content=r.get("content", ""),
+                fiscal_period=r.get("fiscal_period", ""),
             )
-            logger.info(f"{ticker}: {len(df)} bars saved to {save_path}")
-        except Exception as e:
-            logger.error(f"{ticker}: {e}")
+            for r in picked
+        ]
+        summary = " ".join([f"[{x.filing_type}] {x.section}: {x.content[:240].replace(chr(10), ' ')}" for x in filings])
+        return TextualContext(filings=filings, combined_summary=summary)
+
+    return provider
 
 
 def cmd_build(args):
-    """Build tri-modal aligned dataset from existing OHLCV data."""
     from finvl.data.pipeline import build_dataset, load_ohlcv_csv
-    from finvl.data.schema import FinVLDataset
 
     ohlcv = load_ohlcv_csv(args.ohlcv_path)
     all_dates = [d.strftime("%Y-%m-%d") for d in ohlcv.index]
-
-    # Filter to specified range
     if args.start:
         all_dates = [d for d in all_dates if d >= args.start]
     if args.end:
         all_dates = [d for d in all_dates if d <= args.end]
 
-    decision_dates = all_dates[args.lookback::args.sample_every]
-    logger.info(f"Building dataset: {len(decision_dates)} decision dates")
+    decision_dates = all_dates[args.lookback :: args.sample_every]
+    text_provider = None
+    if args.filings_jsonl:
+        text_provider = _build_text_provider(_load_filings(args.filings_jsonl), args.max_filings_per_date)
 
     dataset = build_dataset(
         ohlcv_df=ohlcv,
@@ -94,20 +104,22 @@ def cmd_build(args):
         chart_output_dir=f"{args.output_dir}/charts",
         lookback=args.lookback,
         market=args.market,
+        text_provider=text_provider,
+        split=args.split,
+        enable_factor_bbox=not args.disable_factor_bbox,
     )
 
-    jsonl_path = f"{args.output_dir}/{args.asset}_dataset.jsonl"
-    dataset.save_jsonl(jsonl_path)
-    logger.info(f"Saved {len(dataset)} samples to {jsonl_path}")
+    out = f"{args.output_dir}/{args.asset}_dataset.jsonl"
+    dataset.save_jsonl(out)
+    logger.info("Saved %d samples to %s", len(dataset), out)
 
 
 def main():
     parser = argparse.ArgumentParser(description="FinVL-MAS Data Preparation")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    # Synthetic
     p_syn = sub.add_parser("synthetic", help="Generate synthetic test data")
-    p_syn.add_argument("--asset", default="SYNTH", help="Asset name")
+    p_syn.add_argument("--asset", default="SYNTH")
     p_syn.add_argument("--n-bars", type=int, default=500)
     p_syn.add_argument("--lookback", type=int, default=60)
     p_syn.add_argument("--start-date", default="2022-01-03")
@@ -116,7 +128,6 @@ def main():
     p_syn.add_argument("--sample-every", type=int, default=5)
     p_syn.set_defaults(func=cmd_synthetic)
 
-    # Download
     p_dl = sub.add_parser("download", help="Download OHLCV from Yahoo Finance")
     p_dl.add_argument("--tickers", nargs="+", default=["AAPL", "TSLA", "MSFT"])
     p_dl.add_argument("--start", default="2020-01-01")
@@ -124,7 +135,6 @@ def main():
     p_dl.add_argument("--output-dir", default="data/raw")
     p_dl.set_defaults(func=cmd_download)
 
-    # Build
     p_build = sub.add_parser("build", help="Build tri-modal dataset from OHLCV CSV")
     p_build.add_argument("--ohlcv-path", required=True)
     p_build.add_argument("--asset", required=True)
@@ -134,6 +144,10 @@ def main():
     p_build.add_argument("--start", default=None)
     p_build.add_argument("--end", default=None)
     p_build.add_argument("--output-dir", default="data/processed")
+    p_build.add_argument("--split", default="train", choices=["", "train", "valid", "test"])
+    p_build.add_argument("--filings-jsonl", default=None)
+    p_build.add_argument("--max-filings-per-date", type=int, default=4)
+    p_build.add_argument("--disable-factor-bbox", action="store_true")
     p_build.set_defaults(func=cmd_build)
 
     args = parser.parse_args()

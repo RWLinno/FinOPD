@@ -26,6 +26,7 @@ from finvl.data.provider import OHLCVProvider
 from finvl.evaluation.analysis import format_metrics_table
 from finvl.evaluation.backtest import BacktestConfig, VectorizedBacktester
 from finvl.workflow.orchestrator import AgentOrchestrator
+from finvl.visual.vlm_client import VLMClient, VLMRouter
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("finvl.ablation")
@@ -58,10 +59,34 @@ async def run_variant(
             window_df = provider.get_window(date, lookback=lookback)
             if len(window_df) < 10:
                 continue
+            chart_path = None
+            try:
+                from finvl.visual.renderer import ChartRenderer
+
+                chart_dir = config.get("chart", {}).get("output_dir", "outputs/ablation_charts")
+                renderer = ChartRenderer({**config.get("chart", {}), "output_dir": chart_dir})
+                chart_path, _ = renderer.render_candlestick(window_df, asset="ASSET", save_path=f"{chart_dir}/ASSET_{date}.png")
+            except Exception:
+                chart_path = None
+
+            vlm_cfg = config.get("vlm", {})
+            has_key = bool(vlm_cfg.get("api_key") or os.getenv("OPENAI_API_KEY"))
+            vlm_runtime = None
+            if chart_path and has_key:
+                vlm_runtime = VLMRouter(vlm_cfg) if vlm_cfg.get("routes") else VLMClient(vlm_cfg)
             inputs = {
                 "ohlcv_df": window_df,
                 "current_price": float(window_df["close"].iloc[-1]),
+                "asset": "ASSET",
+                "timeframe": "daily",
+                "start_date": window_df.index[0].strftime("%Y-%m-%d"),
+                "end_date": date,
+                "events": [],
             }
+            if chart_path:
+                inputs["chart_image_path"] = chart_path
+            if chart_path and vlm_runtime is not None:
+                inputs["vlm_client"] = vlm_runtime
             decision = await orchestrator.run(inputs)
             decisions.append({"date": date, "decision": decision})
         except Exception:
@@ -95,6 +120,10 @@ def main():
         split.get("test_start", "2017-01-01"),
         split.get("test_end", "2020-12-31"),
     )
+    if not test_dates:
+        # Fallback for custom datasets whose date range does not overlap default config.
+        all_dates = provider.trading_dates(*provider.date_range)
+        test_dates = all_dates
     if args.max_dates:
         test_dates = test_dates[: args.max_dates]
 
