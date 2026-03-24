@@ -5,8 +5,39 @@ ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
 mkdir -p logs experiments/logs
 
-source "/root/miniconda3/etc/profile.d/conda.sh"
-conda activate finvl-mas
+# Robust conda initialization across Linux/macOS/local installations.
+init_conda() {
+  if command -v conda >/dev/null 2>&1; then
+    # Preferred way: initialize shell functions from current conda.
+    eval "$(conda shell.bash hook)"
+    return 0
+  fi
+
+  local candidates=(
+    "$HOME/miniconda3/etc/profile.d/conda.sh"
+    "$HOME/anaconda3/etc/profile.d/conda.sh"
+    "/opt/miniconda3/etc/profile.d/conda.sh"
+    "/opt/anaconda3/etc/profile.d/conda.sh"
+    "/root/miniconda3/etc/profile.d/conda.sh"
+  )
+  local c
+  for c in "${candidates[@]}"; do
+    if [[ -f "$c" ]]; then
+      # shellcheck disable=SC1090
+      source "$c"
+      return 0
+    fi
+  done
+  return 1
+}
+
+if init_conda; then
+  conda activate "${CONDA_ENV_NAME:-finvl-mas}" || {
+    echo "[warn] conda env '${CONDA_ENV_NAME:-finvl-mas}' not found; using current python."
+  }
+else
+  echo "[warn] conda initialization failed; using current python."
+fi
 
 DATA_PATH="${DATA_PATH:-data/processed/synth_daily.csv}"
 MAX_DATES="${MAX_DATES:-60}"

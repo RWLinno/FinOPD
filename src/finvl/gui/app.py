@@ -550,8 +550,33 @@ def main():
     app = create_app()
     host = os.getenv("FINVL_GUI_HOST", "0.0.0.0")
     port = int(os.getenv("FINVL_GUI_PORT", "7860"))
+    max_port_tries = int(os.getenv("FINVL_GUI_PORT_TRIES", "50"))
     share = os.getenv("FINVL_GUI_SHARE", "false").strip().lower() in {"1", "true", "yes", "y"}
-    app.launch(server_name=host, server_port=port, share=share, theme=APP_THEME, css=APP_CSS)
+    last_error: Optional[Exception] = None
+    for offset in range(max_port_tries):
+        selected_port = port + offset
+        # Force Gradio to test exactly one candidate each round.
+        os.environ["GRADIO_SERVER_PORT"] = str(selected_port)
+        os.environ["GRADIO_NUM_PORTS"] = "1"
+        try:
+            if selected_port != port:
+                print(
+                    f"[FinVL-MAS] Requested port {port} is busy; "
+                    f"retrying with port {selected_port}."
+                )
+            print(f"[FinVL-MAS] GUI running at: http://127.0.0.1:{selected_port}")
+            app.launch(server_name=host, server_port=selected_port, share=share, theme=APP_THEME, css=APP_CSS)
+            return
+        except OSError as exc:
+            last_error = exc
+            if "Cannot find empty port in range" not in str(exc):
+                raise
+            continue
+
+    raise OSError(
+        f"Cannot find available port in range {port}-{port + max_port_tries - 1}. "
+        "Set FINVL_GUI_PORT or FINVL_GUI_PORT_TRIES to a different value."
+    ) from last_error
 
 
 if __name__ == "__main__":

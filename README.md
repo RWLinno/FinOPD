@@ -69,7 +69,7 @@ git clone <repo-url> FinVL-MAS && cd FinVL-MAS
 
 # Option A: Conda (recommended)
 conda env create -f environment.yml
-conda activate finvl-mas-mas
+conda activate finvl-mas
 
 # Option B: Pip
 pip install -e ".[dev]"
