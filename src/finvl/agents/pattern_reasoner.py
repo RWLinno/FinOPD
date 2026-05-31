@@ -18,18 +18,47 @@ PATTERN_BASE_RATES: Dict[str, Dict[str, float]] = {
     "double_top": {"bearish_pct": 0.65, "avg_move_pct": -5.0},
     "double_bottom": {"bullish_pct": 0.65, "avg_move_pct": 5.0},
     "head_and_shoulders": {"bearish_pct": 0.70, "avg_move_pct": -7.0},
+    "head-and-shoulders": {"bearish_pct": 0.70, "avg_move_pct": -7.0},
     "ascending_triangle": {"bullish_pct": 0.68, "avg_move_pct": 4.5},
     "descending_triangle": {"bearish_pct": 0.68, "avg_move_pct": -4.5},
     "symmetrical_triangle": {"breakout_either": 0.50, "avg_move_pct": 3.0},
     "engulfing_bullish": {"bullish_pct": 0.60, "avg_move_pct": 2.0},
+    "bullish_engulfing": {"bullish_pct": 0.60, "avg_move_pct": 2.0},
+    "bullish engulfing": {"bullish_pct": 0.60, "avg_move_pct": 2.0},
     "engulfing_bearish": {"bearish_pct": 0.60, "avg_move_pct": -2.0},
+    "bearish_engulfing": {"bearish_pct": 0.60, "avg_move_pct": -2.0},
+    "bearish engulfing": {"bearish_pct": 0.60, "avg_move_pct": -2.0},
     "morning_star": {"bullish_pct": 0.65, "avg_move_pct": 3.0},
+    "morning star": {"bullish_pct": 0.65, "avg_move_pct": 3.0},
     "evening_star": {"bearish_pct": 0.65, "avg_move_pct": -3.0},
+    "evening star": {"bearish_pct": 0.65, "avg_move_pct": -3.0},
     "hammer": {"bullish_pct": 0.58, "avg_move_pct": 1.5},
+    "inverted_hammer": {"bullish_pct": 0.55, "avg_move_pct": 1.0},
+    "inverted hammer": {"bullish_pct": 0.55, "avg_move_pct": 1.0},
     "shooting_star": {"bearish_pct": 0.58, "avg_move_pct": -1.5},
+    "shooting star": {"bearish_pct": 0.58, "avg_move_pct": -1.5},
     "three_white_soldiers": {"bullish_pct": 0.70, "avg_move_pct": 4.0},
     "three_black_crows": {"bearish_pct": 0.70, "avg_move_pct": -4.0},
+    "doji": {"bullish_pct": 0.50, "bearish_pct": 0.50, "avg_move_pct": 0.0},
+    "spinning_top": {"bullish_pct": 0.50, "bearish_pct": 0.50, "avg_move_pct": 0.0},
+    "marubozu": {"bullish_pct": 0.62, "avg_move_pct": 2.5},
 }
+
+
+def _normalize_pattern_name(name: str) -> str:
+    """Normalize pattern name for lookup."""
+    n = name.lower().strip()
+    # Try direct lookup first, then underscore variant
+    if n in PATTERN_BASE_RATES:
+        return n
+    n_under = n.replace(" ", "_").replace("-", "_")
+    if n_under in PATTERN_BASE_RATES:
+        return n_under
+    # Partial match
+    for key in PATTERN_BASE_RATES:
+        if key in n or n in key:
+            return key
+    return n
 
 
 class PatternReasonerAgent(BaseFinAgent):
@@ -56,7 +85,8 @@ class PatternReasonerAgent(BaseFinAgent):
 
         # Assess formations
         for f in geometry.formations:
-            rates = PATTERN_BASE_RATES.get(f.formation_type, {})
+            norm_name = _normalize_pattern_name(f.formation_type)
+            rates = PATTERN_BASE_RATES.get(norm_name, {})
             if rates:
                 bull = rates.get("bullish_pct", 0)
                 bear = rates.get("bearish_pct", 0)
@@ -79,7 +109,8 @@ class PatternReasonerAgent(BaseFinAgent):
 
         # Assess candlestick patterns
         for cp in geometry.candlestick_patterns:
-            rates = PATTERN_BASE_RATES.get(cp.pattern, {})
+            norm_name = _normalize_pattern_name(cp.pattern)
+            rates = PATTERN_BASE_RATES.get(norm_name, {})
             if rates:
                 bull = rates.get("bullish_pct", 0)
                 bear = rates.get("bearish_pct", 0)

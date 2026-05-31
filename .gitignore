@@ -1,143 +1,16 @@
-# =====================================================================
-# FinVL-MAS project-specific ignores
-# =====================================================================
-
-# Data files (raw, processed, synthetic) -- large binaries
-data/
+# Data & outputs (use HuggingFace for large files)
+data/raw/
+data/chart_geometry/charts/
 outputs/
-papers/
-
-!data/.gitkeep
-
-# Experiment outputs and reports
-outputs/
-
-# LaTeX build artefacts
-*.aux
-*.bbl
-*.blg
-*.fdb_latexmk
-*.fls
-*.synctex.gz
-*.out
-
-# Binary image/PDF files in papers (reference paper assets)
-papers/**/*.png
-papers/**/*.jpg
-papers/**/*.pdf
-# Keep our own figures directory for the FinVL-MAS paper
-!papers/figures/
-
-# Docs directory (dev log, not part of the distributable)
-docs/
-
-# =====================================================================
-# Python standard ignores
-# =====================================================================
-
-# Byte-compiled / optimized / DLL files
+logs/
+wandb/
 __pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
+*.pyc
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Translations
-*.mo
-*.pot
-
-# Logs
-*.log
-
-# Environments
 .env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre / pytype
-.pyre/
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# Ruff
-.ruff_cache/
-
-# PyPI config
-.pypirc
-
-# Cursor / VSCode
-.cursorignore
-.cursorindexingignore
-.vscode/
-
-# pdm / pixi
-.pdm-python
-.pdm-build/
-.pixi
-
-# OS files
-.DS_Store
-Thumbs.db
+nohup.out
+run_*.log
+/tmp/
+*.safetensors
+*.bin
+*.pt

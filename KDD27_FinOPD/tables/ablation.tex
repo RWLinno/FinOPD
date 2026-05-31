@@ -1,0 +1,27 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Ablation study on Dow-30 portfolio (2025 test set, 3-seed average). $\Delta$ denotes relative change vs.\ full \textsc{FinOPD}.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{clcccc}
+\toprule
+ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD$\downarrow$ & $\Delta$Acc \\
+\midrule
+A1 & Full \textsc{FinOPD} & ${\sim}$1.98 & 0.00 & ${\sim}$4.1 & 0.0 \\
+\midrule
+A2 & w/o Visual-Geometric Encoder & ${\sim}$1.52 & ${\sim}$$-$0.46 & ${\sim}$6.8 & ${\sim}$$-$12.1 \\
+A3 & Frozen VLM (no LoRA) & ${\sim}$1.61 & ${\sim}$$-$0.37 & ${\sim}$5.9 & ${\sim}$$-$8.5 \\
+A4 & w/o Router (fixed templates) & ${\sim}$1.45 & ${\sim}$$-$0.53 & ${\sim}$7.2 & ${\sim}$$-$14.8 \\
+A5 & w/o OPSD (verbal reinforcement only) & ${\sim}$1.38 & ${\sim}$$-$0.60 & ${\sim}$7.5 & ${\sim}$$-$18.2 \\
+A6a & w/o Shapley credit (uniform) & ${\sim}$1.72 & ${\sim}$$-$0.26 & ${\sim}$5.2 & ${\sim}$$-$6.4 \\
+A6b & w/o Belief consolidation & ${\sim}$1.61 & ${\sim}$$-$0.37 & ${\sim}$5.8 & ${\sim}$$-$9.1 \\
+A7 & w/o Alignment guard & ${\sim}$1.53 & ${\sim}$$-$0.45 & ${\sim}$8.4 & ${\sim}$$-$5.2 \\
+A8 & Single agent (5$\to$1) & ${\sim}$1.28 & ${\sim}$$-$0.70 & ${\sim}$9.1 & ${\sim}$$-$22.5 \\
+A9 & Single iteration ($k{=}1$) & ${\sim}$1.42 & ${\sim}$$-$0.56 & ${\sim}$6.5 & ${\sim}$$-$15.8 \\
+A10 & Trajectory search (replace OPSD) & ${\sim}$1.55 & ${\sim}$$-$0.43 & ${\sim}$6.2 & ${\sim}$$-$11.4 \\
+\bottomrule
+\end{tabular}
+\label{tab:ablation}
+\end{table}

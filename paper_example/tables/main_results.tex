@@ -1,0 +1,45 @@
+\definecolor{FBest}{RGB}{4,130,53}
+\definecolor{FSecond}{RGB}{30,100,180}
+
+\begin{table*}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Per-asset performance comparison on Dow-30 test set (2025-01 to 2025-12). All portfolio metrics include 15 bps round-trip costs, 5 bps slippage, and 1-day execution delay. Best in \textbf{\textcolor{FBest}{green}}, second-best in \textcolor{FSecond}{blue}. CR: Cumulative Return (\%), SR: Sharpe Ratio, MDD: Maximum Drawdown (\%), WR: Win Rate (\%).}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\begin{threeparttable}
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{clcccclcccclcccclcccc}
+\toprule
+\multirow{3}{*}{Category} & \multirow{3}{*}{Method} & \multicolumn{4}{c}{AAPL} & & \multicolumn{4}{c}{MSFT} & & \multicolumn{4}{c}{NVDA} & & \multicolumn{4}{c}{GOOGL} \\
+\cmidrule{3-6}\cmidrule{8-11}\cmidrule{13-16}\cmidrule{18-21}
+&& CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ \\
+\midrule
+Market
+& Buy \& Hold & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& Equal-Weight & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Time-Series\\Models\end{tabular}}
+& PatchTST & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& TimesNet & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& iTransformer & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+\midrule
+\multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}LLM\\Multi-Agent\end{tabular}}
+& TradingAgents & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& FinCon & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& FinAgent & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& R\&D-Agent & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+& AlphaAgent & -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+\midrule
+\multirow{1}{*}{Ours}
+& \textbf{\textsc{FinOPD}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} && \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} && \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} && \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} & \textbf{\textcolor{FBest}{--}} \\
+\midrule
+\multicolumn{2}{c}{Improvement over best baseline}
+& -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- && -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+}
+\end{threeparttable}
+\label{tab:per_asset}
+\end{table*}

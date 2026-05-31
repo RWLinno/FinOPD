@@ -1,40 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Stage 5: Run all baselines (12 methods)
 cd "$(dirname "$0")/.."
 export PYTHONPATH="src:${PYTHONPATH:-}"
-DATA="${1:-data/processed/csi300_daily.csv}"
+eval "$(conda shell.bash hook)"
+conda activate finopd
+export ALL_PROXY=http://accelerator-cname-hnpmnhnmdul3rmxrwhgend.c.vegalb.com:80
+export WANDB_PROJECT=FinOPD
+export WANDB_API_KEY=${WANDB_API_KEY}
+export CUDA_VISIBLE_DEVICES=0,1
+
+DATA="${1:-data/processed/us_dow30.csv}"
 OUT="outputs/experiments/baselines_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$OUT"
-echo "Running baselines on ${DATA}..."
-python - <<PY2
-import sys, json, numpy as np, pandas as pd
-sys.path.insert(0, 'src')
-from finvl.data.schema import validate_ohlcv_df
-from finvl.evaluation.metrics import compute_all_metrics
+SEEDS="42 123 456"
 
-df = pd.read_csv('${DATA}', parse_dates=True, index_col=0)
-df = validate_ohlcv_df(df)
-close = df['close'].values.astype(float)
-if len(close) < 30:
-    raise ValueError('Need at least 30 bars for baselines')
+echo "=== Running All Baselines ==="
+echo "Time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Data: ${DATA}"
 
-returns = np.diff(close) / close[:-1]
-bh = compute_all_metrics(returns)
-bh['strategy'] = 'Buy-and-Hold'
+python scripts/run_baselines_full.py \
+    --data "$DATA" \
+    --output-dir "$OUT" \
+    --seeds $SEEDS \
+    --config configs/default.yaml
 
-s5 = pd.Series(close).rolling(5, min_periods=1).mean().values
-s20 = pd.Series(close).rolling(20, min_periods=1).mean().values
-signal = np.where(s5[:-1] > s20[:-1], 1.0, -1.0)
-signal[:20] = 0.0
-strat_returns = signal * returns
-sm = compute_all_metrics(strat_returns)
-sm['strategy'] = 'SMA-5/20'
-
-res = {'Buy-and-Hold': bh, 'SMA-Crossover': sm}
-with open('${OUT}/baseline_results.json', 'w') as f:
-    json.dump(res, f, indent=2, default=str)
-
-for name, m in res.items():
-    print(f"{name:20s} Sharpe={m.get('sharpe_ratio', 0):.4f}  Return={m.get('annualized_return', 0):.2%}")
-PY2
-echo "Done. Results: ${OUT}/"
+echo "=== Baselines Complete ==="
+echo "Results: ${OUT}/"

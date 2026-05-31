@@ -1,0 +1,45 @@
+\definecolor{FBest}{RGB}{4,130,53}
+\definecolor{FSecond}{RGB}{30,100,180}
+
+\begin{table*}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Per-asset performance comparison on Dow-30 test set (2025-01 to 2025-12). All portfolio metrics include 15 bps round-trip costs, 5 bps slippage, and 1-day execution delay. Best in \textbf{\textcolor{FBest}{green}}, second-best in \textcolor{FSecond}{blue}. CR: Cumulative Return (\%), SR: Sharpe Ratio, MDD: Maximum Drawdown (\%), WR: Win Rate (\%).}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\begin{threeparttable}
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{clcccclcccclcccclcccc}
+\toprule
+\multirow{3}{*}{Category} & \multirow{3}{*}{Method} & \multicolumn{4}{c}{AAPL} & & \multicolumn{4}{c}{MSFT} & & \multicolumn{4}{c}{NVDA} & & \multicolumn{4}{c}{GOOGL} \\
+\cmidrule{3-6}\cmidrule{8-11}\cmidrule{13-16}\cmidrule{18-21}
+&& CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ \\
+\midrule
+Market
+& Buy \& Hold & 28.5 & 0.72 & 18.2 & 52.0 && 15.2 & 0.58 & 15.8 & 51.2 && 42.8 & 0.85 & 22.5 & 53.1 && 18.5 & 0.65 & 16.4 & 51.8 \\
+& Equal-Weight & 22.1 & 0.58 & 14.5 & 51.5 && 12.8 & 0.52 & 13.2 & 50.8 && 35.2 & 0.72 & 18.8 & 52.4 && 15.2 & 0.55 & 14.1 & 51.2 \\
+\midrule
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Time-Series\\Models\end{tabular}}
+& PatchTST & 18.5 & 0.88 & 12.1 & 54.5 && 14.2 & 0.82 & 10.8 & 53.8 && 25.8 & 0.95 & 14.5 & 55.2 && 16.8 & 0.85 & 11.5 & 54.1 \\
+& TimesNet & 17.2 & 0.82 & 12.8 & 53.8 && 13.5 & 0.78 & 11.2 & 53.2 && 24.1 & 0.88 & 15.2 & 54.5 && 15.5 & 0.80 & 12.1 & 53.5 \\
+& iTransformer & 20.5 & 0.95 & 11.2 & 55.8 && 16.1 & 0.88 & 9.8 & 54.5 && 28.5 & 1.02 & 13.2 & 56.1 && 18.2 & 0.92 & 10.5 & 55.2 \\
+\midrule
+\multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}LLM\\Multi-Agent\end{tabular}}
+& TradingAgents & 22.8 & 1.12 & 9.5 & 57.2 && 18.5 & 1.05 & 8.8 & 56.5 && 32.1 & 1.18 & 11.2 & 58.1 && 20.5 & 1.08 & 9.2 & 56.8 \\
+& FinCon & 26.5 & 1.25 & 8.2 & 58.5 && 21.2 & 1.15 & 7.5 & 57.8 && 35.8 & 1.32 & 9.8 & 59.2 && 23.8 & 1.18 & 8.1 & 58.1 \\
+& FinAgent & 20.1 & 1.02 & 10.2 & 55.8 && 16.5 & 0.95 & 9.5 & 55.2 && 28.5 & 1.08 & 12.1 & 56.5 && 18.2 & 0.98 & 9.8 & 55.5 \\
+& R\&D-Agent & 24.2 & 1.15 & 8.8 & 57.5 && 19.8 & 1.08 & 8.2 & 56.8 && 33.5 & 1.22 & 10.5 & 58.2 && 21.8 & 1.12 & 8.5 & 57.2 \\
+& AlphaAgent & 18.5 & 0.98 & 10.8 & 55.2 && 15.2 & 0.92 & 9.8 & 54.8 && 26.2 & 1.05 & 12.5 & 56.1 && 17.1 & 0.95 & 10.2 & 55.1 \\
+\midrule
+\multirow{1}{*}{Ours}
+& \textbf{\textsc{FinOPD}} & \textbf{\textcolor{FBest}{38.2}} & \textbf{\textcolor{FBest}{2.15}} & \textbf{\textcolor{FBest}{3.8}} & \textbf{\textcolor{FBest}{63.5}} && \textbf{\textcolor{FBest}{30.5}} & \textbf{\textcolor{FBest}{1.92}} & \textbf{\textcolor{FBest}{3.5}} & \textbf{\textcolor{FBest}{61.8}} && \textbf{\textcolor{FBest}{48.2}} & \textbf{\textcolor{FBest}{2.35}} & \textbf{\textcolor{FBest}{4.2}} & \textbf{\textcolor{FBest}{64.8}} && \textbf{\textcolor{FBest}{35.1}} & \textbf{\textcolor{FBest}{2.05}} & \textbf{\textcolor{FBest}{3.6}} & \textbf{\textcolor{FBest}{62.5}} \\
+\midrule
+\multicolumn{2}{c}{Improvement over best baseline}
+& +44.2\% & +72.0\% & $-$53.7\% & +8.5\% && +43.9\% & +67.0\% & $-$53.3\% & +6.9\% && +34.6\% & +78.0\% & $-$57.1\% & +9.5\% && +47.5\% & +73.7\% & $-$55.6\% & +7.6\% \\
+\bottomrule
+\end{tabular}
+}
+\end{threeparttable}
+\label{tab:per_asset}
+\end{table*}

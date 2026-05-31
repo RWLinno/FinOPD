@@ -1,0 +1,111 @@
+﻿Paper,Background/Contribution,Dataset,Framework,Keyword,Method,Repo,Source,cite
+Llama3.1-8B,,,,"LLM, baselines",,,,
+Gemini Pro,,,,"LLM, baselines",,,,
+GPT-3.5-Turb,,,,"LLM, baselines",,,,
+GPT-4-Turbo,,,,"LLM, baselines",,,,
+Qwen2-7B,,,,"LLM, baselines",,,,
+Qwen2.5-VL-7B-Instruct,提出Qwen2.5-VL多模态大语言模型用于视觉-语言理解和交互，以解决现有模型在细粒度视觉感知、长视频理解、文档解析和智能代理功能方面的局限性。,,FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChatcbaa6366ee2fcd082f86529284db50f1.jpg,"VLM, Video, baselines","1. 重新设计的视觉编码器：采用窗口注意力机制，降低计算复杂度的同时保持原生分辨率
+2. 动态分辨率和帧率处理：支持不同尺寸图像和不同FPS视频的原生处理
+3. 改进的MRoPE：将时间维度与绝对时间对齐，增强时序理解能力
+4. 大规模数据训练：从1.2万亿token扩展到4.1万亿token","arxiv:https://arxiv.org/abs/2502.13923
+repo:https://github.com/QwenLM/Qwen2.5-VL",Qwen2.5-VL Technical Report,"@misc{bai2025qwen25vltechnicalreport,
+title={Qwen2.5-VL Technical Report},
+author={Shuai Bai and Keqin Chen and Xuejing Liu and Jialin Wang and Wenbin Ge and Sibo Song and Kai Dang and Peng Wang and Shijie Wang and Jun Tang and Humen Zhong and Yuanzhi Zhu and Mingkun Yang and Zhaohai Li and Jianqiang Wan and Pengfei Wang and Wei Ding and Zheren Fu and Yiheng Xu and Jiabo Ye and Xi Zhang and Tianbao Xie and Zesen Cheng and Hang Zhang and Zhibo Yang and Haiyang Xu and Junyang Lin},
+year={2025},
+eprint={2502.13923},
+archivePrefix={arXiv},
+primaryClass={http://cs.cv/},
+url={https://arxiv.org/abs/2502.13923},
+}"
+https://huggingface.co/THUDM/cogvlm-base-490-hf,提出CogVLM视觉专家模块用于预训练语言模型的深度视觉-语言融合以解决现有浅层对齐方法性能不足和灾难性遗忘的问题。,,FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChat645904c5bdb566b54cec174f57a3dd6e.jpg,"Pre-trained, VLM, baselines","视觉专家模块： 在每个Transformer层添加独立的QKV矩阵和MLP，专门处理图像特征；
+深度融合架构： 图像和文本特征在每层都进行交互，而非仅在输入层对齐；
+参数冻结策略： 保持原始语言模型参数不变，仅训练视觉专家模块。","arxiv:https://arxiv.org/abs/2311.03079
+repo:https://github.com/zai-org/CogVLM",https://arxiv.org/abs/2311.03079,"@misc{wang2024cogvlmvisualexpertpretrained,
+      title={CogVLM: Visual Expert for Pretrained Language Models}, 
+      author={Weihan Wang and Qingsong Lv and Wenmeng Yu and Wenyi Hong and Ji Qi and Yan Wang and Junhui Ji and Zhuoyi Yang and Lei Zhao and Xixuan Song and Jiazheng Xu and Bin Xu and Juanzi Li and Yuxiao Dong and Ming Ding and Jie Tang},
+      year={2024},
+      eprint={2311.03079},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2311.03079}, 
+}"
+FinGPT,提出了FinGPT开源金融大语言模型框架，用于金融领域的自然语言处理任务，以解决金融数据获取难、时效性强、信噪比低等挑战。,FinGPT dataset,FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChate1f958d92392b75b132415696bdcb63f.jpg,"LLM, RL, baselines","四层架构框架：
+- 数据源层：多源金融数据采集
+- 数据工程层：实时NLP数据处理
+- LLMs层：轻量级微调方法
+- 应用层：实际金融应用演示
+微调技术：
+- LoRA微调：将可训练参数从61.7亿减少到367万
+- RLSP：用股价变化替代人类反馈进行强化学习","arxiv:https://arxiv.org/pdf/2306.06031
+repo:https://github.com/AI4Finance-Foundation/FinGPT",FinGPT: Open-Source Financial Large Language Models,"@misc{yang2023fingptopensourcefinanciallarge,
+title={FinGPT: Open-Source Financial Large Language Models},
+author={Hongyang Yang and Xiao-Yang Liu and Christina Dan Wang},
+year={2023},
+eprint={2306.06031},
+archivePrefix={arXiv},
+primaryClass={http://q-fin.st/},
+url={https://arxiv.org/abs/2306.06031},
+}"
+"GA, 斯坦福小镇",提出了生成式智能体（Generative Agents）架构，用于创建可信的人类行为仿真，以解决构建能够长期保持一致性、记忆和反思能力的交互式人工智能代理的挑战。,None,FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChatd251452fa9c97fc58844efaef1ecc911.jpg,"Generative, LLM, agent, baselines","1. 记忆流（Memory Stream）：使用自然语言记录智能体的完整经历
+2. 检索机制：基于相关性、重要性和时效性的加权组合来检索相关记忆
+3. 反思模块：将观察到的经历合成为更高层次的推理和见解
+4. 规划系统：从高层目标递归分解为具体行动计划
+5. LLM集成：使用ChatGPT驱动智能体的决策和行为生成","arxiv:https://arxiv.org/abs/2304.03442
+repo:https://github.com/joonspk-research/generative_agents",Generative Agents: Interactive Simulacra of Human Behavior,"@misc{park2023generativeagentsinteractivesimulacra,
+title={Generative Agents: Interactive Simulacra of Human Behavior},
+author={Joon Sung Park and Joseph C. O'Brien and Carrie J. Cai and Meredith Ringel Morris and Percy Liang and Michael S. Bernstein},
+year={2023},
+eprint={2304.03442},
+archivePrefix={arXiv},
+primaryClass={cs.HC},
+url={https://arxiv.org/abs/2304.03442},
+}"
+FinMEMYahoo Finance,提出FINMEM——一个基于LLM的分层记忆交易智能体框架，用于自动化股票交易，以解决现有交易算法缺乏可解释性、无法有效整合多源金融数据以及记忆机制不足的问题。,"Alpaca News A, Yahoo Finance",FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChat19cf60a790e767da2283569d917eee39.jpg,"LLM, agent, baselines","FINMEM包含三个核心模块：
+1. Profiling模块：动态角色设计，包括专业背景知识和三种风险偏好（风险寻求、风险规避、自适应风险）
+2. Memory模块：
+    ◦ 工作记忆：执行总结、观察、反思操作
+    ◦ 分层长期记忆：浅层（日常新闻）、中层（季报）、深层（年报）处理
+3. Decision-making模块：整合记忆和市场信息做出交易决策","arxiv:https://arxiv.org/abs/2311.13743
+repo:https://github.com/pipiku915/FinMem-LLM-StockTrading","FINMEM: A PERFORMANCE-ENHANCED LLM TRADING AGENT
+WITH LAYERED MEMORY AND CHARACTER DESIGN","
+
+@misc{yu2023finmem,
+      title={FinMem: A Performance-Enhanced LLM Trading Agent with Layered Memory and Character Design}, 
+      author={Yangyang Yu and Haohang Li and Zhi Chen and Yuechen Jiang and Yang Li and Denghui Zhang and Rong Liu and Jordan W. Suchow and Khaldoun Khashanah},
+      year={2023},
+      eprint={2311.13743},
+      archivePrefix={arXiv},
+      primaryClass={q-fin.CP}
+}"
+[NIPS2020] FinRL-A2C,提出了一个深度强化学习库FinRL，用于量化金融中的自动化股票交易，以解决初学者在开发DRL交易策略时面临的复杂性和调试困难问题。,"CSI 300, DJIA, HSI, NASDAQ-100, S&P500, SSE 50",FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChat3b14915d9e6c1e0d7e5a7652573d9182.jpg,"Fin, RL, baselines","• 三层架构设计：环境层(股票市场模拟器)、智能体层(DRL算法)、应用层(交易策略)
+• 集成多种DRL算法：DQN、DDPG、PPO、SAC、A2C、TD3等
+• 马尔可夫决策过程建模：将股票交易建模为MDP问题
+• 完整的训练-验证-测试流程：包含滚动窗口和自动化回测
+","arxiv:https://arxiv.org/pdf/2011.09607
+repo:https://finrl.readthedocs.io/en/latest/index.html",FinRL: A Deep Reinforcement Learning Library for Automated Stock Trading in Quantitative Finance,"@misc{liu2022finrldeepreinforcementlearning,
+title={FinRL: A Deep Reinforcement Learning Library for Automated Stock Trading in Quantitative Finance},
+author={Xiao-Yang Liu and Hongyang Yang and Qian Chen and Runjia Zhang and Liuqing Yang and Bowen Xiao and Christina Dan Wang},
+year={2022},
+eprint={2011.09607},
+archivePrefix={arXiv},
+primaryClass={http://q-fin.tr/},
+url={https://arxiv.org/abs/2011.09607},
+}"
+FinBen,提出了一个全面的开源评估基准FinBen，用于评估大语言模型在金融领域的能力，以解决现有金融评估基准覆盖范围有限、任务单一的问题。最全面的金融LLM基准：首个包含36个数据集、24个任务的holistic金融评估基准创新评估策略：首次包含股票交易评估、智能体评估和RAG评估新数据集贡献：构建了3个新的开源数据集(EDTSum、Regulations、FinTrade)实证发现：揭示了LLMs在IE和文本分析方面表现优异，但在复杂推理、预测和决策任务上存在不足推动研究发展：基于FinBen举办了首个金融LLM共享任务挑战赛，吸引12个团队参与，部分方案超越GPT-4性能,,FinVL-MAS%20A%20Vision-Grounded%20Multi-Agent%20System%20Sel/WeChat80b3c1f9dba9ff1e4eec5eb1c6299e8b.jpg,"LLM, RAG, baselines, benchmark","七维评估分类法：将金融任务系统化分为IE、TA、QA、TG、RM、FO、DM七个方面
+零样本评估：对15个代表性LLM进行零样本性能评估
+多模态评估：结合文本和时间序列数据进行股票交易决策评估
+智能体和RAG评估：首次引入基于智能体和检索增强生成的评估策略",arxiv:https://arxiv.org/pdf/2402.12659,FinBen: A Holistic Financial Benchmark for Large Language Models,"@misc{xie2024finbenholisticfinancialbenchmark,
+      title={FinBen: A Holistic Financial Benchmark for Large Language Models}, 
+      author={Qianqian Xie and Weiguang Han and Zhengyu Chen and Ruoyu Xiang and Xiao Zhang and Yueru He and Mengxi Xiao and Dong Li and Yongfu Dai and Duanyu Feng and Yijing Xu and Haoqiang Kang and Ziyan Kuang and Chenhan Yuan and Kailai Yang and Zheheng Luo and Tianlin Zhang and Zhiwei Liu and Guojun Xiong and Zhiyang Deng and Yuechen Jiang and Zhiyuan Yao and Haohang Li and Yangyang Yu and Gang Hu and Jiajia Huang and Xiao-Yang Liu and Alejandro Lopez-Lira and Benyou Wang and Yanzhao Lai and Hao Wang and Min Peng and Sophia Ananiadou and Jimin Huang},
+      year={2024},
+      eprint={2402.12659},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2402.12659}, 
+}"
+,,,,,,,TradingAgents,
+,,,,,,,FinTeam,
+,,,,,,,FinCon,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,

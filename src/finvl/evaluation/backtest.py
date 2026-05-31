@@ -106,7 +106,10 @@ class VectorizedBacktester:
                 if signal_date in decision_signals:
                     sig = decision_signals[signal_date]
                     size = decision_sizes.get(signal_date, 0.05)
-                    current_pos = sig * size
+                    if sig != 0.0:
+                        # BUY or SELL: update position
+                        current_pos = sig * size
+                    # HOLD (sig==0): keep current_pos unchanged
             positions[i] = current_pos
 
         # Compute returns

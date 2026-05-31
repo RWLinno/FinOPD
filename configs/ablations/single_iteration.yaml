@@ -1,0 +1,7 @@
+# A9: Single iteration (k=1) self-evolution
+# Tests H4: whether multi-iteration evolution is necessary
+self_evolution:
+  enabled: true
+  iterations: 1
+  belief_enabled: true
+  opsd_enabled: true

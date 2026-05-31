@@ -1,0 +1,11 @@
+# Model pretraining cutoff dates for evaluation rigor
+model_cutoffs:
+  qwen2.5-vl-7b: "2024-03"
+  gpt-4o-mini: "2024-10"
+  deepseek-v3: "2024-12"
+
+# Temporal boundaries
+test_start: "2025-01-01"
+test_end: "2025-12-31"
+live_forward_start: "2026-05-01"
+live_forward_end: "2026-08-31"

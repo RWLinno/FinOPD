@@ -1,0 +1,58 @@
+\documentclass{article}
+
+% KDD 2027 style (using NeurIPS 2025 as closest available template)
+\usepackage[final]{neurips_2025}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\let\Bbbk\undefined
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{threeparttable}
+\usepackage{enumitem}
+
+\title{\textsc{FinOPD}: Experience-Driven Dual-Track Self-Evolution\\for Financial Multi-Agent Systems}
+
+\author{
+  Weilin Ruan \\
+  HKUST(GZ) \\
+  \texttt{rwlinno@gmail.com} \\
+  \And
+  Yuxuan Liang \\
+  HKUST(GZ) \\
+  \texttt{yuxliang@outlook.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\input{sections/00_abstract}
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/02b_problem}
+\input{sections/03_method}
+\input{sections/04_experiments}
+\input{sections/05_conclusion}
+
+\bibliographystyle{plain}
+\bibliography{main}
+
+\newpage
+\appendix
+\input{sections/appendix}
+
+\end{document}

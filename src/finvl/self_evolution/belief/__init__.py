@@ -1,0 +1,1 @@
+"""Belief consolidation sub-module."""

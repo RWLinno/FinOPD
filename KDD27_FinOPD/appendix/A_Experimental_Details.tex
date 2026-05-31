@@ -1,0 +1,79 @@
+\section{Experimental Details}
+\label{appx:experiment_details}
+
+\subsection{Dataset Details}
+\label{appx:dataset_details} 
+
+\input{tables/dataset-details}
+
+The benchmark datasets used in our experiments are summarized in Table~\ref{tab:dataset}. These datasets span diverse domains, including temperature monitoring (\textit{ETTm1}, \textit{ETTm2}, \textit{ETTh1}, \textit{ETTh2}), electricity consumption (\textit{Electricity}), transportation (\textit{Traffic}), and weather forecasting (\textit{Weather}). Each dataset contains multiple time series with varying sequence lengths, split into training, validation, and testing sets. The datasets are collected at different frequencies, ranging from 15 minutes to yearly intervals, and exhibit distinct periodic patterns. For short-term forecasting, we utilize the M4 benchmark, which includes datasets with yearly, quarterly, monthly, weekly, daily, and hourly frequencies, covering domains such as finance, industry, and demographics. This diverse collection of datasets ensures a comprehensive evaluation of our method.
+
+\subsubsection{Dataset Description}
+\label{appx:dataset_description}
+
+The datasets used in our experiments are described below:
+
+\vspace{-1em}
+\begin{itemize}[leftmargin=*, itemsep=0pt]
+    \item \textbf{ECL}: Measurements of electric power consumption in one household with a one-minute sampling rate over 4 years. It includes various electrical quantities and sub-metering values, totaling 2,075,259 measurements from a house in Sceaux, France (December 2006 to November 2010).
+
+    \item \textbf{ETT}: The Electricity Transformer Temperature (ETT) dataset, crucial for electric power deployment, contains 2 years of data from two counties in China. Subsets \textit{ETTh1} and \textit{ETTh2} provide 1-hour-level data, while \textit{ETTm1} offers 15-minute-level data. Each point includes the target "oil temperature" and 6 power load features, with a 12/4/4 month train/val/test split.
+
+    \item \textbf{Traffic}: Hourly data from the California Department of Transportation, describing road occupancy rates measured by sensors on San Francisco Bay area freeways.
+
+    \item \textbf{Weather}: Recorded every 10 minutes throughout 2020, this dataset includes 21 meteorological indicators, such as air temperature and humidity.
+
+    \item \textbf{M4}: A collection of 100,000 time series from the Makridakis Forecasting Competition, including yearly, quarterly, monthly, weekly, daily, and hourly data. The training sets have minimum observations of 13 (yearly), 16 (quarterly), 42 (monthly), 80 (weekly), 93 (daily), and 700 (hourly). Forecasts required are 6 (yearly), 8 (quarterly), 18 (monthly), 13 (weekly), 14 (daily), and 48 (hourly).
+\end{itemize}
+\vspace{-1em}
+
+\subsubsection{Periodicity Parameter}
+\label{appx:periodicity_parameter} 
+
+The \textit{Periodicity} column in Table~\ref{tab:dataset} specifies the periodicity hyperparameter \( P \) used in the periodicity encoding process. This parameter is derived from the inherent characteristics of each dataset and reflects the dominant temporal patterns, such as daily, weekly, or seasonal cycles. For example, in the \textit{ETTm1} and \textit{ETTm2} datasets, which are sampled every 15 minutes, the periodicity \( P = 96 \) corresponds to a daily cycle (24 hours \(\times\) 4 samples per hour). Similarly, for the \textit{ETTh1} and \textit{ETTh2} datasets, sampled hourly, \( P = 24 \) represents a daily cycle. The \textit{Weather} dataset, sampled every 10 minutes, has \( P = 144 \), reflecting a daily cycle (24 hours \(\times\) 6 samples per hour). For the M4 benchmark datasets, the periodicity values are set based on their sampling frequencies: \( P = 1 \) for yearly data, \( P = 4 \) for quarterly and weekly data, \( P = 3 \) for monthly data, and \( P = 24 \) for hourly data. These values are used in the periodicity encoding formula:
+
+\begin{equation}
+    \text{encoding}(t) = \left[ \sin\left(\frac{2\pi t}{P}\right), \cos\left(\frac{2\pi t}{P}\right) \right],
+\end{equation}
+
+where \( t \) is the time step and \( P \) is the periodicity hyperparameter. The resulting encodings are concatenated with the input time series, enriching the model's ability to capture temporal dependencies and periodic patterns.
+
+\subsection{Optimization Settings}
+\label{appx:optimization_settings}
+
+\subsubsection{Model Architecture Parameters}
+\label{appx:model_parameters}
+
+\method consists of several key components, each with specific parameter configurations. Image representations are set to a size of $64 \times 64$, balancing computational efficiency and temporal information preservation. The model backbone utilizes a hidden dimension of $d\_model = 128$, while the encoder-decoder structure comprises $e\_layers = 2$ encoder layers and $d\_layers = 1$ decoder layer. A dropout rate of $0.1$ is applied to mitigate overfitting during training. For efficient data loading, the model employs $num\_workers = 32$ to parallelize data preprocessing tasks.
+
+The gated fusion module is designed with a dimension of $d\_fusion = 256$, facilitating the effective integration of multimodal features. The VLM component generates multimodal embeddings with a token length of $vlm\_fused\_len = 156$ and a hidden dimension of $vlm\_hidden\_dim = 768$, ensuring seamless compatibility with the pre-trained VLM's architecture.
+
+\input{tables/model-parameters}
+
+\subsubsection{Training Parameters}
+\label{appx:training_settings}
+
+We adopt a comprehensive training strategy with both general and task-specific parameters. The model is trained with a batch size of $32$ and an initial learning rate of $0.001$, using the \textit{AdamW} optimizer. Early stopping with a patience of $3$ epochs is implemented to prevent overfitting. The training process employs Mean Squared Error (MSE) as the primary loss function and runs for a maximum of $10$ epochs. For time series processing, we use an input sequence length of $512$ and prediction lengths of $96$, $192$, $336$, or $720$, depending on the task. The output dimension ($c\_out$) varies by dataset: $7$ for ETTh1/h2/m1/m2, $21$ for Weather, $321$ for Electricity, and $862$ for Traffic. The periodicity parameter is set to $24$ for ETTh1/h2, Electricity, and Traffic; $96$ for ETTm1/m2; and $144$ for Weather, ensuring alignment with dataset-specific temporal patterns. A normalization coefficient of $0.4$ is applied to stabilize training dynamics. The patch embedding module uses a patch length of $16$, a stride of $8$, and padding of $8$ to process the input sequences. The temporal memory mechanism employs $8$ learnable queries and $4$ attention heads to capture high-level dependencies. Additionally, the training process leverages automatic mixed precision (AMP) to accelerate training while maintaining numerical stability.
+
+\input{tables/training-parameters}
+
+\subsection{Evaluation Metrics}
+\label{appx:evaluation_metric}
+
+For evaluation, we utilize mean squared error (MSE) and mean absolute error (MAE) for long-term forecasting. For short-term forecasting on the M4 benchmark, we adopt symmetric mean absolute percentage error (SMAPE), mean absolute scaled error (MASE), and overall weighted average (OWA), following the evaluation protocol of N-BEATS \citep{oreshkin2019n}. OWA is a specific metric used in the M4 competition. The metrics are calculated as follows:
+
+\begin{align*} \label{equ:metrics}
+    \text{MSE} &= \frac{1}{H}\sum_{h=1}^T (\mathbf{Y}_{h} - \Hat{\mathbf{Y}}_{h})^2,
+    &
+    \text{MAE} &= \frac{1}{H}\sum_{h=1}^H|\mathbf{Y}_{h} - \Hat{\mathbf{Y}}_{h}|,\\
+    \text{SMAPE} &= \frac{200}{H} \sum_{h=1}^H \frac{|\mathbf{Y}_{h} - \Hat{\mathbf{Y}}_{h}|}{|\mathbf{Y}_{h}| + |\Hat{\mathbf{Y}}_{h}|},
+    &
+    \text{MAPE} &= \frac{100}{H} \sum_{h=1}^H \frac{|\mathbf{Y}_{h} - \Hat{\mathbf{Y}}_{h}|}{|\mathbf{Y}_{h}|}, \\
+    \text{MASE} &= \frac{1}{H} \sum_{h=1}^H \frac{|\mathbf{Y}_{h} - \Hat{\mathbf{Y}}_{h}|}{\frac{1}{H-s}\sum_{j=s+1}^{H}|\mathbf{Y}_j - \mathbf{Y}_{j-s}|},
+    &
+    \text{OWA} &= \frac{1}{2} \left[ \frac{\text{SMAPE}}{\text{SMAPE}_{\textrm{Naïve2}}}  + \frac{\text{MASE}}{\text{MASE}_{\textrm{Naïve2}}}  \right],
+\end{align*}
+
+where $s$ is the periodicity of the time series, $H$ is the prediction horizon, and $\mathbf{Y}_{h}$ and $\Hat{\mathbf{Y}}_{h}$ are the ground truth and prediction at time step $h$, respectively.
+
+\newpage

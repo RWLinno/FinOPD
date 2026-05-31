@@ -1,0 +1,28 @@
+\section{Future Work}
+\label{appx:future_work}
+
+\subsection{Limitations}
+
+While \method demonstrates significant improvements in time series forecasting by integrating temporal, visual, and textual modalities, it has some limitations.
+
+First, the framework performs less robustly on datasets with highly volatile or irregular patterns, such as those with sudden changes or non-stationary trends, compared to datasets with periodic structures. This limitation may arise from the current visual transformation techniques, which may not adequately capture abrupt temporal dynamics or sudden shifts. Future work could refine these transformations to better handle such irregularities.
+
+Second, the current implementation relies on pre-trained VLMs like ViLT and CLIP, which are optimized for natural vision-language tasks rather than time series forecasting. While these models excel in visual understanding, their textual capabilities are limited, often supporting only shorter text inputs and lacking domain-specific knowledge relevant to time series. This restricts their ability to fully utilize textual context for forecasting. Future work could involve developing larger, domain-specific VLMs trained on multimodal time series datasets to address these limitations.
+
+\subsection{Future Work}
+
+Building on the current framework, several promising directions for future research emerge:
+
+\vspace{-1em}
+\begin{itemize}[leftmargin=*, itemsep=0pt]
+    \item \textbf{Optimizing Visual Transformations:} Future work could focus on developing adaptive visual transformation techniques that better preserve temporal dynamics, especially for datasets with irregular or non-stationary patterns, to more effectively highlight sudden changes and complex trends.
+
+    \item \textbf{Scaling Multimodal VLMs for Enhanced Forecasting:}  While the current framework uses smaller pre-trained Vision-Language Models (VLMs), scaling to larger models could improve forecasting accuracy. Investigating trade-offs between model size, computational efficiency, and performance is a promising direction for future research. Additionally, studying different VLM architectures could identify optimal designs for temporal modeling.  
+
+    \item \textbf{Interpretable Multimodal Learning for Time Series Analysis:}  Understanding the contributions of visual and textual modalities in time series forecasting is crucial for improving model transparency. Future work could explore the interpretability of multimodal features, analyzing how different types of information contribute to performance gains. This would provide deeper insights into temporal dependencies and enhance trust in multimodal forecasting models.  
+
+    \item \textbf{Pre-training Multimodal Foundation Models for Time Series Analysis:} Existing VLMs are not designed to handle time series data, limiting their ability to capture domain-specific temporal context. Future research could focus on constructing large-scale multimodal datasets that pair time series data with rich textual and visual annotations, enabling the development of models specifically optimized for time series forecasting. Additionally, this multimodal framework could be extended to support multi-task learning, enhancing the model's versatility for tasks such as anomaly detection, classification, or imputation. This would allow the model to capture a broader range of temporal patterns and dependencies, improving its applicability across various domains.
+
+\end{itemize}
+
+By addressing these directions, future research can build on the foundation laid by \method, advancing the field of multimodal time series forecasting while ensuring responsible and ethical deployment in real-world applications.

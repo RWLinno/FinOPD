@@ -1,0 +1,63 @@
+\section{Method}
+\label{sec:method}
+
+We organize \textsc{FinOPD} along four stages: perception, routing, collaboration, and self-evolution. The first three stages establish the infrastructure that makes on-policy self-distillation feasible in the financial multi-agent setting; the fourth stage constitutes our core contribution.
+
+\subsection{System Overview}
+\label{sec:overview}
+
+At each trading day $t$, the system receives a 60-day lookback candlestick chart and associated textual context (news, filings). A Visual-Geometric Encoder extracts a structured \texttt{ChartGeometry} representation. A Geometry-Conditioned Factor Router selects a subset of factors from a library of approximately 160 candidates. Five specialist agents (ChartAnalyst, PatternReasoner, EventAnalyst, RiskController, DecisionPM) consume the geometric representation and factor evidence through a gated shared memory, producing a trading decision with position sizing and rationale. The realized risk-adjusted PnL then drives two parallel self-evolution tracks: parametric (on-policy self-distillation) and non-parametric (belief consolidation).
+
+\subsection{Visual-Geometric Encoder}
+\label{sec:vge}
+
+Financial charts are highly structured visual objects whose geometric primitives carry actionable semantics for traders. We adapt Qwen2.5-VL-7B with LoRA (rank 16, applied to vision encoder top layers and cross-attention modules) to output a structured \texttt{ChartGeometry} JSON containing trend lines, support-resistance levels, candlestick patterns, chart formations, volume signals, and regime state. Training uses approximately 50,000 US equity daily charts with weak supervision from a rule-based geometric extractor, supplemented by 1,000 human-verified samples. The system prompt enforces strict JSON schema compliance via reject sampling (target $>$98\%). The encoder provides two downstream outputs: (1) structured JSON for interpretable agent reasoning, and (2) a pooled geometric embedding from final-layer geometry tokens, serving as the conditioning signal for the factor router and the indexing key for belief retrieval.
+
+\subsection{Geometry-Conditioned Factor Router}
+\label{sec:router}
+
+The router maps the continuous geometric embedding to a discrete, interpretable, and backtestable set of factors. The factor library contains approximately 160 candidates: self-evolved alpha factors mined through prior research iterations (with information ratios up to 3.04), supplemented by standard technical indicators. The router takes as input the concatenation of the geometry embedding and a regime one-hot vector, passes it through a two-layer MLP, and applies Gumbel-Softmax top-$k$ selection ($k \in [10, 20]$) to produce a differentiable factor subset with associated call parameters. Selected factors are computed in Python and injected into the shared memory for agent consumption.
+
+The design choice of routing through an explicit factor library rather than end-to-end prediction serves three purposes: decisions remain interpretable (each trade traces back to specific geometric observations and factor selections), credit assignment becomes tractable (top-$k$ selection is a discrete action amenable to group relative advantage estimation), and the system remains auditable for compliance. The router's discrete actions are optimized via GRPO-lite within the self-evolution loop (Section~\ref{sec:opsd}).
+
+\subsection{On-Policy Self-Distillation}
+\label{sec:opsd}
+
+This is the core mechanism of \textsc{FinOPD}. We enable the same model to serve as both student and teacher through differential conditioning, transferring the on-policy self-distillation paradigm from single-model mathematical reasoning to multi-agent financial trajectories.
+
+\paragraph{Formulation.} Let $o_t$ denote the observation at time $t$ (chart geometry, factor evidence, market text). Agent $i$ produces a reasoning-and-action sequence $y^{(i)}_t = (y^{(i)}_{t,1}, \ldots, y^{(i)}_{t,L})$. The shared LoRA parameters simultaneously define two policies:
+\begin{align}
+\text{Student:} \quad & p_S(y^{(i)}_{t,n} \mid o_t, y^{(i)}_{t,<n}) \\
+\text{Teacher:} \quad & p_T(y^{(i)}_{t,n} \mid o_t, y^{(i)}_{t,<n}, \hat{y})
+\end{align}
+where $\hat{y}$ is the \emph{privileged information}: a structured summary of the realized risk-adjusted returns over the subsequent $K$ trading days, serialized as a hindsight-token sequence prepended to the teacher's prompt. Both policies share identical LoRA weights; they differ only in conditioning context. The teacher's weights are frozen to the initial LoRA checkpoint throughout training.
+
+\paragraph{Training procedure.} Each self-evolution iteration proceeds in three steps. \textbf{Step 1 (Student rollout):} The student policy $p_S$ generates trajectories over a rolling window, covering all time steps and all five agents. \textbf{Step 2 (Teacher evaluation):} For each trajectory, the teacher computes $p_T$ at every token position via a single forward pass (no generation), with weights frozen. \textbf{Step 3 (Token-level distribution matching):} At each position, we compute the generalized Jensen-Shannon divergence:
+\begin{equation}
+D_\beta(p_T \| p_S) = \beta \, \mathrm{KL}(p_T \| m) + (1-\beta) \, \mathrm{KL}(p_S \| m), \quad m = \beta \, p_T + (1-\beta) \, p_S
+\end{equation}
+averaged along the trajectory as the loss, with gradients flowing only through the student's logits back to LoRA parameters.
+
+\paragraph{Key adaptations for the financial multi-agent setting.}
+
+\emph{Per-token pointwise KL clipping.} Financial reasoning text contains stylistic tokens (``risk'', ``caution'', ``recommend'') that exhibit disproportionately high distribution divergence. Without clipping, these tokens dominate the gradient. We cap the KL contribution of any single vocabulary entry at each position to a threshold $c$.
+
+\emph{Shapley credit assignment.} A single trajectory involves five specialist agents whose contributions are entangled. For each high-reward trajectory, we sample $m{=}8$ random agent subsets and perform leave-subset-out replay to estimate each agent's marginal contribution $\phi_i$. The normalized Shapley values weight the distillation samples, preventing the five agents' contributions from being diluted by uniform averaging.
+
+\emph{GRPO-lite for the router.} Factor selection is a discrete action that cannot be matched via distribution divergence. We apply group relative advantage estimation to the router separately: within each mini-batch, the advantage of trajectory $j$ is $(J_j - \bar{J})$ where $J$ is the risk-adjusted return, requiring no critic network.
+
+\emph{Alignment guard.} We maintain a KL budget $\mathrm{KL}(p_S \| p_{\mathrm{ref}}) < \epsilon$ against the reference policy. Every four iterations, we perform an off-policy refresh using adversarial samples drawn from regime-shift periods (2020 COVID crash, 2022 bear market, extreme volatility days) to prevent the self-evolution from drifting toward local optima.
+
+\subsection{Long-Term Belief Consolidation}
+\label{sec:belief}
+
+Parametric updates capture shifts in \emph{tendency}, but the most stable profitable patterns in finance deserve explicit memory: a specific geometry (e.g., ascending wedge with neckline retest) paired with a specific factor set (e.g., momentum + volume divergence + ATR breakout) and a specific action (e.g., scaled entry + 1.5 ATR stop-loss) that consistently profits across multiple historical episodes. Parametric averaging would gradually dilute this specificity, yet a trader's expertise accumulates precisely in this concrete form.
+
+From each self-evolution iteration's high-reward trajectories (realized $J$ above the 80th percentile), we extract quadruples $(\mathbf{g}, F, a, J)$ where $\mathbf{g}$ is the geometry signature (mean-pooled final-layer geometric tokens), $F$ is the selected factor set, $a$ is the action pattern, and $J$ is the realized risk-adjusted return. These quadruples are indexed by $\mathbf{g}$ in a FAISS vector store with capacity constraints to prevent unbounded growth. At inference time, the current geometry signature retrieves top-$k$ nearest neighbors, and the associated $(F, a)$ pairs are injected as few-shot priors into the shared memory's short-term window.
+
+This mechanism differs from standard RAG in three ways: the retrieval key is a geometric embedding rather than text semantics, the retrieval granularity is a decision triple rather than a document, and the value function is realized risk-adjusted return rather than similarity. It complements the parametric track: parameters slowly reshape policy preferences while the belief store rapidly surfaces concrete proven patterns.
+
+\subsection{Evolution as an Observable Trajectory}
+\label{sec:evolution_curve}
+
+Self-evolution is not a one-shot action but a continuous process. As iteration $k$ increases, we expect: the parametric policy's loss on a held-out validation set decreases monotonically; the belief store grows within controlled bounds with increasing retrieval hit rate; and the joint system's test-set Sharpe ratio and alpha decay exhibit monotonic improvement or stability across three random seeds. The \emph{evolution curve} (Sharpe and alpha decay versus iteration $k$) serves as the central figure of this work, transforming ``self-evolution'' from an abstract claim into an observable, measurable process. Hypothesis H4 explicitly tests this monotonicity under strict post-cutoff forward evaluation to rule out pretraining leakage.

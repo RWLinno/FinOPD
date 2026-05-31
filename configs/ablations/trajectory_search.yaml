@@ -1,0 +1,12 @@
+# A10: Trajectory search style self-evolution (replace OPSD)
+# Uses best-of-N trajectory sampling instead of distillation
+self_evolution:
+  enabled: true
+  method: "trajectory_search"
+  iterations: 8
+  opsd_enabled: false
+  belief_enabled: true
+  trajectory_search:
+    n_candidates: 16
+    selection: "top_k"
+    k: 4

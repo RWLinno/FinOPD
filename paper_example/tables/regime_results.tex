@@ -1,0 +1,23 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Regime-conditioned Sharpe ratio on Dow-30 portfolio. Regimes: volatility (20-day realized vol percentile) and trend (60-day slope direction). Best in \textbf{bold}.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+Method & Calm & Normal & Volatile & Trending & Ranging \\
+\midrule
+Buy \& Hold & -- & -- & -- & -- & -- \\
+PatchTST & -- & -- & -- & -- & -- \\
+TradingAgents & -- & -- & -- & -- & -- \\
+FinCon & -- & -- & -- & -- & -- \\
+AlphaAgent & -- & -- & -- & -- & -- \\
+R\&D-Agent & -- & -- & -- & -- & -- \\
+\midrule
+\textsc{FinOPD} (Ours) & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} & \textbf{--} \\
+\bottomrule
+\end{tabular}
+\label{tab:regime}
+\end{table}

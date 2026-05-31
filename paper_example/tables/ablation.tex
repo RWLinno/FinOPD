@@ -1,0 +1,27 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Ablation study on Dow-30 portfolio (2025 test set, 3-seed average). $\Delta$ denotes relative change vs.\ full \textsc{FinOPD}.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{clcccc}
+\toprule
+ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD$\downarrow$ & $\Delta$Acc \\
+\midrule
+A1 & Full \textsc{FinOPD} & -- & -- & -- & -- \\
+\midrule
+A2 & w/o Visual-Geometric Encoder & -- & -- & -- & -- \\
+A3 & Frozen VLM (no LoRA) & -- & -- & -- & -- \\
+A4 & w/o Router (fixed templates) & -- & -- & -- & -- \\
+A5 & w/o OPSD (verbal reinforcement only) & -- & -- & -- & -- \\
+A6a & w/o Shapley credit (uniform) & -- & -- & -- & -- \\
+A6b & w/o Belief consolidation & -- & -- & -- & -- \\
+A7 & w/o Alignment guard & -- & -- & -- & -- \\
+A8 & Single agent (5$\to$1) & -- & -- & -- & -- \\
+A9 & Single iteration ($k{=}1$) & -- & -- & -- & -- \\
+A10 & Trajectory search (replace OPSD) & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\label{tab:ablation}
+\end{table}

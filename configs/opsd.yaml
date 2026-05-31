@@ -1,0 +1,60 @@
+# On-Policy Self-Distillation (OPSD) configuration
+opsd:
+  iterations: 8
+  rolling_window_days: 60
+  forward_return_days: 20
+  jsd_beta: 0.5
+  per_token_kl_cap: 5.0
+  shapley_samples: 8
+  alignment_epsilon: 0.1
+  seeds: [42, 123, 456]
+
+  teacher:
+    freeze_weights: true
+    hindsight_prefix: "[HINDSIGHT]"
+
+  student:
+    backbone: "/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct"
+    lora_rank: 16
+    lora_target_modules: ["q_proj", "v_proj", "o_proj"]
+    learning_rate: 2.0e-5
+    warmup_ratio: 0.05
+    gradient_accumulation_steps: 4
+    max_grad_norm: 1.0
+
+  router:
+    gumbel_tau_start: 1.0
+    gumbel_tau_end: 0.5
+    top_k: 15
+    hidden_dim: 256
+
+  belief:
+    capacity: 10000
+    admission_percentile: 80
+    embedding_dim: 768
+    faiss_index_type: "IVFFlat"
+    nprobe: 16
+
+  grpo_lite:
+    lr: 1.0e-4
+    batch_size: 32
+    no_critic: true
+
+  alignment_guard:
+    kl_budget: 0.1
+    check_every_steps: 100
+    adversarial_refresh_every: 4
+    adversarial_dates:
+      - "2020-03"  # COVID crash
+      - "2022-06"  # Bear market
+      - "2022-09"  # Extreme volatility
+
+  stability_check:
+    asset: "AAPL"
+    epochs: 3
+    kl_explosion_threshold: 10.0
+
+hardware:
+  gpus: 4
+  gpu_type: "A100-80GB"
+  per_iteration_hours: 4

@@ -8,6 +8,8 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List
 
+import numpy as np
+
 from finvl.agents.base import AgentOutput, BaseFinAgent
 from finvl.core.types import Action, Conviction, DecisionOutput, Implication
 
@@ -23,6 +25,46 @@ class DecisionPMAgent(BaseFinAgent):
     def __init__(self, config: Dict[str, Any] | None = None):
         super().__init__("DecisionPM", config or {})
         self.integration_mode = (config or {}).get("integration_mode", "confidence_weighted")
+        self._factor_lib = None
+        self._top_factors = None
+
+    def _get_factor_lib(self):
+        if self._factor_lib is None:
+            try:
+                from finvl.factors.library import FactorLibrary
+                self._factor_lib = FactorLibrary("docs/best_factor.json")
+                # Select top-k factors by IR
+                sorted_factors = sorted(
+                    self._factor_lib.factors.values(),
+                    key=lambda f: f.ir, reverse=True
+                )
+                self._top_factors = [f for f in sorted_factors if f.ir >= 1.0][:30]
+                # Try to load trained router
+                self._router = None
+                try:
+                    import torch
+                    from finvl.factors.router import FactorRouter
+                    from pathlib import Path
+                    router_path = Path("outputs/router/router_best.pt")
+                    config_path = Path("outputs/router/router_config.pt")
+                    if router_path.exists() and config_path.exists():
+                        cfg = torch.load(config_path, weights_only=False)
+                        self._router = FactorRouter(
+                            geometry_dim=768, regime_dim=4,
+                            num_factors=cfg['num_factors'],
+                            hidden_dim=256, top_k=cfg['top_k']
+                        )
+                        self._router.load_state_dict(torch.load(router_path, weights_only=False))
+                        self._router.eval()
+                        self._all_factors = sorted_factors[:cfg['num_factors']]
+                        logger.info(f"Factor Router loaded (top_k={cfg['top_k']})")
+                except Exception as e:
+                    logger.debug(f"Router not available: {e}")
+                logger.info(f"Loaded {len(self._top_factors)} top factors (IR>=1.0)")
+            except Exception as e:
+                logger.warning(f"Failed to load factor library: {e}")
+                self._top_factors = []
+        return self._top_factors
 
     async def process(self, inputs: Dict[str, Any], memory: Dict[str, Any]) -> AgentOutput:
         chart_bias = memory.get("chart_bias", "neutral")
@@ -39,12 +81,65 @@ class DecisionPMAgent(BaseFinAgent):
         risk_assessment = memory.get("risk_assessment", {})
         position_pct = memory.get("position_size_pct", 0.05)
 
+        # Compute medium-term trend from price data
+        ohlcv_df = inputs.get("ohlcv_df")
+        trend_bias = 0.0
+        factor_bias = 0.0
+        if ohlcv_df is not None and len(ohlcv_df) >= 20:
+            close = ohlcv_df["close"].values
+            high = ohlcv_df["high"].values
+            low = ohlcv_df["low"].values
+            volume = ohlcv_df["volume"].values if "volume" in ohlcv_df.columns else np.ones(len(close))
+
+            sma20 = close[-20:].mean()
+            current = close[-1]
+
+            # === Evolved factor signals (from best_factor.json via DSL engine) ===
+            top_factors = self._get_factor_lib()
+            factor_values = []
+            if top_factors and len(ohlcv_df) >= 30:
+                df_for_factors = ohlcv_df.copy()
+                df_for_factors.columns = [c.lower() for c in df_for_factors.columns]
+                for f in top_factors[:20]:
+                    try:
+                        vals = f.compute(df_for_factors)
+                        last_val = vals.iloc[-1] if len(vals) > 0 else 0
+                        if np.isfinite(last_val) and last_val != 0:
+                            factor_values.append(last_val)
+                    except:
+                        pass
+
+            # Compute factor consensus signal
+            if factor_values:
+                # Normalize: positive values = bullish, negative = bearish
+                fv = np.array(factor_values)
+                # Z-score normalize
+                fv_z = (fv - np.nanmean(fv)) / (np.nanstd(fv) + 1e-12)
+                # Fraction of factors that are positive
+                pos_frac = np.sum(fv_z > 0.5) / len(fv_z)
+                neg_frac = np.sum(fv_z < -0.5) / len(fv_z)
+                factor_bias = np.clip((pos_frac - neg_frac) * 2, -1.0, 1.0)
+            else:
+                factor_bias = 0.0
+
+            # Volatility regime: reduce conviction in high vol
+            if len(close) >= 21:
+                daily_rets = np.diff(close[-21:]) / close[-21:-1]
+                vol20 = np.std(daily_rets) * np.sqrt(252)
+                if vol20 > 0.35:
+                    trend_bias *= 0.5
+                    factor_bias *= 0.5
+
+            trend_bias = max(-1.0, min(1.0, trend_bias))
+
         # Score biases: bullish=+1, bearish=-1, neutral=0
         bias_map = {"bullish": 1.0, "bearish": -1.0, "neutral": 0.0}
         signals = [
-            ("chart", bias_map.get(chart_bias, 0.0), chart_confidence),
-            ("pattern", bias_map.get(pattern_bias, 0.0), pattern_confidence),
+            ("chart", bias_map.get(chart_bias, 0.0), chart_confidence * 0.4),
+            ("pattern", bias_map.get(pattern_bias, 0.0), pattern_confidence * 0.3),
             ("event", bias_map.get(event_bias, 0.0), event_confidence),
+            ("trend", trend_bias, 0.6),
+            ("factors", factor_bias, 0.8),
         ]
 
         # Confidence-weighted score
@@ -64,10 +159,11 @@ class DecisionPMAgent(BaseFinAgent):
         risk_factor = risk_mult.get(risk_level, 0.5)
         adjusted_score = normalized_score * risk_factor
 
-        # Determine action
-        if adjusted_score > 0.2:
+        # Determine action with asymmetric thresholds
+        # In trend-following: easier to buy (follow trend), harder to sell (against trend)
+        if adjusted_score > 0.15:
             action = Action.BUY
-        elif adjusted_score < -0.2:
+        elif adjusted_score < -0.3:
             action = Action.SELL
         else:
             action = Action.HOLD
@@ -148,8 +244,8 @@ class DecisionPMAgent(BaseFinAgent):
         base_pct: float, conviction: Conviction, risk_level: str,
     ) -> float:
         """Scale position size by conviction and risk level."""
-        conviction_mult = {Conviction.HIGH: 1.0, Conviction.MODERATE: 0.6, Conviction.LOW: 0.3}
-        risk_mult = {"low": 1.0, "moderate": 0.8, "high": 0.4, "extreme": 0.1}
+        conviction_mult = {Conviction.HIGH: 1.0, Conviction.MODERATE: 0.7, Conviction.LOW: 0.4}
+        risk_mult = {"low": 1.2, "moderate": 1.0, "high": 0.5, "extreme": 0.1}
         return base_pct * conviction_mult.get(conviction, 0.5) * risk_mult.get(risk_level, 0.5)
 
     def _detect_disagreements(

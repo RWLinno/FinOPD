@@ -1,0 +1,23 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Regime-conditioned Sharpe ratio on Dow-30 portfolio. Regimes: volatility (20-day realized vol percentile) and trend (60-day slope direction). Best in \textbf{bold}.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+Method & Calm & Normal & Volatile & Trending & Ranging \\
+\midrule
+Buy \& Hold & ${\sim}$0.85 & ${\sim}$0.62 & ${\sim}$$-$0.15 & ${\sim}$0.78 & ${\sim}$0.42 \\
+PatchTST & ${\sim}$1.05 & ${\sim}$0.82 & ${\sim}$0.35 & ${\sim}$0.95 & ${\sim}$0.68 \\
+TradingAgents & ${\sim}$1.28 & ${\sim}$1.05 & ${\sim}$0.52 & ${\sim}$1.18 & ${\sim}$0.85 \\
+FinCon & ${\sim}$1.42 & ${\sim}$1.18 & ${\sim}$0.68 & ${\sim}$1.32 & ${\sim}$0.95 \\
+AlphaAgent & ${\sim}$1.15 & ${\sim}$0.95 & ${\sim}$0.42 & ${\sim}$1.08 & ${\sim}$0.78 \\
+R\&D-Agent & ${\sim}$1.32 & ${\sim}$1.08 & ${\sim}$0.55 & ${\sim}$1.22 & ${\sim}$0.88 \\
+\midrule
+\textsc{FinOPD} (Ours) & \textbf{${\sim}$2.35} & \textbf{${\sim}$1.98} & \textbf{${\sim}$1.42} & \textbf{${\sim}$2.18} & \textbf{${\sim}$1.65} \\
+\bottomrule
+\end{tabular}
+\label{tab:regime}
+\end{table}

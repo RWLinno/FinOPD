@@ -1,0 +1,27 @@
+\section{Preliminaries and Problem Setup}
+\label{sec:problem}
+
+\subsection{Financial Multi-Agent Decision Problem}
+
+Consider a universe of $N$ assets observed over trading days $t = 1, \ldots, T$. At each day $t$, the system observes a multimodal context $o_t = (I_t, x_t, d_t)$ consisting of a rendered candlestick chart $I_t$ (60-day lookback), an OHLCV feature matrix $x_t \in \mathbb{R}^{N \times F}$, and textual context $d_t$ (news, filings). A multi-agent system $\mathcal{M} = \{A_1, \ldots, A_5\}$ produces a decision $a_t = (w_t, s_t, r_t)$ comprising portfolio weights $w_t \in \Delta^N$, position sizes $s_t$, and a natural-language rationale $r_t$. The trajectory $\tau = (o_1, a_1, \ldots, o_T, a_T)$ yields a risk-adjusted return $J(\tau)$ computed as the Sharpe ratio net of transaction costs (15 bps round-trip), slippage (5 bps), and one-day execution delay.
+% 中文：考虑 N 个资产在交易日 t=1,...,T 上被观测。每天 t，系统观测多模态上下文 o_t=(I_t, x_t, d_t)，包含渲染的 K 线图 I_t（60 日回看）、OHLCV 特征矩阵 x_t 和文本上下文 d_t（新闻、财报）。多智能体系统 M={A_1,...,A_5} 产生决策 a_t=(w_t, s_t, r_t)，包含组合权重、仓位大小和自然语言理由。轨迹 τ 产生风险调整收益 J(τ)，计算为扣除交易成本（15bps 往返）、滑点（5bps）和一日执行延迟后的夏普比率。
+
+The objective is to maximize $\mathbb{E}[J(\tau)]$ subject to maximum drawdown $\leq \delta$ and cross-regime robustness: performance does not degrade by more than a factor $\gamma$ across calm, trending, and volatile market regimes.
+% 中文：目标是最大化 E[J(τ)]，约束最大回撤 ≤ δ 且跨 regime 鲁棒：在平静、趋势和高波动市场 regime 之间性能下降不超过因子 γ。
+
+\subsection{Design Questions for Financial Self-Evolution}
+
+Transferring on-policy self-distillation~\cite{opsd2026} from mathematical reasoning to financial multi-agent systems requires answering three questions:
+% 中文：将在线策略自蒸馏从数学推理迁移到金融多智能体系统需要回答三个问题：
+
+\textbf{DQ1: What is the privileged information?} In math, the teacher observes ground-truth solutions. In finance, ground-truth does not exist. Using directional prediction accuracy as the target leads to reward hacking~\cite{losingwinner2025}. The privileged information must be anchored to risk-adjusted profitability.
+% 中文：DQ1：特权信息是什么？数学中教师观测 ground-truth 答案。金融中 ground-truth 不存在。用方向预测准确率作为目标导致 reward hacking。特权信息必须锚定于风险调整盈利性。
+
+\textbf{DQ2: How to assign credit across agents?} A single trajectory involves five specialist agents whose contributions are entangled. Uniform weighting dilutes the learning signal from high-contributing agents.
+% 中文：DQ2：如何在 agent 之间分配信用？单条轨迹涉及五个专家 agent，其贡献是纠缠的。均匀加权会稀释高贡献 agent 的学习信号。
+
+\textbf{DQ3: Is parametric evolution sufficient?} Financial markets exhibit both slow distributional drift and recurring concrete patterns. Parametric averaging dilutes pattern specificity; a complementary non-parametric mechanism is needed.
+% 中文：DQ3：参数进化是否充分？金融市场同时展现缓慢的分布漂移和反复出现的具体模式。参数平均稀释模式特异性；需要互补的非参数机制。
+
+These questions map to our method as follows: DQ1 $\to$ hindsight PnL conditioning (\S\ref{sec:opsd}), DQ2 $\to$ Shapley-weighted distillation (\S\ref{sec:opsd}), DQ3 $\to$ belief consolidation (\S\ref{sec:belief}).
+% 中文：这些问题映射到我们的方法：DQ1 → 事后 PnL 条件化，DQ2 → Shapley 加权蒸馏，DQ3 → belief 固化。

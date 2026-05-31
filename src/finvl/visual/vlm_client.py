@@ -124,10 +124,20 @@ class VLMClient:
     @staticmethod
     def _parse_response(raw: str) -> Dict[str, Any]:
         text = raw.strip()
-        if text.startswith("```"):
-            lines = text.split("\n")
-            lines = [l for l in lines if not l.strip().startswith("```")]
-            text = "\n".join(lines).strip()
+        import re
+        # Extract JSON from markdown code blocks
+        json_match = re.search(r'```(?:json)?\s*\n(.*?)\n```', text, re.DOTALL)
+        if json_match:
+            text = json_match.group(1).strip()
+        else:
+            brace_start = text.find('{')
+            brace_end = text.rfind('}')
+            if brace_start != -1 and brace_end != -1:
+                text = text[brace_start:brace_end + 1]
+        # Remove // comments that VLMs sometimes add
+        text = re.sub(r'//[^\n]*', '', text)
+        # Remove trailing commas before } or ]
+        text = re.sub(r',\s*([}\]])', r'\1', text)
         try:
             return json.loads(text)
         except json.JSONDecodeError:

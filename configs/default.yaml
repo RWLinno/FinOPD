@@ -39,20 +39,15 @@ geometry:
 
 vlm:
   backend: "openai"
-  model: "gpt-4o"
+  model: "/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct"
+  base_url: "http://localhost:8000/v1"
+  api_key: "EMPTY"
   temperature: 0.1
   max_tokens: 2048
-  timeout: 60
+  timeout: 120
   max_retries: 3
   retry_base_delay: 2.0
-  routes:
-    - name: "chart_fast"
-      model: "gpt-4o-mini"
-      agent_names: ["ChartAnalyst"]
-      tasks: ["chart_analysis"]
-    - name: "chart_precise"
-      model: "gpt-4o"
-      tasks: ["high_precision_chart"]
+  routes: []
 
 agents:
   chart_analyst:
@@ -66,8 +61,8 @@ agents:
     stub: true  # No event data for MVP
   risk_controller:
     enabled: true
-    max_position_pct: 0.10
-    default_stop_loss_pct: 0.05
+    max_position_pct: 0.30
+    default_stop_loss_pct: 0.08
   decision_pm:
     enabled: true
     integration_mode: "confidence_weighted"
@@ -79,12 +74,13 @@ memory:
 
 evaluation:
   temporal_split:
-    train_start: "2008-01-01"
-    train_end: "2014-12-31"
-    valid_start: "2015-01-01"
-    valid_end: "2016-12-31"
-    test_start: "2017-01-01"
-    test_end: "2020-12-31"
+    train_start: "2019-01-01"
+    train_end: "2022-12-31"
+    valid_start: "2023-01-01"
+    valid_end: "2023-12-31"
+    test_start: "2025-01-01"
+    test_end: "2025-12-31"
+    live_forward_start: "2026-05-01"
   transaction_cost_bps: 15
   slippage_bps: 5
   execution_delay_days: 1

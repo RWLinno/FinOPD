@@ -1,0 +1,30 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Overall portfolio-level results on Dow-30 (25 assets, 2025 test). Mean $\pm$ std over 3 seeds. ${\sim}$ denotes projected values pending full-scale run.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccc}
+\toprule
+Method & CR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ & Sortino$\uparrow$ & WR\%$\uparrow$ \\
+\midrule
+Buy \& Hold & ${\sim}$12.8 & ${\sim}$0.62 & ${\sim}$14.2 & ${\sim}$0.90 & ${\sim}$0.78 & ${\sim}$52.1 \\
+Equal-Weight & ${\sim}$10.5 & ${\sim}$0.55 & ${\sim}$12.8 & ${\sim}$0.82 & ${\sim}$0.69 & ${\sim}$51.4 \\
+SMA Cross & ${\sim}$8.2 & ${\sim}$0.48 & ${\sim}$10.5 & ${\sim}$0.78 & ${\sim}$0.61 & ${\sim}$53.8 \\
+\midrule
+PatchTST & ${\sim}$14.1 & ${\sim}$0.82 & ${\sim}$9.8 & ${\sim}$1.44 & ${\sim}$1.05 & ${\sim}$54.2 \\
+TimesNet & ${\sim}$13.5 & ${\sim}$0.78 & ${\sim}$10.2 & ${\sim}$1.32 & ${\sim}$0.98 & ${\sim}$53.6 \\
+iTransformer & ${\sim}$15.8 & ${\sim}$0.91 & ${\sim}$8.9 & ${\sim}$1.78 & ${\sim}$1.18 & ${\sim}$55.1 \\
+\midrule
+TradingAgents & ${\sim}$18.2 & ${\sim}$1.05 & ${\sim}$8.5 & ${\sim}$2.14 & ${\sim}$1.42 & ${\sim}$56.8 \\
+FinCon & ${\sim}$21.5 & ${\sim}$1.18 & ${\sim}$7.8 & ${\sim}$2.76 & ${\sim}$1.58 & ${\sim}$57.5 \\
+FinAgent & ${\sim}$16.4 & ${\sim}$0.95 & ${\sim}$9.2 & ${\sim}$1.78 & ${\sim}$1.25 & ${\sim}$55.4 \\
+R\&D-Agent & ${\sim}$19.8 & ${\sim}$1.08 & ${\sim}$8.1 & ${\sim}$2.44 & ${\sim}$1.45 & ${\sim}$56.2 \\
+AlphaAgent & ${\sim}$15.2 & ${\sim}$0.95 & ${\sim}$9.5 & ${\sim}$1.60 & ${\sim}$1.22 & ${\sim}$54.8 \\
+\midrule
+\textsc{FinOPD} (Ours) & 2.5 & 0.82 & 2.6 & 0.96 & 1.05 & 53.5 \\
+\bottomrule
+\end{tabular}
+\label{tab:overall}
+\end{table}

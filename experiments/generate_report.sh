@@ -1,23 +1,41 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
+# Stage 6: Generate Final Report + Upload to HuggingFace
 cd "$(dirname "$0")/.."
 export PYTHONPATH="src:${PYTHONPATH:-}"
-RDIR="${1:-outputs/experiments}"
-OUTPUT="${2:-outputs/report.html}"
-echo "Generating report from ${RDIR}..."
-python -c "
-import sys,json,glob,os
-sys.path.insert(0,'src')
-from finvl.visualization.report import generate_report
-rd='${RDIR}'; out='${OUTPUT}'
-metrics={}
-for mf in glob.glob(os.path.join(rd,'**/metrics.json'),recursive=True):
-    with open(mf) as f: metrics=json.load(f); break
-ablation={}
-for af in glob.glob(os.path.join(rd,'**/ablation_results.json'),recursive=True):
-    with open(af) as f: ablation=json.load(f); break
-if not metrics: print('No metrics found.'); sys.exit(0)
-p=generate_report(metrics=metrics,ablation_results=ablation or None,output_path=out)
-print(f'Report: {p}')
-"
-echo "Done."
+eval "$(conda shell.bash hook)"
+conda activate finopd
+export ALL_PROXY=http://accelerator-cname-hnpmnhnmdul3rmxrwhgend.c.vegalb.com:80
+export HF_TOKEN=${HF_TOKEN}
+
+echo "=== Generate Final Report ==="
+echo "Time: $(date '+%Y-%m-%d %H:%M:%S')"
+
+python scripts/generate_report.py \
+    --experiments-dir outputs/experiments/ \
+    --baselines-dir outputs/experiments/ \
+    --evolution-curve outputs/opsd_full/evolution_curve.jsonl \
+    --live-forward-dir outputs/live_forward/ \
+    --output outputs/final_report.html
+
+echo "[Report] outputs/final_report.html"
+
+# Upload checkpoints and data to HuggingFace
+echo "=== Uploading to HuggingFace ==="
+
+if [ -d "outputs/vlm_lora" ]; then
+    echo "Uploading VLM LoRA checkpoint..."
+    huggingface-cli upload RWLinno/FinOPD-VLM-LoRA outputs/vlm_lora/ || true
+fi
+
+if [ -d "outputs/opsd_full" ]; then
+    echo "Uploading OPSD checkpoints..."
+    huggingface-cli upload RWLinno/FinOPD-Checkpoints outputs/opsd_full/ || true
+fi
+
+if [ -d "data/chart_geometry" ]; then
+    echo "Uploading ChartGeometry dataset..."
+    huggingface-cli upload RWLinno/FinChartGeometry-50K data/chart_geometry/ --repo-type dataset || true
+fi
+
+echo "=== Report & Upload Complete ==="

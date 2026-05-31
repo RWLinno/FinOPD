@@ -1,0 +1,194 @@
+\begin{thebibliography}{10}
+
+\bibitem{gkd2024}
+Rishabh Agarwal, Nino Vieillard, Piotr Stanczyk, Sabela Ramos, Matthieu Geist,
+  and Olivier Bachem.
+\newblock On-policy distillation of language models: Learning from
+  self-generated mistakes.
+\newblock In {\em International Conference on Learning Representations}, 2024.
+
+\bibitem{alphaagent2025}
+Anonymous.
+\newblock {AlphaAgent}: Llm-driven alpha mining with originality constraints.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{chartmuseum2025}
+Anonymous.
+\newblock {ChartMuseum}: Testing visual reasoning of large vision-language
+  models on financial charts.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{cogalpha2025}
+Anonymous.
+\newblock {CogAlpha}: Cognitive-inspired alpha factor mining with llm agents.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{factfin2025}
+Anonymous.
+\newblock {FactFin}: Factuality evaluation for financial text generation.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{factormad2025}
+Anonymous.
+\newblock {FactorMAD}: Multi-agent debate for quantitative factor discovery.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{finchartbench2025}
+Anonymous.
+\newblock {FinChart-Bench}: Benchmarking multimodal llms on financial chart
+  understanding.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{finteam2025}
+Anonymous.
+\newblock {FinTeam}: A multi-agent collaborative intelligence system for
+  comprehensive financial scenarios.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{losingwinner2025}
+Anonymous.
+\newblock The losing winner: How reinforcement-finetuned llms fail at stock
+  trading.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{mas4ts2025}
+Anonymous.
+\newblock Multi-agent system for time series: Analyzer-reasoner-executor with
+  visual anchoring.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{seagent2025}
+Anonymous.
+\newblock {SE-Agent}: Self-evolving agents with trajectory revision and
+  recombination.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{seea2025}
+Anonymous.
+\newblock {SEEA-R1}: Self-evolving exploration agents with tree-grpo.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{selfchallenge2025}
+Anonymous.
+\newblock Self-challenging improves llm agents via autonomous difficulty
+  escalation.
+\newblock {\em arXiv preprint}, 2025.
+
+\bibitem{agent02026}
+Anonymous.
+\newblock {Agent0}: Autonomous agent training via self-play.
+\newblock {\em arXiv preprint}, 2026.
+
+\bibitem{crisp2026}
+Anonymous.
+\newblock {CRISP}: Iterative self-policy distillation for reasoning models.
+\newblock {\em arXiv preprint}, 2026.
+
+\bibitem{lookaheadbench2026}
+Anonymous.
+\newblock {Look-Ahead-Bench}: Evaluating llm financial agents beyond
+  pretraining cutoff.
+\newblock {\em arXiv preprint}, 2026.
+
+\bibitem{rzero2026}
+Anonymous.
+\newblock {R-Zero}: Cost-efficient self-play for llm agent training.
+\newblock {\em arXiv preprint}, 2026.
+
+\bibitem{qwen25vl2024}
+Jinze Bai et~al.
+\newblock {Qwen2.5-VL} technical report.
+\newblock {\em arXiv preprint arXiv:2502.13923}, 2025.
+
+\bibitem{visionts2024}
+Mouxiang Chen et~al.
+\newblock {VisionTS}: Visual masked autoencoders are free-lunch zero-shot time
+  series forecasters.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~37, 2024.
+
+\bibitem{rdagent2025}
+Xiao Chen, Yuge Li, et~al.
+\newblock {R\&D-Agent}: Automating research and development with multi-agent
+  collaboration.
+\newblock {\em arXiv preprint arXiv:2505.15155}, 2025.
+
+\bibitem{deepfund2025}
+Haohang Li et~al.
+\newblock {DeepFund}: Will llm be professional at fund investment? a live arena
+  perspective.
+\newblock {\em arXiv preprint arXiv:2501.09394}, 2025.
+
+\bibitem{timevlm2025}
+Shuai Liu et~al.
+\newblock {Time-VLM}: Exploring multimodal vision-language models for augmented
+  time series forecasting.
+\newblock In {\em International Conference on Machine Learning}, 2025.
+
+\bibitem{itransformer2024}
+Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, and
+  Mingsheng Long.
+\newblock {iTransformer}: Inverted transformers are effective for time series
+  forecasting.
+\newblock In {\em International Conference on Learning Representations}, 2024.
+
+\bibitem{patchtst2023}
+Yuqi Nie, Nam~H Nguyen, Phanwadee Sinthong, and Jayant Kalagnanam.
+\newblock A time series is worth 64 words: Long-term forecasting with
+  transformers.
+\newblock In {\em International Conference on Learning Representations}, 2023.
+
+\bibitem{dpo2023}
+Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher~D Manning, Stefano
+  Ermon, and Chelsea Finn.
+\newblock Direct preference optimization: Your language model is secretly a
+  reward model.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~36, 2023.
+
+\bibitem{grpo2024}
+Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu, Junxiao Song, Mingchuan Zhang,
+  Y.K. Li, Y.~Wu, and Daya Guo.
+\newblock {DeepSeekMath}: Pushing the limits of mathematical reasoning in open
+  language models.
+\newblock {\em arXiv preprint arXiv:2402.03300}, 2024.
+
+\bibitem{reflexion2023}
+Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik Shakhnarovich, Beck
+  Labash, and Shunyu Yao.
+\newblock Reflexion: Language agents with verbal reinforcement learning.
+\newblock {\em Advances in Neural Information Processing Systems}, 36, 2023.
+
+\bibitem{timesnet2023}
+Haixu Wu, Tengge Hu, Yong Liu, Hang Zhou, Jianmin Wang, and Mingsheng Long.
+\newblock {TimesNet}: Temporal 2d-variation modeling for general time series
+  analysis.
+\newblock In {\em International Conference on Learning Representations}, 2023.
+
+\bibitem{tradingagents2025}
+Yijia Xiao, Mahyar Rawal, Salman Sapra, Mingwen Li, Caleb Han, Yue Hu, Aarav
+  Agrawal, Fei-Fei Song, and Akul Sharma.
+\newblock Tradingagents: Multi-agents llm financial trading framework.
+\newblock {\em arXiv preprint arXiv:2412.20138}, 2024.
+
+\bibitem{fincon2024}
+Yangyang Yu, Zhiyuan Yao, Haohang Li, Zhiyang Chen, Yuechen Jiang, Yang Li,
+  Denghui Zhang, Rong Liu, Jordan~W Suchow, and Khaldoun Khashanah.
+\newblock {FinCon}: A synthesized llm multi-agent system with conceptual verbal
+  reinforcement for enhanced financial decision making.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~37, 2024.
+
+\bibitem{finagent2024}
+Wentao Zhang, Lingxuan Jiang, et~al.
+\newblock {FinAgent}: A multimodal foundation agent for financial trading:
+  Tool-augmented, diversified, and generalist.
+\newblock {\em arXiv preprint arXiv:2402.18485}, 2024.
+
+\bibitem{opsd2026}
+Siyan Zhao, Tian-Xing Huang, Xiang Wan, Jian Deng, et~al.
+\newblock Self-distilled reasoner: On-policy self-distillation for large
+  language models.
+\newblock {\em arXiv preprint arXiv:2601.18734}, 2026.
+
+\end{thebibliography}

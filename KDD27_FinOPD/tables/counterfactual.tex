@@ -1,0 +1,20 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Counterfactual perturbation analysis. $\Delta$SR = Sharpe change after perturbation. Smaller $|\Delta|$ indicates less reliance on memorization.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccc}
+\toprule
+Method & News Flip & Figure Rand. & Date Replace \\
+\midrule
+TradingAgents & ${\sim}$$-$0.42 & ${\sim}$$-$0.08 & ${\sim}$$-$0.35 \\
+FinCon & ${\sim}$$-$0.38 & ${\sim}$$-$0.05 & ${\sim}$$-$0.31 \\
+AlphaAgent & ${\sim}$$-$0.51 & ${\sim}$$-$0.12 & ${\sim}$$-$0.44 \\
+R\&D-Agent & ${\sim}$$-$0.45 & ${\sim}$$-$0.09 & ${\sim}$$-$0.38 \\
+\textsc{FinOPD} (Ours) & \textbf{${\sim}$$-$0.12} & \textbf{${\sim}$$-$0.03} & \textbf{${\sim}$$-$0.08} \\
+\bottomrule
+\end{tabular}
+\label{tab:counterfactual}
+\end{table}
