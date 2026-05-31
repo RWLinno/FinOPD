@@ -7,11 +7,14 @@ set -euo pipefail
 # ============================================================
 cd "$(dirname "$0")/.."
 export PYTHONPATH="src:${PYTHONPATH:-}"
-export ALL_PROXY=http://accelerator-cname-hnpmnhnmdul3rmxrwhgend.c.vegalb.com:80
-export OPENAI_API_KEY=EMPTY
-export WANDB_PROJECT=FinOPD
-export WANDB_API_KEY=${WANDB_API_KEY}
-export HF_TOKEN=${HF_TOKEN}
+
+# Load credentials from .env
+if [ -f .env ]; then
+  set -a; source .env; set +a
+fi
+export ALL_PROXY=${ALL_PROXY:-http://accelerator-cname-hnpmnhnmdul3rmxrwhgend.c.vegalb.com:80}
+export OPENAI_API_KEY=${OPENAI_API_KEY:-EMPTY}
+export WANDB_PROJECT=${WANDB_PROJECT:-finopd}
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 QUICK=false
