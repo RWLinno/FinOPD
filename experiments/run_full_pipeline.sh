@@ -13,6 +13,8 @@ if [ -f .env ]; then
   set -a; source .env; set +a
 fi
 export ALL_PROXY=${ALL_PROXY:-http://accelerator-cname-hnpmnhnmdul3rmxrwhgend.c.vegalb.com:80}
+export NO_PROXY=localhost,127.0.0.1
+export no_proxy=localhost,127.0.0.1
 export OPENAI_API_KEY=${OPENAI_API_KEY:-EMPTY}
 export WANDB_PROJECT=${WANDB_PROJECT:-finopd}
 export CUDA_VISIBLE_DEVICES=0,1,2,3

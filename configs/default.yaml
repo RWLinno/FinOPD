@@ -39,7 +39,7 @@ geometry:
 
 vlm:
   backend: "openai"
-  model: "/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct"
+  model: "opd_lora"
   base_url: "http://localhost:8000/v1"
   api_key: "EMPTY"
   temperature: 0.1
