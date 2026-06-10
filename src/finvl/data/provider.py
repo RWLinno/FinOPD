@@ -1,6 +1,7 @@
 """
 Data providers for FinVL-MAS.
 Loads OHLCV data from CSV files with proper validation and temporal slicing.
+Supports both single-ticker and multi-ticker CSV formats.
 """
 
 from __future__ import annotations
@@ -20,19 +21,51 @@ class OHLCVProvider:
     """
     Provides OHLCV data with point-in-time guarantees.
     Only returns data up to and including the requested date.
+
+    Supports two modes:
+    - Single-ticker CSV (no 'ticker' column): all rows belong to one asset.
+    - Multi-ticker CSV (has 'ticker' column): pass ticker= to filter.
     """
 
-    def __init__(self, data_path: str):
+    def __init__(self, data_path: str, ticker: Optional[str] = None):
         path = Path(data_path)
         if not path.exists():
             raise FileNotFoundError(f"Data file not found: {data_path}")
 
         raw = pd.read_csv(path)
+        col_lower = {c.lower(): c for c in raw.columns}
+
+        # Detect multi-ticker CSV and filter if ticker is specified
+        ticker_col = col_lower.get("ticker")
+        if ticker_col and ticker is not None:
+            raw = raw[raw[ticker_col] == ticker].copy()
+            if len(raw) == 0:
+                raise ValueError(
+                    f"No data for ticker '{ticker}' in {data_path}"
+                )
+            raw = raw.drop(columns=[ticker_col])
+            logger.info(f"Filtered ticker={ticker}, {len(raw)} bars")
+
+        # Also drop 'adj close' / 'adj_close' if present (not needed)
+        for col_name in ["adj close", "adj_close"]:
+            real_name = col_lower.get(col_name.replace(" ", "").lower())
+            # Try exact match
+            if col_name in raw.columns:
+                raw = raw.drop(columns=[col_name])
+            elif col_name.replace(" ", "_") in raw.columns:
+                raw = raw.drop(columns=[col_name.replace(" ", "_")])
+
         self.df = validate_ohlcv_df(raw)
+        self._ticker = ticker
         logger.info(
             f"Loaded {len(self.df)} bars from {data_path} "
             f"({self.df.index.min():%Y-%m-%d} to {self.df.index.max():%Y-%m-%d})"
+            + (f" [ticker={ticker}]" if ticker else "")
         )
+
+    @property
+    def ticker(self) -> Optional[str]:
+        return self._ticker
 
     def get_window(
         self,

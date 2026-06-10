@@ -119,6 +119,8 @@ def main():
     parser.add_argument("--data", default=None)
     parser.add_argument("--output-dir", default="outputs/experiments")
     parser.add_argument("--max-dates", type=int, default=None)
+    parser.add_argument("--ticker", default=None, help="Ticker to evaluate (filters multi-ticker CSV)")
+    parser.add_argument("--tickers", default=None, help="Comma-separated tickers to loop over")
     parser.add_argument("--ablation-suite", action="store_true")
     args = parser.parse_args()
 
@@ -153,69 +155,93 @@ def main():
         logger.error("Data file not found: %s", data_path)
         sys.exit(1)
 
-    provider = OHLCVProvider(data_path)
+    # Determine tickers to evaluate
+    if args.tickers:
+        tickers = [t.strip() for t in args.tickers.split(",")]
+    elif args.ticker:
+        tickers = [args.ticker]
+    else:
+        tickers = [cfg.get("scenario", {}).get("market", "ASSET").upper()]
+
     split_cfg = cfg.get("evaluation", {}).get("temporal_split", {})
-    test_start = split_cfg.get("test_start", "2017-01-01")
-    test_end = split_cfg.get("test_end", "2020-12-31")
-    test_dates = provider.trading_dates(test_start, test_end)
-    if not test_dates:
-        logger.warning("Configured test range has no data, fallback to provider full range")
-        test_dates = provider.trading_dates(*provider.date_range)
-    if args.max_dates:
-        test_dates = test_dates[: args.max_dates]
+    test_start = split_cfg.get("test_start", "2025-01-01")
+    test_end = split_cfg.get("test_end", "2025-12-31")
 
     orchestrator = AgentOrchestrator(cfg)
-    renderer = _build_chart_renderer(cfg, str(chart_dir))
     vlm_runtime = _build_vlm_runtime(cfg)
-    asset = cfg.get("scenario", {}).get("market", "ASSET").upper()
+    lookback = cfg.get("scenario", {}).get("lookback_window", 60)
 
-    decisions = asyncio.run(
-        run_pipeline_on_dates(
-            orchestrator=orchestrator,
-            provider=provider,
-            dates=test_dates,
-            lookback=cfg.get("scenario", {}).get("lookback_window", 60),
-            renderer=renderer,
-            vlm_runtime=vlm_runtime,
-            asset=asset,
+    all_results = {}
+    for asset in tickers:
+        logger.info("=" * 60)
+        logger.info("Evaluating ticker: %s", asset)
+        logger.info("=" * 60)
+
+        provider = OHLCVProvider(data_path, ticker=asset)
+        test_dates = provider.trading_dates(test_start, test_end)
+        if not test_dates:
+            logger.warning("No data for %s in test range, skipping", asset)
+            continue
+        if args.max_dates:
+            test_dates = test_dates[:args.max_dates]
+
+        asset_chart_dir = chart_dir / asset
+        asset_chart_dir.mkdir(parents=True, exist_ok=True)
+        renderer = _build_chart_renderer(cfg, str(asset_chart_dir))
+
+        decisions = asyncio.run(
+            run_pipeline_on_dates(
+                orchestrator=orchestrator,
+                provider=provider,
+                dates=test_dates,
+                lookback=lookback,
+                renderer=renderer,
+                vlm_runtime=vlm_runtime,
+                asset=asset,
+            )
         )
-    )
 
-    eval_cfg = cfg.get("evaluation", {})
-    backtester = VectorizedBacktester(
-        BacktestConfig(
-            transaction_cost_bps=eval_cfg.get("transaction_cost_bps", 15),
-            slippage_bps=eval_cfg.get("slippage_bps", 5),
-            execution_delay_days=eval_cfg.get("execution_delay_days", 1),
+        eval_cfg = cfg.get("evaluation", {})
+        backtester = VectorizedBacktester(
+            BacktestConfig(
+                transaction_cost_bps=eval_cfg.get("transaction_cost_bps", 15),
+                slippage_bps=eval_cfg.get("slippage_bps", 5),
+                execution_delay_days=eval_cfg.get("execution_delay_days", 1),
+            )
         )
-    )
 
-    test_df = provider.get_date_range(test_start, test_end)
-    result = backtester.run(decisions, test_df)
+        test_df = provider.get_date_range(test_start, test_end)
+        result = backtester.run(decisions, test_df)
+        all_results[asset] = result.metrics
 
-    with open(output_dir / "metrics.json", "w", encoding="utf-8") as f:
-        json.dump(result.metrics, f, indent=2)
+        # Save per-asset results
+        with open(output_dir / f"metrics_{asset}.json", "w", encoding="utf-8") as f:
+            json.dump(result.metrics, f, indent=2)
 
-    rows = []
-    for d in decisions:
-        dec: DecisionOutput = d["decision"]
-        rows.append({
-            "date": d["date"],
-            "action": dec.action.value,
-            "conviction": dec.conviction.value,
-            "confidence": dec.confidence,
-            "position_pct": dec.position_size_pct,
-            "rationale": dec.rationale[:240],
-        })
-    pd.DataFrame(rows).to_csv(output_dir / "decisions.csv", index=False)
+        rows = []
+        for d in decisions:
+            dec: DecisionOutput = d["decision"]
+            rows.append({
+                "date": d["date"],
+                "action": dec.action.value,
+                "conviction": dec.conviction.value,
+                "confidence": dec.confidence,
+                "position_pct": dec.position_size_pct,
+                "rationale": dec.rationale[:240],
+            })
+        pd.DataFrame(rows).to_csv(output_dir / f"decisions_{asset}.csv", index=False)
 
-    print("\nEXPERIMENT RESULTS")
-    for k, v in sorted(result.metrics.items()):
-        if isinstance(v, float):
-            print(f"{k:30s}: {v:>10.4f}")
-        else:
-            print(f"{k:30s}: {v}")
-    print(f"\nResults saved to: {output_dir}")
+        print(f"\n{'='*40} {asset} {'='*40}")
+        for k, v in sorted(result.metrics.items()):
+            if isinstance(v, float):
+                print(f"  {k:30s}: {v:>10.4f}")
+            else:
+                print(f"  {k:30s}: {v}")
+
+    # Save combined results
+    with open(output_dir / "all_metrics.json", "w", encoding="utf-8") as f:
+        json.dump(all_results, f, indent=2)
+    print(f"\nAll results saved to: {output_dir}")
 
     if args.ablation_suite:
         cmd = [

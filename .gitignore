@@ -1,5 +1,5 @@
 # Data & outputs (use HuggingFace for large files)
-data/
+/data/
 outputs/
 logs/
 wandb/
@@ -20,8 +20,3 @@ run_*.log
 
 # Keep only code and tex
 !data/.gitkeep
-docs/cursor_finopd.md
-docs/cursor_proposal_preparation_for_kdd27_c.md
-Proposal/
-*.csv
-*.log
