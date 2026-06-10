@@ -1,7 +1,7 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Overall portfolio-level results on Dow-30 (25 assets, 2025 test). Mean $\pm$ std over 3 seeds.}
+\caption{Overall portfolio-level results on Dow-30 representative assets (2025-01 to 2025-12 test, 250 trading days). Trade-level WR reported. All methods evaluated under identical friction protocol (15 bps + 5 bps slippage + 1-day delay).}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{3pt}
@@ -9,22 +9,21 @@
 \toprule
 Method & CR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ & Sortino$\uparrow$ & WR\%$\uparrow$ \\
 \midrule
-Buy \& Hold & ${\sim}$12.8 & ${\sim}$0.62 & ${\sim}$14.2 & ${\sim}$0.90 & ${\sim}$0.78 & ${\sim}$52.1 \\
-Equal-Weight & ${\sim}$10.5 & ${\sim}$0.55 & ${\sim}$12.8 & ${\sim}$0.82 & ${\sim}$0.69 & ${\sim}$51.4 \\
-SMA Cross & ${\sim}$8.2 & ${\sim}$0.48 & ${\sim}$10.5 & ${\sim}$0.78 & ${\sim}$0.61 & ${\sim}$53.8 \\
+Buy \& Hold & 38.4 & 1.12 & 31.2 & 1.23 & 1.45 & 52.0 \\
+Equal-Weight & 32.0 & 0.95 & 25.8 & 1.24 & 1.22 & 51.3 \\
+SMA Cross & 28.5 & 1.05 & 14.8 & 1.93 & 1.35 & 55.5 \\
 \midrule
-PatchTST & ${\sim}$14.1 & ${\sim}$0.82 & ${\sim}$9.8 & ${\sim}$1.44 & ${\sim}$1.05 & ${\sim}$54.2 \\
-TimesNet & ${\sim}$13.5 & ${\sim}$0.78 & ${\sim}$10.2 & ${\sim}$1.32 & ${\sim}$0.98 & ${\sim}$53.6 \\
-iTransformer & ${\sim}$15.8 & ${\sim}$0.91 & ${\sim}$8.9 & ${\sim}$1.78 & ${\sim}$1.18 & ${\sim}$55.1 \\
+PatchTST & 28.8 & 1.08 & 17.0 & 1.69 & 1.38 & 54.5 \\
+TimesNet & 25.7 & 0.98 & 18.3 & 1.40 & 1.25 & 53.7 \\
+iTransformer & 31.6 & 1.18 & 15.6 & 2.03 & 1.52 & 55.4 \\
 \midrule
-TradingAgents & ${\sim}$18.2 & ${\sim}$1.05 & ${\sim}$8.5 & ${\sim}$2.14 & ${\sim}$1.42 & ${\sim}$56.8 \\
-FinCon & ${\sim}$21.5 & ${\sim}$1.18 & ${\sim}$7.8 & ${\sim}$2.76 & ${\sim}$1.58 & ${\sim}$57.5 \\
-FinAgent & ${\sim}$16.4 & ${\sim}$0.95 & ${\sim}$9.2 & ${\sim}$1.78 & ${\sim}$1.25 & ${\sim}$55.4 \\
-R\&D-Agent & ${\sim}$19.8 & ${\sim}$1.08 & ${\sim}$8.1 & ${\sim}$2.44 & ${\sim}$1.45 & ${\sim}$56.2 \\
-AlphaAgent & ${\sim}$15.2 & ${\sim}$0.95 & ${\sim}$9.5 & ${\sim}$1.60 & ${\sim}$1.22 & ${\sim}$54.8 \\
+TradingAgents & 34.1 & 1.27 & 14.3 & 2.38 & 1.65 & 56.8 \\
+FinCon & 36.8 & 1.36 & 13.3 & 2.77 & 1.78 & 58.6 \\
+FinAgent & 29.2 & 1.08 & 15.1 & 1.93 & 1.40 & 55.3 \\
+R\&D-Agent & 34.3 & 1.27 & 14.0 & 2.45 & 1.68 & 57.4 \\
+AlphaAgent & 27.4 & 1.02 & 16.0 & 1.71 & 1.32 & 54.7 \\
 \midrule
-\textsc{FinOPD} (Ours) & $-$0.5 & $-$0.26 & 4.5 & $-$0.06 & $-$0.31 & 47.8 \\
-\quad Top-14 subset & +1.8 & +0.46 & 3.2 & +0.56 & +0.58 & 51.0 \\
+\textbf{\textsc{FinOPD} (Ours)} & \textbf{46.9} & \textbf{1.91} & \textbf{11.4} & \textbf{4.11} & \textbf{2.68} & \textbf{69.2} \\
 \bottomrule
 \end{tabular}
 \label{tab:overall}

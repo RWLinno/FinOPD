@@ -1,6 +1,5 @@
 # Data & outputs (use HuggingFace for large files)
-data/raw/
-data/chart_geometry/charts/
+data/
 outputs/
 logs/
 wandb/
@@ -14,3 +13,10 @@ run_*.log
 *.safetensors
 *.bin
 *.pt
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# Keep only code and tex
+!data/.gitkeep

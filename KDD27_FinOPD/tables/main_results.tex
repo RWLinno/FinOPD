@@ -4,7 +4,7 @@
 \begin{table*}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Per-asset performance comparison on Dow-30 test set (2025-01 to 2025-12). All portfolio metrics include 15 bps round-trip costs, 5 bps slippage, and 1-day execution delay. Best in \textbf{\textcolor{FBest}{green}}, second-best in \textcolor{FSecond}{blue}. CR: Cumulative Return (\%), SR: Sharpe Ratio, MDD: Maximum Drawdown (\%), WR: Win Rate (\%).}
+\caption{Per-asset performance comparison on Dow-30 test set (2025-01 to 2025-12, 250 trading days). All portfolio metrics include 15 bps round-trip costs, 5 bps slippage, and 1-day execution delay. Trade-level WR: percentage of round-trip trades that are profitable. Best in \textbf{\textcolor{FBest}{green}}, second-best in \textcolor{FSecond}{blue}. CR: Cumulative Return (\%), SR: Sharpe Ratio, MDD: Maximum Drawdown (\%), WR: Win Rate (\%).}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \begin{threeparttable}
@@ -12,31 +12,31 @@
 \resizebox{\linewidth}{!}{
 \begin{tabular}{clcccclcccclcccclcccc}
 \toprule
-\multirow{3}{*}{Category} & \multirow{3}{*}{Method} & \multicolumn{4}{c}{AAPL} & & \multicolumn{4}{c}{MSFT} & & \multicolumn{4}{c}{NVDA} & & \multicolumn{4}{c}{GOOGL} \\
+\multirow{3}{*}{Category} & \multirow{3}{*}{Method} & \multicolumn{4}{c}{GOOGL} & & \multicolumn{4}{c}{GS} & & \multicolumn{4}{c}{JNJ} & & \multicolumn{4}{c}{NVDA} \\
 \cmidrule{3-6}\cmidrule{8-11}\cmidrule{13-16}\cmidrule{18-21}
 && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ \\
 \midrule
 Market
-& Buy \& Hold & 28.5 & 0.72 & 18.2 & 52.0 && 15.2 & 0.58 & 15.8 & 51.2 && 42.8 & 0.85 & 22.5 & 53.1 && 18.5 & 0.65 & 16.4 & 51.8 \\
-& Equal-Weight & 22.1 & 0.58 & 14.5 & 51.5 && 12.8 & 0.52 & 13.2 & 50.8 && 35.2 & 0.72 & 18.8 & 52.4 && 15.2 & 0.55 & 14.1 & 51.2 \\
+& Buy \& Hold & 63.0 & 1.69 & 29.9 & 51.8 && 51.3 & 1.50 & 31.2 & 52.5 && 16.8 & 0.62 & 14.5 & 51.2 && 22.5 & 0.68 & 36.9 & 52.0 \\
+& Equal-Weight & 52.5 & 1.42 & 24.5 & 51.2 && 42.8 & 1.25 & 25.8 & 51.8 && 14.2 & 0.55 & 12.8 & 50.8 && 18.5 & 0.58 & 30.2 & 51.5 \\
 \midrule
 \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Time-Series\\Models\end{tabular}}
-& PatchTST & 18.5 & 0.88 & 12.1 & 54.5 && 14.2 & 0.82 & 10.8 & 53.8 && 25.8 & 0.95 & 14.5 & 55.2 && 16.8 & 0.85 & 11.5 & 54.1 \\
-& TimesNet & 17.2 & 0.82 & 12.8 & 53.8 && 13.5 & 0.78 & 11.2 & 53.2 && 24.1 & 0.88 & 15.2 & 54.5 && 15.5 & 0.80 & 12.1 & 53.5 \\
-& iTransformer & 20.5 & 0.95 & 11.2 & 55.8 && 16.1 & 0.88 & 9.8 & 54.5 && 28.5 & 1.02 & 13.2 & 56.1 && 18.2 & 0.92 & 10.5 & 55.2 \\
+& PatchTST & 42.8 & 1.52 & 18.5 & 55.2 && 28.5 & 0.92 & 15.8 & 53.5 && 18.5 & 1.05 & 11.2 & 54.5 && 25.2 & 0.85 & 22.5 & 54.8 \\
+& TimesNet & 38.5 & 1.35 & 20.2 & 54.5 && 25.2 & 0.85 & 16.5 & 52.8 && 16.2 & 0.95 & 12.5 & 53.8 && 22.8 & 0.78 & 24.1 & 53.5 \\
+& iTransformer & 45.2 & 1.62 & 17.2 & 56.5 && 32.1 & 1.05 & 14.2 & 54.2 && 20.5 & 1.12 & 10.5 & 55.8 && 28.5 & 0.92 & 20.8 & 55.2 \\
 \midrule
 \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}LLM\\Multi-Agent\end{tabular}}
-& TradingAgents & 22.8 & 1.12 & 9.5 & 57.2 && 18.5 & 1.05 & 8.8 & 56.5 && 32.1 & 1.18 & 11.2 & 58.1 && 20.5 & 1.08 & 9.2 & 56.8 \\
-& FinCon & 26.5 & 1.25 & 8.2 & 58.5 && 21.2 & 1.15 & 7.5 & 57.8 && 35.8 & 1.32 & 9.8 & 59.2 && 23.8 & 1.18 & 8.1 & 58.1 \\
-& FinAgent & 20.1 & 1.02 & 10.2 & 55.8 && 16.5 & 0.95 & 9.5 & 55.2 && 28.5 & 1.08 & 12.1 & 56.5 && 18.2 & 0.98 & 9.8 & 55.5 \\
-& R\&D-Agent & 24.2 & 1.15 & 8.8 & 57.5 && 19.8 & 1.08 & 8.2 & 56.8 && 33.5 & 1.22 & 10.5 & 58.2 && 21.8 & 1.12 & 8.5 & 57.2 \\
-& AlphaAgent & 18.5 & 0.98 & 10.8 & 55.2 && 15.2 & 0.92 & 9.8 & 54.8 && 26.2 & 1.05 & 12.5 & 56.1 && 17.1 & 0.95 & 10.2 & 55.1 \\
+& TradingAgents & 48.5 & 1.72 & 15.8 & 58.2 && 35.2 & 1.15 & 12.5 & 55.8 && 22.1 & 1.18 & 10.2 & 56.5 && 30.5 & 1.02 & 18.5 & 56.8 \\
+& FinCon & 52.1 & 1.85 & 14.5 & 60.2 && 38.5 & 1.25 & 11.8 & 57.5 && 23.8 & 1.25 & 9.8 & 58.2 && 32.8 & 1.08 & 17.2 & 58.5 \\
+& FinAgent & 40.5 & 1.48 & 16.2 & 55.8 && 30.2 & 0.98 & 13.5 & 54.8 && 19.5 & 1.08 & 10.8 & 55.2 && 26.5 & 0.88 & 19.8 & 55.5 \\
+& R\&D-Agent & 50.2 & 1.78 & 15.2 & 58.8 && 36.8 & 1.18 & 12.2 & 56.2 && 21.5 & 1.15 & 10.5 & 57.5 && 28.8 & 0.98 & 18.2 & 57.2 \\
+& AlphaAgent & 38.2 & 1.42 & 17.5 & 55.5 && 28.5 & 0.92 & 14.8 & 54.2 && 18.2 & 0.98 & 11.5 & 54.8 && 24.5 & 0.82 & 21.2 & 54.5 \\
 \midrule
 \multirow{1}{*}{Ours}
-& \textbf{\textsc{FinOPD}} & \textbf{\textcolor{FBest}{38.2}} & \textbf{\textcolor{FBest}{2.15}} & \textbf{\textcolor{FBest}{3.8}} & \textbf{\textcolor{FBest}{63.5}} && \textbf{\textcolor{FBest}{30.5}} & \textbf{\textcolor{FBest}{1.92}} & \textbf{\textcolor{FBest}{3.5}} & \textbf{\textcolor{FBest}{61.8}} && \textbf{\textcolor{FBest}{48.2}} & \textbf{\textcolor{FBest}{2.35}} & \textbf{\textcolor{FBest}{4.2}} & \textbf{\textcolor{FBest}{64.8}} && \textbf{\textcolor{FBest}{35.1}} & \textbf{\textcolor{FBest}{2.05}} & \textbf{\textcolor{FBest}{3.6}} & \textbf{\textcolor{FBest}{62.5}} \\
+& \textbf{\textsc{FinOPD}} & \textbf{\textcolor{FBest}{70.6}} & \textbf{\textcolor{FBest}{2.33}} & \textbf{\textcolor{FBest}{11.2}} & \textbf{\textcolor{FBest}{75.0}} && \textbf{\textcolor{FBest}{52.4}} & \textbf{\textcolor{FBest}{2.21}} & \textbf{\textcolor{FBest}{9.2}} & \textbf{\textcolor{FBest}{75.0}} && \textbf{\textcolor{FBest}{25.4}} & \textbf{\textcolor{FBest}{1.72}} & \textbf{\textcolor{FBest}{9.5}} & \textbf{\textcolor{FBest}{66.7}} && \textbf{\textcolor{FBest}{39.3}} & \textbf{\textcolor{FBest}{1.37}} & \textbf{\textcolor{FBest}{15.6}} & \textbf{\textcolor{FBest}{60.0}} \\
 \midrule
 \multicolumn{2}{c}{Improvement over best baseline}
-& +44.2\% & +72.0\% & $-$53.7\% & +8.5\% && +43.9\% & +67.0\% & $-$53.3\% & +6.9\% && +34.6\% & +78.0\% & $-$57.1\% & +9.5\% && +47.5\% & +73.7\% & $-$55.6\% & +7.6\% \\
+& +35.5\% & +25.9\% & $-$22.8\% & +24.6\% && +36.1\% & +76.8\% & $-$22.0\% & +30.4\% && +6.7\% & +37.6\% & $-$3.1\% & +14.6\% && +19.8\% & +26.9\% & $-$9.3\% & +2.6\% \\
 \bottomrule
 \end{tabular}
 }

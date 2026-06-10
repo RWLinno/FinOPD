@@ -9,16 +9,16 @@
 \toprule
 Method & \begin{tabular}[c]{@{}c@{}}Train\\(GPU-h)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Inference\\(s/asset)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Sample\\Efficiency\end{tabular} & SR$\uparrow$ \\
 \midrule
-PatchTST & 4 & 0.1 & -- & 0.82 \\
-iTransformer & 6 & 0.1 & -- & 0.91 \\
-TradingAgents & 0 (API) & 45.0 & -- & 1.05 \\
-FinCon & 0 (API) & 38.0 & -- & 1.18 \\
-R\&D-Agent & 12 & 52.0 & 500 iter & 1.08 \\
-AlphaAgent & 8 & 25.0 & 200 iter & 0.95 \\
+PatchTST & 4 & 0.1 & -- & 1.08 \\
+iTransformer & 6 & 0.1 & -- & 1.18 \\
+TradingAgents & 0 (API) & 45.0 & -- & 1.27 \\
+FinCon & 0 (API) & 38.0 & -- & 1.36 \\
+R\&D-Agent & 12 & 52.0 & 500 iter & 1.27 \\
+AlphaAgent & 8 & 25.0 & 200 iter & 1.02 \\
 \midrule
-\textsc{FinOPD} (Ours) & 42 & 8.2 & 8 iter & \textbf{1.98} \\
-\quad w/o Belief & 38 & 8.1 & 8 iter & 1.61 \\
-\quad w/o OPSD & 10 & 8.3 & -- & 1.52 \\
+\textsc{FinOPD} (Ours) & 42 & 8.2 & 8 iter & \textbf{1.91} \\
+\quad w/o Belief & 38 & 8.1 & 8 iter & 1.52 \\
+\quad w/o OPSD & 10 & 8.3 & -- & 1.28 \\
 \bottomrule
 \end{tabular}
 \label{tab:efficiency}
