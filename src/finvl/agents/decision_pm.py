@@ -85,6 +85,9 @@ class DecisionPMAgent(BaseFinAgent):
         ohlcv_df = inputs.get("ohlcv_df")
         trend_bias = 0.0
         factor_bias = 0.0
+        vol20 = 0.2
+        ret_20d = 0.0
+        has_edge = False
         if ohlcv_df is not None and len(ohlcv_df) >= 20:
             close = ohlcv_df["close"].values
             high = ohlcv_df["high"].values
@@ -93,6 +96,17 @@ class DecisionPMAgent(BaseFinAgent):
 
             sma20 = close[-20:].mean()
             current = close[-1]
+
+            # --- Trend signal (compute from SMA + returns) ---
+            ret_20d = (current - close[-20]) / (close[-20] + 1e-8) if len(close) >= 20 else 0
+            ret_5d = (current - close[-5]) / (close[-5] + 1e-8) if len(close) >= 5 else 0
+            pvsma = (current - sma20) / (sma20 + 1e-8)
+            trend_bias = np.clip(
+                0.4 * np.sign(pvsma) * min(abs(pvsma) * 5, 1) +
+                0.4 * np.sign(ret_20d) * min(abs(ret_20d) * 5, 1) +
+                0.2 * np.sign(ret_5d) * min(abs(ret_5d) * 10, 1),
+                -1, 1
+            )
 
             # === Evolved factor signals (from best_factor.json via DSL engine) ===
             top_factors = self._get_factor_lib()
@@ -111,36 +125,52 @@ class DecisionPMAgent(BaseFinAgent):
 
             # Compute factor consensus signal
             if factor_values:
-                # Normalize: positive values = bullish, negative = bearish
                 fv = np.array(factor_values)
-                # Z-score normalize
                 fv_z = (fv - np.nanmean(fv)) / (np.nanstd(fv) + 1e-12)
-                # Fraction of factors that are positive
                 pos_frac = np.sum(fv_z > 0.5) / len(fv_z)
                 neg_frac = np.sum(fv_z < -0.5) / len(fv_z)
                 factor_bias = np.clip((pos_frac - neg_frac) * 2, -1.0, 1.0)
             else:
                 factor_bias = 0.0
 
-            # Volatility regime: reduce conviction in high vol
+            # Volatility for RASW and EGA
             if len(close) >= 21:
                 daily_rets = np.diff(close[-21:]) / close[-21:-1]
                 vol20 = np.std(daily_rets) * np.sqrt(252)
-                if vol20 > 0.35:
-                    trend_bias *= 0.5
-                    factor_bias *= 0.5
+
+            # --- RASW: Regime-Adaptive Signal Weighting ---
+            if vol20 > 0.35:
+                w_trend, w_factor = 0.3, 0.7
+            elif abs(ret_20d) > 0.08:
+                w_trend, w_factor = 0.7, 0.3
+            else:
+                w_trend, w_factor = 0.5, 0.5
+
+            # --- EGA: Edge-Gated Abstention ---
+            has_edge = (vol20 > 0.25) or (abs(ret_20d) > 0.05)
 
             trend_bias = max(-1.0, min(1.0, trend_bias))
 
         # Score biases: bullish=+1, bearish=-1, neutral=0
         bias_map = {"bullish": 1.0, "bearish": -1.0, "neutral": 0.0}
-        signals = [
-            ("chart", bias_map.get(chart_bias, 0.0), chart_confidence * 0.4),
-            ("pattern", bias_map.get(pattern_bias, 0.0), pattern_confidence * 0.3),
-            ("event", bias_map.get(event_bias, 0.0), event_confidence),
-            ("trend", trend_bias, 0.6),
-            ("factors", factor_bias, 0.8),
-        ]
+
+        # Use RASW weights for trend/factor when available
+        if ohlcv_df is not None and len(ohlcv_df) >= 20:
+            signals = [
+                ("chart", bias_map.get(chart_bias, 0.0), chart_confidence * 0.3),
+                ("pattern", bias_map.get(pattern_bias, 0.0), pattern_confidence * 0.2),
+                ("event", bias_map.get(event_bias, 0.0), event_confidence),
+                ("trend", trend_bias, w_trend),
+                ("factors", factor_bias, w_factor),
+            ]
+        else:
+            signals = [
+                ("chart", bias_map.get(chart_bias, 0.0), chart_confidence * 0.4),
+                ("pattern", bias_map.get(pattern_bias, 0.0), pattern_confidence * 0.3),
+                ("event", bias_map.get(event_bias, 0.0), event_confidence),
+                ("trend", trend_bias, 0.6),
+                ("factors", factor_bias, 0.8),
+            ]
 
         # Confidence-weighted score
         weighted_score = 0.0
@@ -159,14 +189,23 @@ class DecisionPMAgent(BaseFinAgent):
         risk_factor = risk_mult.get(risk_level, 0.5)
         adjusted_score = normalized_score * risk_factor
 
-        # Determine action with asymmetric thresholds
-        # In trend-following: easier to buy (follow trend), harder to sell (against trend)
-        if adjusted_score > 0.15:
-            action = Action.BUY
-        elif adjusted_score < -0.3:
-            action = Action.SELL
+        # Determine action with EGA (Edge-Gated Abstention)
+        if has_edge:
+            # In edge regime: use moderate thresholds
+            if adjusted_score > 0.10:
+                action = Action.BUY
+            elif adjusted_score < -0.20:
+                action = Action.SELL
+            else:
+                action = Action.HOLD
         else:
-            action = Action.HOLD
+            # No edge: require much stronger signal to trade
+            if adjusted_score > 0.30:
+                action = Action.BUY
+            elif adjusted_score < -0.40:
+                action = Action.SELL
+            else:
+                action = Action.HOLD
 
         # Risk recommendation override
         recommendation = risk_assessment.get("recommendation", "proceed")
