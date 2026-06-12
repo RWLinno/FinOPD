@@ -38,7 +38,11 @@ class DecisionPMAgent(BaseFinAgent):
                     self._factor_lib.factors.values(),
                     key=lambda f: f.ir, reverse=True
                 )
-                self._top_factors = [f for f in sorted_factors if f.ir >= 1.0][:30]
+                # Use ALL evolved factors with IR >= 0.5 (paper: 160+ factor library)
+                self._top_factors = [f for f in sorted_factors if f.ir >= 0.5]
+                if len(self._top_factors) < 50:
+                    # Fallback: use all available factors
+                    self._top_factors = sorted_factors
                 # Try to load trained router
                 self._router = None
                 try:
@@ -114,22 +118,25 @@ class DecisionPMAgent(BaseFinAgent):
             if top_factors and len(ohlcv_df) >= 30:
                 df_for_factors = ohlcv_df.copy()
                 df_for_factors.columns = [c.lower() for c in df_for_factors.columns]
-                for f in top_factors[:20]:
+                for f in top_factors:  # use full evolved factor library
                     try:
                         vals = f.compute(df_for_factors)
                         last_val = vals.iloc[-1] if len(vals) > 0 else 0
                         if np.isfinite(last_val) and last_val != 0:
-                            factor_values.append(last_val)
+                            factor_values.append((last_val, f.ir))
                     except:
                         pass
 
-            # Compute factor consensus signal
+            # Compute IR-weighted factor consensus signal (paper: factor router IR weighting)
             if factor_values:
-                fv = np.array(factor_values)
-                fv_z = (fv - np.nanmean(fv)) / (np.nanstd(fv) + 1e-12)
-                pos_frac = np.sum(fv_z > 0.5) / len(fv_z)
-                neg_frac = np.sum(fv_z < -0.5) / len(fv_z)
-                factor_bias = np.clip((pos_frac - neg_frac) * 2, -1.0, 1.0)
+                vals = np.array([v for v, ir in factor_values])
+                irs = np.array([ir for v, ir in factor_values])
+                vz = (vals - np.nanmean(vals)) / (np.nanstd(vals) + 1e-12)
+                signs = np.sign(vz)
+                signs[np.abs(vz) < 0.5] = 0
+                weighted_sum = np.sum(signs * irs)
+                total_ir = np.sum(irs) + 1e-12
+                factor_bias = np.clip(weighted_sum / total_ir * 2, -1.0, 1.0)
             else:
                 factor_bias = 0.0
 

@@ -350,7 +350,7 @@ def main():
 
     # Initialize FinOPD
     lib = FactorLibrary()
-    top_factors = sorted([f for f in lib.factors.values() if f.ir >= 1.0], key=lambda f: -f.ir)
+    top_factors = sorted([f for f in lib.factors.values() if f.ir >= 0.5], key=lambda f: -f.ir)
     print(f"FinOPD: {len(top_factors)} factors with IR>=1.0")
     finopd = FinOPDStrategy(lib, top_factors, entry=args.entry, exit_th=args.exit,
                             no_edge_entry=args.no_edge_entry, no_edge_exit=args.no_edge_exit)

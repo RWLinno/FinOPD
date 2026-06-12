@@ -181,7 +181,14 @@ def main():
     args = parser.parse_args()
 
     methods = ['tradingagents', 'fincon', 'rdagent', 'alphagen'] if args.method == 'all' else [args.method]
-    tickers = ['GOOGL', 'GS', 'JNJ', 'NVDA'] if args.ticker == 'all' else [args.ticker]
+    if args.ticker == 'all':
+        tickers = ['GOOGL', 'GS', 'JNJ', 'NVDA']
+    elif args.ticker == 'all25':
+        tickers = ['GOOGL','GS','JNJ','NVDA','AAPL','MSFT','AMZN','V','WMT','HD','DIS','KO','MCD','CSCO','MRK','UNH','CVX','XOM','JPM','PG','IBM','VZ','BA','NKE']
+    elif ',' in args.ticker:
+        tickers = [t.strip() for t in args.ticker.split(',')]
+    else:
+        tickers = [args.ticker]
 
     results = {}
     for method in methods:

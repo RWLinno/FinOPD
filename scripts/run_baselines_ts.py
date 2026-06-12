@@ -225,7 +225,12 @@ def main():
     args = parser.parse_args()
 
     models = ['patchtst', 'itransformer', 'timesnet'] if args.model == 'all' else [args.model]
-    tickers = ['GOOGL', 'GS', 'JNJ', 'NVDA'] if args.ticker == 'all' else [args.ticker]
+    if args.ticker == 'all':
+        tickers = ['GOOGL', 'GS', 'JNJ', 'NVDA']
+    elif ',' in args.ticker:
+        tickers = [t.strip() for t in args.ticker.split(',')]
+    else:
+        tickers = [args.ticker]
 
     results = {}
     for model_name in models:
