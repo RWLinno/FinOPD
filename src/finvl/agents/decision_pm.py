@@ -197,7 +197,18 @@ class DecisionPMAgent(BaseFinAgent):
         adjusted_score = normalized_score * risk_factor
 
         # Determine action with EGA (Edge-Gated Abstention)
-        if has_edge:
+        # Confirmed uptrend flag for trend-riding (full-position capture of directional moves)
+        strong_uptrend = False
+        if ohlcv_df is not None and len(ohlcv_df) >= 50:
+            close = ohlcv_df["close"].values
+            sma50 = close[-50:].mean()
+            strong_uptrend = (close[-1] > sma20) and (sma20 > sma50) and (ret_20d > 0.02)
+
+        if strong_uptrend:
+            # Ride confirmed uptrend at full position regardless of marginal score
+            action = Action.BUY
+            adjusted_score = max(adjusted_score, 0.65)  # force HIGH conviction
+        elif has_edge:
             # In edge regime: use moderate thresholds
             if adjusted_score > 0.10:
                 action = Action.BUY
@@ -213,6 +224,14 @@ class DecisionPMAgent(BaseFinAgent):
                 action = Action.SELL
             else:
                 action = Action.HOLD
+
+        # Confirmed downtrend protection: exit to cash (keeps MDD low)
+        if ohlcv_df is not None and len(ohlcv_df) >= 50:
+            close = ohlcv_df["close"].values
+            sma50 = close[-50:].mean()
+            if close[-1] < sma50 and ret_20d < -0.03:
+                action = Action.SELL
+                adjusted_score = min(adjusted_score, -0.3)
 
         # Risk recommendation override
         recommendation = risk_assessment.get("recommendation", "proceed")
@@ -289,10 +308,16 @@ class DecisionPMAgent(BaseFinAgent):
     def _adjust_position_size(
         base_pct: float, conviction: Conviction, risk_level: str,
     ) -> float:
-        """Scale position size by conviction and risk level."""
-        conviction_mult = {Conviction.HIGH: 1.0, Conviction.MODERATE: 0.7, Conviction.LOW: 0.4}
-        risk_mult = {"low": 1.2, "moderate": 1.0, "high": 0.5, "extreme": 0.1}
-        return base_pct * conviction_mult.get(conviction, 0.5) * risk_mult.get(risk_level, 0.5)
+        """Position sizing: full-position trend-following scaled by conviction and risk.
+        Paper: capture full directional moves when signal is confirmed.
+        Returns a portfolio weight in [0, 1], NOT a small fraction.
+        """
+        # Base full position scaled by conviction (high conviction = near full)
+        conviction_weight = {Conviction.HIGH: 1.0, Conviction.MODERATE: 0.85, Conviction.LOW: 0.6}
+        # Risk-based trimming (only de-risk in genuinely high-risk regimes)
+        risk_mult = {"low": 1.0, "moderate": 1.0, "high": 0.7, "extreme": 0.4}
+        weight = conviction_weight.get(conviction, 0.6) * risk_mult.get(risk_level, 0.7)
+        return float(min(max(weight, 0.0), 1.0))
 
     def _detect_disagreements(
         self, signals: List[tuple[str, float, float]]

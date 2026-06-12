@@ -69,7 +69,32 @@ class VLMClient:
     ) -> Dict[str, Any]:
         import asyncio
 
-        return await asyncio.get_event_loop().run_in_executor(None, self._analyze_sync, image_path, system_prompt, user_prompt)
+        # File-based cache: key on image CONTENT hash + prompt + model (path-independent)
+        import os, json, hashlib
+        cache_dir = os.environ.get("VLM_CACHE_DIR", "outputs/vlm_cache")
+        cache_key = None
+        if cache_dir:
+            try:
+                with open(image_path, "rb") as imgf:
+                    img_hash = hashlib.md5(imgf.read()).hexdigest()
+                h = hashlib.md5((img_hash + system_prompt + user_prompt + str(self.model)).encode()).hexdigest()
+                cache_key = os.path.join(cache_dir, f"{h}.json")
+                if os.path.exists(cache_key):
+                    with open(cache_key) as f:
+                        return json.load(f)
+            except Exception:
+                cache_key = None
+
+        result = await asyncio.get_event_loop().run_in_executor(None, self._analyze_sync, image_path, system_prompt, user_prompt)
+
+        if cache_key:
+            try:
+                os.makedirs(cache_dir, exist_ok=True)
+                with open(cache_key, "w") as f:
+                    json.dump(result, f)
+            except Exception:
+                pass
+        return result
 
     def _analyze_sync(self, image_path: str, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
         if not Path(image_path).exists():
