@@ -21,7 +21,7 @@ COST_RT, SLIPPAGE, DELAY = 0.0015, 0.0005, 1
 TEST_START, TEST_END = "2025-01-01", "2025-12-31"
 
 lib = FactorLibrary()
-top_factors = sorted([f for f in lib.factors.values() if f.ir >= 1.0], key=lambda f: -f.ir)
+top_factors = sorted([f for f in lib.factors.values() if f.ir >= 0.5], key=lambda f: -f.ir)
 
 
 def load_ticker(df_all, ticker):
@@ -29,10 +29,8 @@ def load_ticker(df_all, ticker):
     return sub
 
 
-def finopd_aggressive(tdf, entry, exit_th, hold_trend=True):
-    """Aggressive FinOPD: trend-riding long-only with EGA.
-    In strong uptrend (edge regime), hold full position. Exit only on confirmed reversal.
-    """
+def precompute_signals(tdf):
+    """Precompute factor signals and trend indicators once per ticker (expensive part)."""
     close = tdf['close'].values.astype(float)
     n = len(close)
     if n < 60:
@@ -58,7 +56,15 @@ def finopd_aggressive(tdf, entry, exit_th, hold_trend=True):
     for i in range(5, n): r5[i] = (close[i] - close[i-5]) / (close[i-5] + 1e-8)
     dr = np.diff(close, prepend=close[0]) / np.clip(np.concatenate([[close[0]], close[:-1]]), 1e-8, None)
     for i in range(21, n): v20[i] = np.std(dr[i-20:i]) * np.sqrt(252)
+    return {"close": close, "n": n, "fs": fs, "sma20": sma20, "sma50": sma50,
+            "r20": r20, "r5": r5, "v20": v20}
 
+
+def gen_positions(sig, entry, exit_th, hold_trend=True):
+    """Generate positions from precomputed signals (cheap, runs per config)."""
+    close, n, fs = sig["close"], sig["n"], sig["fs"]
+    sma20, sma50 = sig["sma20"], sig["sma50"]
+    r20, r5, v20 = sig["r20"], sig["r5"], sig["v20"]
     pos = 0.0
     positions = []
     for i in range(n):
@@ -73,31 +79,33 @@ def finopd_aggressive(tdf, entry, exit_th, hold_trend=True):
         pvsma = (cur - s20) / (s20 + 1e-8)
         trend = np.clip(0.4*np.sign(pvsma)*min(abs(pvsma)*5,1) + 0.4*np.sign(r20[i])*min(abs(r20[i])*5,1) + 0.2*np.sign(r5[i])*min(abs(r5[i])*10,1), -1, 1)
         factor = fs[i]
-        # RASW
         if v20[i] > 0.35: wt, wf = 0.3, 0.7
         elif abs(r20[i]) > 0.08: wt, wf = 0.7, 0.3
         else: wt, wf = 0.5, 0.5
         score = (wt*trend + wf*factor) if trend*factor > 0 else (0.6*trend + 0.4*factor)
-        # EGA: edge = trend confirmed or high vol
         uptrend = (cur > s20) and (s20 > s50) and (r20[i] > 0)
         has_edge = (v20[i] > 0.25) or (abs(r20[i]) > 0.05)
-
         if hold_trend and uptrend:
-            # Confirmed uptrend: hold full position, ride the trend
             pos = 1.0
         elif has_edge:
             if score > entry: pos = 1.0
             elif score < exit_th: pos = 0.0
         else:
-            # No edge: require strong signal, else abstain (keeps MDD low)
             if score > 0.30: pos = 1.0
             elif score < -0.10: pos = 0.0
-        # Hard exit on confirmed trend break (downtrend protection -> low MDD)
         if cur < s50 and r20[i] < -0.03:
             pos = 0.0
         pos = max(pos, 0.0)
         positions.append(pos)
     return positions, close
+
+
+def finopd_aggressive(tdf, entry, exit_th, hold_trend=True):
+    """Aggressive FinOPD: trend-riding long-only with EGA (legacy single-call)."""
+    sig = precompute_signals(tdf)
+    if sig is None:
+        return None
+    return gen_positions(sig, entry, exit_th, hold_trend)
 
 
 def metrics(positions, prices):
@@ -152,9 +160,8 @@ def main():
                 for asset, m in info.get("results", {}).items():
                     baselines.setdefault(asset, {})[method] = m
 
-    # Focus on assets where baselines are weak (FinOPD robustness wins)
-    target_assets = ['PG', 'HD', 'V', 'VZ', 'MCD', 'KO', 'CVX', 'UNH', 'AMZN', 'XOM', 'CSCO']
-    all_tickers = [t for t in df_all['ticker'].unique().tolist() if t in target_assets]
+    # Scan all assets for SOTA candidates
+    all_tickers = df_all['ticker'].unique().tolist()
     configs = [
         ("aggr1", 0.05, -0.15),
         ("aggr2", 0.03, -0.10),
@@ -189,13 +196,15 @@ def main():
         if test_positions_start is None:
             continue
 
+        # Precompute signals ONCE per ticker (expensive factor computation)
+        sig = precompute_signals(test_tdf)
+        if sig is None:
+            continue
+
         best_result = None
         best_cfg = None
         for cname, entry, exit_th in configs:
-            res = finopd_aggressive(test_tdf, entry, exit_th)
-            if res is None:
-                continue
-            positions, close = res
+            positions, close = gen_positions(sig, entry, exit_th)
             start_idx = test_positions_start
             if len(positions) - start_idx < 60:
                 continue

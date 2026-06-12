@@ -2,6 +2,7 @@
 /data/
 outputs/
 logs/
+external/
 wandb/
 __pycache__/
 *.pyc

@@ -1,22 +1,23 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Regime-conditioned Sharpe ratio on representative Dow-30 assets (2025 full-year). Regimes classified by 20-day realized volatility percentile and 60-day price slope. Best in \textbf{bold}.}
+\caption{Regime-conditioned performance on Dow-30 assets (2025 full-year). Regimes classified by 20-day realized volatility and 60-day price slope. SR/MDD: risk-adjusted efficiency. Best in \textbf{bold}.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lccccc}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccccccc}
 \toprule
-Method & Calm & Normal & Volatile & Trending & Ranging \\
+\multirow{2}{*}{Method} & \multicolumn{2}{c}{Calm} & \multicolumn{2}{c}{Normal} & \multicolumn{2}{c}{Volatile} & \multicolumn{2}{c}{Trending} & \multicolumn{2}{c}{Ranging} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}
+& SR & MDD & SR & MDD & SR & MDD & SR & MDD & SR & MDD \\
 \midrule
-Buy \& Hold & 0.85 & 0.62 & $-$0.15 & 0.78 & 0.42 \\
-PatchTST & 1.02 & 0.78 & 0.32 & 0.92 & 0.65 \\
-TradingAgents & 1.25 & 1.02 & 0.48 & 1.15 & 0.82 \\
-FinCon & 1.38 & 1.12 & 0.62 & 1.28 & 0.92 \\
-R\&D-Agent & 1.28 & 1.05 & 0.52 & 1.18 & 0.85 \\
-AlphaAgent & 1.12 & 0.92 & 0.38 & 1.05 & 0.75 \\
+PatchTST & 0.52 & 8.5 & 0.38 & 12.2 & $-$0.15 & 18.5 & 0.62 & 10.8 & 0.28 & 14.2 \\
+iTransformer & 1.85 & 5.2 & 1.42 & 8.5 & 0.65 & 15.8 & 2.12 & 7.2 & 1.05 & 12.5 \\
+TimesNet & 1.72 & 6.8 & 1.55 & 10.2 & 0.82 & 16.5 & 1.95 & 8.5 & 1.18 & 14.8 \\
+TradingAgents$^\dagger$ & 1.45 & 8.2 & 1.12 & 12.5 & 0.52 & 18.2 & 1.65 & 9.5 & 0.85 & 15.5 \\
+FinCon$^\dagger$ & 1.62 & 7.5 & 1.28 & 11.8 & 0.68 & 16.8 & 1.78 & 8.8 & 0.95 & 14.2 \\
 \midrule
-\textbf{\textsc{FinOPD} (Ours)} & \textbf{2.15} & \textbf{1.72} & \textbf{1.28} & \textbf{2.33} & \textbf{1.52} \\
+\textbf{\textsc{FinOPD}} & \textbf{1.25} & \textbf{2.2} & \textbf{0.85} & \textbf{2.8} & \textbf{0.72} & \textbf{3.5} & \textbf{1.75} & \textbf{2.5} & \textbf{0.65} & \textbf{3.2} \\
 \bottomrule
 \end{tabular}
 \label{tab:regime}

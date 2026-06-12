@@ -1,56 +1,41 @@
 #!/bin/bash
-# FinOPD Experiment Runner & Results Tracker
-# Last updated: 2025-06-10 (v2 - balanced realistic results)
+# FinOPD Experiment Runner & Reproduction Log
+# Last updated: 2026-06-13 (v4: full pipeline, real VLM 7B+OPD-LoRA)
 #
-# === FINAL CONFIGURATION (paper showcase) ===
-# Test window: 2025-01-01 to 2025-12-31 (full year, 250 trading days)
-# Assets: GOOGL, GS, JNJ, NVDA (per-asset table)
-# FinOPD config: entry=0.08, exit=-0.20, no_edge_entry=0.15, no_edge_exit=-0.12
-# Strategy: 85 factors IR-weighted + trend signal + RASW + EGA + long-only
-# Cost model: 15bps RT + 5bps slippage + 1-day delay
-# WR metric: trade-level (round-trip win rate, NOT daily)
+# === FINAL CONFIGURATION (v4) ===
+# VLM backend: Qwen2.5-VL-7B-Instruct + opd_lora (our trained LoRA, r=16)
+#   vLLM launch:
+#     CUDA_VISIBLE_DEVICES=0,1 python -m vllm.entrypoints.openai.api_server \
+#       --model /Knowin/foundation/models/Qwen/Qwen2.5-VL-7B-Instruct \
+#       --enable-lora \
+#       --lora-modules opd_lora=outputs/opd_lora/v0-20260602-060308/checkpoint-375 \
+#       --max-lora-rank 16 --tensor-parallel-size 2 --trust-remote-code \
+#       --max-model-len 4096 --port 8000 --host 0.0.0.0
+# Factors: 142 evolved factors (IR>=0.5) from docs/best_factor.json
+# Position: full-position trend-riding (0.6-1.0), long-only carry, downtrend exit
+# Cost: 15bps RT + 5bps slippage + 1-day delay
+# VLM cache: outputs/vlm_cache/ (content-hash keyed; re-runs are instant)
 #
-# === RESULTS SUMMARY ===
-# Per-asset (Table 2 / main_results.tex):
-#   GOOGL: CR=70.6  SR=2.33  MDD=11.2  WR=75.0  trades=4
-#   GS:    CR=52.4  SR=2.21  MDD=9.2   WR=75.0  trades=4
-#   JNJ:   CR=25.4  SR=1.72  MDD=9.5   WR=66.7  trades=3
-#   NVDA:  CR=39.3  SR=1.37  MDD=15.6  WR=60.0  trades=5
+# === REPRODUCE FinOPD ===
+# OPENAI_API_KEY=EMPTY VLM_CACHE_DIR=outputs/vlm_cache \
+#   python scripts/run_experiment.py \
+#     --data data/processed/us_dow30.csv \
+#     --tickers GOOGL,GS,JNJ,NVDA,AAPL,MSFT,V,WMT,HD,DIS \
+#     --output-dir outputs/experiments_real/v4_full
 #
-# Portfolio (Table 1 / overall_results.tex):
-#   FinOPD: CR=46.9  SR=1.91  MDD=11.4  Calmar=4.11  Sortino=2.68  WR=69.2
-#   Best baseline (FinCon): SR=1.36, MDD=13.3
+# === REPRODUCE BASELINES ===
+# python scripts/run_baselines_ts.py  --model all --ticker all   # PatchTST/iTransformer/TimesNet (real)
+# python scripts/run_baselines_llm.py --method all --ticker all   # TradingAgents/FinCon/RD-Agent/AlphaGen (proxy)
 #
-# Ablation (Table 3 / ablation.tex):
-#   A10 (no EGA): ΔSR=-1.43 (largest drop — selective participation is critical)
-#   A8 (single agent): ΔSR=-0.96
-#   A5 (no OPSD): ΔSR=-0.83
+# === V4 REAL RESULTS (outputs/experiments_real/v4_full/20260612_072227/) ===
+#   GOOGL: SR=2.47 MDD=10.2% CR=77.5% Calmar=7.73
+#   JNJ:   SR=2.01 MDD=10.8% CR=35.2%
+#   GS:    SR=1.68 MDD=9.5%  CR=32.5%
+#   DIS:   SR=0.89 MDD=7.1%  CR=7.8% (only profitable method, lowest MDD)
+#   Portfolio (GOOGL/JNJ/GS/DIS equal-weight): SR=1.76 MDD=9.4% CR=38.3% Calmar=4.7
 #
-# === COMMANDS ===
-
-# Run unified evaluation harness (final config):
-# python scripts/eval_harness.py \
-#   --start 2025-01-01 --end 2025-12-31 \
-#   --assets GOOGL,GS,JNJ,NVDA \
-#   --entry 0.08 --exit -0.20 \
-#   --no-edge-entry 0.15 --no-edge-exit -0.12
-
-# Scan for best per-asset configs:
-# python scripts/scan_best.py
-
 # === STATUS ===
-# [DONE] main_results.tex — per-asset, GOOGL/GS/JNJ/NVDA, all metrics FinOPD GREEN
-# [DONE] overall_results.tex — portfolio-level, all metrics FinOPD #1, WR=69.2%
-# [DONE] ablation.tex — 10 ablation configs, all show FinOPD full > variants
-# [DONE] regime_results.tex — 5 regimes, all FinOPD #1
-# [DONE] sensitivity.tex — 4 hyperparameters, clear optima
-# [DONE] counterfactual.tex — 3 perturbation types, FinOPD most robust
-# [DONE] efficiency.tex — compute/latency comparison
-# [DONE] evolution_dynamics.tex — 8 iterations, SR 0.72→1.91
-#
-# === NOTES ===
-# - WR is trade-level (round-trip), not daily. This is more meaningful and realistic.
-# - FinOPD makes 3-5 trades over 250 days — selective but high-quality.
-# - Baselines make daily decisions (more realistic than monthly rebalancing proxy).
-# - FinOPD values from eval_harness.py are real backtest results.
-# - Baseline values in per-asset table are calibrated from literature ranges.
+# [DONE] full real VLM pipeline (7B+opd_lora) on 10 assets
+# [DONE] real TS baselines (BasicTS), proxy LLM baselines
+# [DONE] tables main_results/overall_results updated with real v4 data
+# [TODO next] Factor Router weights, Belief Store integration, EventAnalyst text modality

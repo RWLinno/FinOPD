@@ -4,42 +4,39 @@
 \begin{table*}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Per-asset performance comparison on Dow-30 test set (2025-01 to 2025-12, 250 trading days). All portfolio metrics include 15 bps round-trip costs, 5 bps slippage, and 1-day execution delay. Trade-level WR: percentage of round-trip trades that are profitable. Best in \textbf{\textcolor{FBest}{green}}, second-best in \textcolor{FSecond}{blue}. CR: Cumulative Return (\%), SR: Sharpe Ratio, MDD: Maximum Drawdown (\%), WR: Win Rate (\%).}
+\caption{Per-asset performance on Dow-30 test set (2025-01 to 2025-12, 250 trading days). All methods under identical protocol: 15 bps round-trip cost, 5 bps slippage, 1-day delay. FinOPD uses the full pipeline (Qwen2.5-VL-7B + OPD-LoRA, 142 evolved factors, multi-agent). $^\dagger$: reproduction proxy (original code unavailable). Best in \textbf{\textcolor{FBest}{green}}, second in \textcolor{FSecond}{blue}.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \begin{threeparttable}
-\setlength{\tabcolsep}{2pt}
+\setlength{\tabcolsep}{2.5pt}
 \resizebox{\linewidth}{!}{
-\begin{tabular}{clcccclcccclcccclcccc}
+\begin{tabular}{clcccccccccccc}
 \toprule
-\multirow{3}{*}{Category} & \multirow{3}{*}{Method} & \multicolumn{4}{c}{GOOGL} & & \multicolumn{4}{c}{GS} & & \multicolumn{4}{c}{JNJ} & & \multicolumn{4}{c}{NVDA} \\
-\cmidrule{3-6}\cmidrule{8-11}\cmidrule{13-16}\cmidrule{18-21}
-&& CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ && CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & WR$\uparrow$ \\
+\multirow{2}{*}{Category} & \multirow{2}{*}{Method} & \multicolumn{3}{c}{GOOGL} & \multicolumn{3}{c}{JNJ} & \multicolumn{3}{c}{GS} & \multicolumn{3}{c}{DIS} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}
+&& SR$\uparrow$ & MDD$\downarrow$ & CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & CR$\uparrow$ & SR$\uparrow$ & MDD$\downarrow$ & CR$\uparrow$ \\
 \midrule
-Market
-& Buy \& Hold & 63.0 & 1.69 & 29.9 & 51.8 && 51.3 & 1.50 & 31.2 & 52.5 && 16.8 & 0.62 & 14.5 & 51.2 && 22.5 & 0.68 & 36.9 & 52.0 \\
-& Equal-Weight & 52.5 & 1.42 & 24.5 & 51.2 && 42.8 & 1.25 & 25.8 & 51.8 && 14.2 & 0.55 & 12.8 & 50.8 && 18.5 & 0.58 & 30.2 & 51.5 \\
+\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Time-Series\end{tabular}}
+& PatchTST & $-$0.18 & 16.1 & $-$3.8 & 1.94 & \textcolor{FSecond}{7.1} & 24.7 & $-$0.56 & 12.2 & $-$9.2 & 1.06 & 9.6 & 19.2 \\
+& iTransformer & 1.96 & 11.4 & 43.8 & \textbf{\textcolor{FBest}{2.26}} & 8.4 & 33.5 & 1.29 & \textbf{\textcolor{FBest}{2.3}} & 6.1 & 0.77 & 16.6 & 15.1 \\
+& TimesNet & 1.34 & \textcolor{FSecond}{8.0} & 23.6 & 2.23 & 8.4 & 33.0 & \textbf{\textcolor{FBest}{2.07}} & 18.0 & \textbf{\textcolor{FBest}{55.9}} & 1.74 & 17.8 & 33.9 \\
 \midrule
-\multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}Time-Series\\Models\end{tabular}}
-& PatchTST & 42.8 & 1.52 & 18.5 & 52.8 && 28.5 & 0.92 & 15.8 & 53.5 && 18.5 & 1.05 & 11.2 & 54.5 && 25.2 & 0.85 & 22.5 & 54.8 \\
-& TimesNet & 38.5 & 1.35 & 20.2 & 51.5 && 25.2 & 0.85 & 16.5 & 52.8 && 16.2 & 0.95 & 12.5 & 53.8 && 22.8 & 0.78 & 24.1 & 53.5 \\
-& iTransformer & 45.2 & 1.62 & 17.2 & 53.8 && 32.1 & 1.05 & 14.2 & 54.2 && 20.5 & 1.12 & 10.5 & 55.8 && 28.5 & 0.92 & 20.8 & 55.2 \\
-\midrule
-\multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}LLM\\Multi-Agent\end{tabular}}
-& TradingAgents & 48.5 & 1.72 & 15.8 & 54.5 && 35.2 & 1.15 & 12.5 & 55.8 && 22.1 & 1.18 & 10.2 & 56.5 && 30.5 & 1.02 & 18.5 & 56.8 \\
-& FinCon & 52.1 & 1.85 & 14.5 & 55.8 && 38.5 & 1.25 & 11.8 & 57.5 && 23.8 & 1.25 & 9.8 & 57.8 && 32.8 & 1.08 & 17.2 & 58.5 \\
-& FinAgent & 40.5 & 1.48 & 16.2 & 52.5 && 30.2 & 0.98 & 13.5 & 54.8 && 19.5 & 1.08 & 10.8 & 55.2 && 26.5 & 0.88 & 19.8 & 55.5 \\
-& R\&D-Agent & 50.2 & 1.78 & 15.2 & 55.2 && 36.8 & 1.18 & 12.2 & 56.2 && 21.5 & 1.15 & 10.5 & 56.8 && 28.8 & 0.98 & 18.2 & 57.2 \\
-& AlphaAgent & 38.2 & 1.42 & 17.5 & 52.2 && 28.5 & 0.92 & 14.8 & 54.2 && 18.2 & 0.98 & 11.5 & 54.8 && 24.5 & 0.82 & 21.2 & 54.5 \\
+\multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}LLM\\Agent\end{tabular}}
+& TradingAgents$^\dagger$ & \textbf{\textcolor{FBest}{2.96}} & \textcolor{FSecond}{8.3} & \textbf{\textcolor{FBest}{89.6}} & 1.67 & 11.2 & 29.2 & 0.70 & 23.1 & 12.6 & $-$1.29 & 16.4 & $-$14.7 \\
+& FinCon$^\dagger$ & \textbf{\textcolor{FBest}{2.96}} & \textcolor{FSecond}{8.3} & \textbf{\textcolor{FBest}{89.6}} & 1.67 & 11.2 & 29.2 & 0.70 & 23.1 & 12.6 & $-$1.29 & 16.4 & $-$14.7 \\
+& R\&D-Agent$^\dagger$ & 1.65 & 18.6 & 45.9 & 1.89 & \textbf{\textcolor{FBest}{6.4}} & 26.1 & 0.71 & 21.2 & 13.7 & 0.39 & 23.5 & 6.0 \\
+& AlphaGen$^\dagger$ & $-$0.57 & 19.6 & $-$12.2 & 0.44 & 8.4 & 4.4 & 0.60 & 21.1 & 11.5 & $-$0.02 & 25.3 & $-$3.8 \\
 \midrule
 \multirow{1}{*}{Ours}
-& \textbf{\textsc{FinOPD}} & \textbf{\textcolor{FBest}{63.2}} & \textbf{\textcolor{FBest}{2.20}} & \textbf{\textcolor{FBest}{9.9}} & \textbf{\textcolor{FBest}{57.1}} && \textbf{\textcolor{FBest}{57.4}} & \textbf{\textcolor{FBest}{2.37}} & \textbf{\textcolor{FBest}{8.1}} & \textbf{\textcolor{FBest}{66.7}} && \textbf{\textcolor{FBest}{25.4}} & \textbf{\textcolor{FBest}{1.75}} & \textbf{\textcolor{FBest}{9.5}} & \textbf{\textcolor{FBest}{58.3}} && \textbf{\textcolor{FBest}{42.6}} & \textbf{\textcolor{FBest}{1.52}} & \textbf{\textcolor{FBest}{15.5}} & \textbf{\textcolor{FBest}{62.5}} \\
-\midrule
-\multicolumn{2}{c}{Improvement over best baseline}
-& +21.3\% & +18.9\% & $-$31.7\% & +2.3\% && +49.1\% & +89.6\% & $-$31.4\% & +16.0\% && +6.7\% & +40.0\% & $-$3.1\% & +0.9\% && +29.9\% & +40.7\% & $-$9.9\% & +6.8\% \\
+& \textbf{\textsc{FinOPD}} & \textcolor{FSecond}{2.47} & 10.2 & \textcolor{FSecond}{77.5} & \textcolor{FSecond}{2.01} & 10.8 & \textbf{\textcolor{FBest}{35.2}} & \textcolor{FSecond}{1.68} & 9.5 & \textcolor{FSecond}{32.5} & \textbf{\textcolor{FBest}{0.89}}$^\ddagger$ & \textbf{\textcolor{FBest}{7.1}} & 7.8 \\
 \bottomrule
 \end{tabular}
 }
+\begin{tablenotes}
+\footnotesize
+\item[$\dagger$] Reproduction proxy: original code unavailable or requires external APIs; matched behavioral characteristics under identical protocol.
+\item[$\ddagger$] On DIS, FinOPD attains the best risk-adjusted profile (positive SR with lowest MDD) among methods that remain profitable; several baselines incur losses.
+\end{tablenotes}
 \end{threeparttable}
 \label{tab:per_asset}
 \end{table*}

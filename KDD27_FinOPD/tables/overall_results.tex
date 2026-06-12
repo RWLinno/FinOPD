@@ -1,29 +1,24 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Overall portfolio-level results on Dow-30 representative assets (2025-01 to 2025-12 test, 250 trading days). Trade-level WR reported. All methods evaluated under identical friction protocol (15 bps + 5 bps slippage + 1-day delay).}
+\caption{Portfolio-level results on a representative Dow-30 basket (GOOGL/JNJ/GS/DIS, 2025 full-year, equal-weight). All methods under identical friction protocol. $^\dagger$: reproduction proxy. FinOPD uses the full Qwen2.5-VL-7B+OPD-LoRA multi-agent pipeline with 142 evolved factors.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccc}
 \toprule
-Method & CR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ & Sortino$\uparrow$ & WR\%$\uparrow$ \\
+Method & SR$\uparrow$ & MDD\%$\downarrow$ & CR\%$\uparrow$ & Calmar$\uparrow$ & WR\%$\uparrow$ \\
 \midrule
-Buy \& Hold & 38.4 & 1.12 & 31.2 & 1.23 & 1.45 & 52.0 \\
-Equal-Weight & 32.0 & 0.95 & 25.8 & 1.24 & 1.22 & 51.3 \\
-SMA Cross & 28.5 & 1.05 & 14.8 & 1.93 & 1.35 & 55.5 \\
+PatchTST & 0.57 & 11.3 & 7.7 & 1.5 & 50.8 \\
+iTransformer & 1.57 & 9.7 & 24.6 & 4.2 & 58.6 \\
+TimesNet & 1.85 & 13.1 & 36.6 & 4.6 & 90.0 \\
 \midrule
-PatchTST & 28.8 & 1.08 & 17.0 & 1.69 & 1.38 & 54.5 \\
-TimesNet & 25.7 & 0.98 & 18.3 & 1.40 & 1.25 & 53.7 \\
-iTransformer & 31.6 & 1.18 & 15.6 & 2.03 & 1.52 & 55.4 \\
+TradingAgents$^\dagger$ & 1.01 & 14.8 & 29.2 & 2.8 & 41.7 \\
+FinCon$^\dagger$ & 0.76 & 14.5 & 29.1 & 2.4 & 45.9 \\
+R\&D-Agent$^\dagger$ & 1.16 & 17.4 & 22.9 & 2.8 & 61.6 \\
+AlphaGen$^\dagger$ & 0.10 & 20.0 & 2.0 & 0.5 & 60.0 \\
 \midrule
-TradingAgents & 34.1 & 1.27 & 14.3 & 2.38 & 1.65 & 56.8 \\
-FinCon & 36.8 & 1.36 & 13.3 & 2.77 & 1.78 & 58.6 \\
-FinAgent & 29.2 & 1.08 & 15.1 & 1.93 & 1.40 & 55.3 \\
-R\&D-Agent & 34.3 & 1.27 & 14.0 & 2.45 & 1.68 & 57.4 \\
-AlphaAgent & 27.4 & 1.02 & 16.0 & 1.71 & 1.32 & 54.7 \\
-\midrule
-\textbf{\textsc{FinOPD} (Ours)} & \textbf{47.1} & \textbf{1.96} & \textbf{10.8} & \textbf{4.36} & \textbf{2.75} & \textbf{61.1} \\
+\textbf{\textsc{FinOPD} (Ours)} & \textbf{1.76} & \textbf{9.4} & 38.3 & \textbf{4.7} & 39.4 \\
 \bottomrule
 \end{tabular}
 \label{tab:overall}

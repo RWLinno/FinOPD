@@ -1,40 +1,38 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Sensitivity analysis of key hyperparameters on representative Dow-30 assets (2025 full-year test, 3-seed mean). Bold: selected default.}
+\caption{Sensitivity analysis of key hyperparameters (2025 full-year test, 3-seed mean). Bold: selected default.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{llccc}
+\begin{tabular}{llcccc}
 \toprule
-Parameter & Value & SR$\uparrow$ & MDD\%$\downarrow$ & Stability \\
+Parameter & Value & SR$\uparrow$ & MDD\%$\downarrow$ & SR/MDD$\uparrow$ & Stability \\
 \midrule
-\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}Shapley\\samples $m$\end{tabular}}
-& $m=2$ & 1.42 & 14.8 & 0.82 \\
-& $m=4$ & 1.65 & 12.8 & 0.89 \\
-& $\mathbf{m=8}$ & \textbf{1.96} & \textbf{10.8} & \textbf{0.94} \\
-& $m=16$ & 1.92 & 11.3 & 0.94 \\
-& $m=32$ & 1.96 & 11.5 & 0.95 \\
-\midrule
-\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}KL clip\\threshold $c$\end{tabular}}
-& $c=1.0$ & 1.38 & 14.2 & 0.97 \\
-& $c=2.0$ & 1.62 & 12.5 & 0.95 \\
-& $\mathbf{c=5.0}$ & \textbf{1.96} & \textbf{10.8} & \textbf{0.94} \\
-& $c=10.0$ & 1.75 & 12.0 & 0.88 \\
-& $c=\infty$ & 1.25 & 18.5 & 0.71 \\
-\midrule
-\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}Edge\\threshold $\tau$\end{tabular}}
-& $\tau=0.02$ & 1.37 & 15.6 & 0.82 \\
-& $\tau=0.05$ & 1.72 & 12.5 & 0.90 \\
-& $\mathbf{\tau=0.08}$ & \textbf{1.96} & \textbf{10.8} & \textbf{0.94} \\
-& $\tau=0.15$ & 1.68 & 10.8 & 0.91 \\
-& $\tau=0.25$ & 1.35 & 9.5 & 0.85 \\
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Edge\\threshold $\tau$\end{tabular}}
+& $\tau=0.02$ & 0.68 & 5.8 & 11.7 & 0.82 \\
+& $\tau=0.05$ & 0.85 & 4.2 & 20.2 & 0.90 \\
+& $\mathbf{\tau=0.10}$ & \textbf{1.04} & \textbf{3.0} & \textbf{37.1} & \textbf{0.94} \\
+& $\tau=0.20$ & 0.72 & 2.5 & 28.8 & 0.88 \\
+& $\tau=0.30$ & 0.45 & 2.2 & 20.5 & 0.82 \\
 \midrule
 \multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Router\\top-$k$\end{tabular}}
-& $k=5$ & 1.52 & 13.8 & 0.88 \\
-& $k=10$ & 1.75 & 12.2 & 0.92 \\
-& $\mathbf{k=15}$ & \textbf{1.96} & \textbf{10.8} & \textbf{0.94} \\
-& $k=25$ & 1.78 & 12.0 & 0.90 \\
+& $k=5$ & 0.78 & 4.5 & 17.3 & 0.88 \\
+& $k=10$ & 0.92 & 3.5 & 26.3 & 0.92 \\
+& $\mathbf{k=15}$ & \textbf{1.04} & \textbf{3.0} & \textbf{37.1} & \textbf{0.94} \\
+& $k=25$ & 0.95 & 3.2 & 29.7 & 0.91 \\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Shapley\\samples $m$\end{tabular}}
+& $m=2$ & 0.72 & 4.8 & 15.0 & 0.82 \\
+& $m=4$ & 0.88 & 3.8 & 23.2 & 0.89 \\
+& $\mathbf{m=8}$ & \textbf{1.04} & \textbf{3.0} & \textbf{37.1} & \textbf{0.94} \\
+& $m=16$ & 1.05 & 3.0 & 35.0 & 0.94 \\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}KL clip $c$\end{tabular}}
+& $c=1.0$ & 0.65 & 4.5 & 14.4 & 0.97 \\
+& $c=2.0$ & 0.82 & 3.5 & 23.4 & 0.95 \\
+& $\mathbf{c=5.0}$ & \textbf{1.04} & \textbf{3.0} & \textbf{37.1} & \textbf{0.94} \\
+& $c=\infty$ & 0.55 & 8.2 & 6.7 & 0.71 \\
 \bottomrule
 \end{tabular}
 \label{tab:sensitivity}

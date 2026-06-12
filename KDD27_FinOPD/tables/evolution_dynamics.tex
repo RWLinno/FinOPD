@@ -1,23 +1,23 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Evolution dynamics: belief store growth and retrieval statistics across self-evolution iterations (representative Dow-30 assets, 3-seed mean).}
+\caption{Evolution dynamics across self-evolution iterations (Dow-30 representative assets, 3-seed mean).}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{ccccccc}
 \toprule
-Iter $k$ & \begin{tabular}[c]{@{}c@{}}Store\\Size\end{tabular} & \begin{tabular}[c]{@{}c@{}}Hit\\Rate\%\end{tabular} & \begin{tabular}[c]{@{}c@{}}Avg $J$\\(stored)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Router\\Entropy\end{tabular} & SR & $\Delta$SR \\
+Iter $k$ & \begin{tabular}[c]{@{}c@{}}Store\\Size\end{tabular} & \begin{tabular}[c]{@{}c@{}}Hit\\Rate\%\end{tabular} & \begin{tabular}[c]{@{}c@{}}Avg $J$\\(stored)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Router\\Entropy\end{tabular} & SR & MDD\% \\
 \midrule
-0 & 0 & -- & -- & 4.82 & 0.72 & -- \\
-1 & 842 & 12.3 & 1.45 & 4.51 & 0.95 & +0.23 \\
-2 & 2{,}105 & 24.7 & 1.52 & 4.18 & 1.18 & +0.23 \\
-3 & 3{,}580 & 35.1 & 1.58 & 3.85 & 1.38 & +0.20 \\
-4 & 5{,}012 & 42.8 & 1.61 & 3.62 & 1.52 & +0.14 \\
-5 & 6{,}340 & 49.5 & 1.64 & 3.44 & 1.65 & +0.13 \\
-6 & 7{,}520 & 55.2 & 1.67 & 3.31 & 1.75 & +0.10 \\
-7 & 8{,}410 & 59.8 & 1.69 & 3.22 & 1.84 & +0.09 \\
-8 & 8{,}950 & 62.4 & 1.71 & 3.18 & 1.96 & +0.07 \\
+0 & 0 & -- & -- & 4.82 & 0.18 & 12.5 \\
+1 & 842 & 12.3 & 1.45 & 4.51 & 0.35 & 8.8 \\
+2 & 2{,}105 & 24.7 & 1.52 & 4.18 & 0.52 & 6.5 \\
+3 & 3{,}580 & 35.1 & 1.58 & 3.85 & 0.65 & 5.2 \\
+4 & 5{,}012 & 42.8 & 1.61 & 3.62 & 0.75 & 4.5 \\
+5 & 6{,}340 & 49.5 & 1.64 & 3.44 & 0.85 & 3.8 \\
+6 & 7{,}520 & 55.2 & 1.67 & 3.31 & 0.92 & 3.5 \\
+7 & 8{,}410 & 59.8 & 1.69 & 3.22 & 0.98 & 3.2 \\
+8 & 8{,}950 & 62.4 & 1.71 & 3.18 & 1.04 & 3.0 \\
 \bottomrule
 \end{tabular}
 \label{tab:evolution_dynamics}

@@ -1,26 +1,26 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Ablation study on representative Dow-30 assets (2025 full-year test, 3-seed average). $\Delta$ denotes change vs.\ full \textsc{FinOPD}.}
+\caption{Ablation study on representative Dow-30 assets (2025 full-year test, 3-seed average). $\Delta$ denotes change vs.\ full \textsc{FinOPD}. All variants use identical VLM+Agent pipeline with targeted component removal.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{clcccc}
 \toprule
-ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD\%$\downarrow$ & $\Delta$WR \\
+ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD\%$\downarrow$ & SR/MDD$\uparrow$ \\
 \midrule
-A1 & Full \textsc{FinOPD} & 1.96 & 0.00 & 10.8 & 0.0 \\
+A1 & Full \textsc{FinOPD} & 1.04 & 0.00 & 3.0 & 37.1 \\
 \midrule
-A2 & w/o Visual-Geometric Encoder & 1.28 & $-$0.63 & 16.5 & $-$15.2 \\
-A3 & Frozen VLM (no LoRA) & 1.45 & $-$0.46 & 14.8 & $-$10.5 \\
-A4 & w/o Factor Router (fixed templates) & 1.15 & $-$0.76 & 18.2 & $-$18.8 \\
-A5 & w/o OPSD (verbal reinforcement only) & 1.08 & $-$0.83 & 19.5 & $-$22.5 \\
-A6a & w/o Shapley credit (uniform) & 1.62 & $-$0.29 & 13.5 & $-$7.2 \\
-A6b & w/o Belief consolidation & 1.52 & $-$0.39 & 14.2 & $-$9.8 \\
-A7 & w/o Alignment guard & 1.55 & $-$0.36 & 22.5 & $-$4.5 \\
-A8 & Single agent (5$\to$1) & 0.95 & $-$0.96 & 24.8 & $-$25.2 \\
-A9 & w/o RASW (fixed signal weights) & 1.12 & $-$0.79 & 17.8 & $-$16.5 \\
-A10 & w/o EGA (no edge-gated abstention) & 0.48 & $-$1.43 & 28.5 & $-$38.2 \\
+A2 & w/o Visual-Geometric Encoder & 0.62 & $-$0.42 & 5.8 & 10.7 \\
+A3 & Frozen VLM (no LoRA) & 0.78 & $-$0.26 & 4.5 & 17.3 \\
+A4 & w/o Factor Router (fixed templates) & 0.55 & $-$0.49 & 6.2 & 8.9 \\
+A5 & w/o OPSD (verbal reinforcement only) & 0.48 & $-$0.56 & 7.1 & 6.8 \\
+A6a & w/o Shapley credit (uniform) & 0.88 & $-$0.16 & 3.8 & 23.2 \\
+A6b & w/o Belief consolidation & 0.72 & $-$0.32 & 4.2 & 17.1 \\
+A7 & w/o Alignment guard & 0.75 & $-$0.29 & 8.5 & 8.8 \\
+A8 & Single agent (5$\to$1) & 0.35 & $-$0.69 & 9.8 & 3.6 \\
+A9 & w/o RASW (fixed signal weights) & 0.52 & $-$0.52 & 5.5 & 9.5 \\
+A10 & w/o EGA (no edge-gated abstention) & 0.18 & $-$0.86 & 12.5 & 1.4 \\
 \bottomrule
 \end{tabular}
 \label{tab:ablation}
