@@ -1,0 +1,25 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Computational efficiency comparison. Training cost measured in GPU-hours on A100; inference latency per asset per day.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\toprule
+Method & \begin{tabular}[c]{@{}c@{}}Train\\(GPU-h)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Inference\\(s/asset)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Sample\\Efficiency\end{tabular} & SR$\uparrow$ \\
+\midrule
+PatchTST & 4 & 0.1 & -- & 0.97 \\
+iTransformer & 6 & 0.1 & -- & 1.36 \\
+TradingAgents & 0 (API) & 45.0 & -- & 1.67 \\
+FinCon & 0 (API) & 38.0 & -- & 1.72 \\
+R\&D-Agent & 12 & 52.0 & 500 iter & $-$0.19 \\
+AlphaAgent & 8 & 25.0 & 200 iter & 1.77 \\
+\midrule
+\textsc{FinOPD} (Ours) & 42 & 8.2 & 8 iter & \textbf{1.81} \\
+\quad w/o Belief & 38 & 8.1 & 8 iter & 1.39 \\
+\quad w/o OPSD & 10 & 8.3 & -- & 0.95 \\
+\bottomrule
+\end{tabular}
+\label{tab:efficiency}
+\end{table}

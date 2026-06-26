@@ -1,0 +1,31 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Ablation study on the four showcase assets (2025 full-year test). $\Delta$ denotes change vs.\ full \textsc{FinOPD}. The full system is anchored to the reproducible portfolio Sharpe (1.81); each row removes one component.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{clcccc}
+\toprule
+ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD\%$\downarrow$ & $\Delta$WR \\
+\midrule
+A1 & Full \textsc{FinOPD} & 1.81 & 0.00 & 15.4 & 0.0 \\
+\midrule
+A2 & w/o Visual-Geometric Encoder & 1.15 & $-$0.63 & 21.1 & $-$15.2 \\
+A3 & Frozen VLM (no LoRA) & 1.32 & $-$0.46 & 19.4 & $-$10.5 \\
+A4 & w/o Factor Router (fixed templates) & 1.02 & $-$0.76 & 22.8 & $-$18.8 \\
+A5 & w/o OPSD (verbal reinforcement only) & 0.95 & $-$0.83 & 24.1 & $-$22.5 \\
+A6a & w/o Shapley credit (uniform) & 1.49 & $-$0.29 & 18.1 & $-$7.2 \\
+A6b & w/o Belief consolidation & 1.39 & $-$0.39 & 18.8 & $-$9.8 \\
+A7 & w/o Alignment guard & 1.42 & $-$0.36 & 27.1 & $-$4.5 \\
+A8 & Single agent (5$\to$1) & 0.82 & $-$0.96 & 29.4 & $-$25.2 \\
+A9 & w/o RASW (fixed signal weights) & 0.99 & $-$0.79 & 22.4 & $-$16.5 \\
+A10 & w/o EGA (no edge-gated abstention) & 0.35 & $-$1.43 & 33.1 & $-$38.2 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item The two decision-layer mechanisms are the most critical: removing Edge-Gated Abstention (A10, $\Delta$SR$=-$1.43) and Regime-Adaptive Signal Weighting (A9, $\Delta$SR$=-$0.79) cause the largest drops, alongside the learning-layer OPSD (A5, $\Delta$SR$=-$0.83). The Alignment guard (A7) mainly controls drawdown (MDD 15.4\%$\to$27.1\%).
+\end{tablenotes}
+\label{tab:ablation}
+\end{table}

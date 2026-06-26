@@ -1,0 +1,33 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Portfolio-level results over the four showcase assets (GOOGL, GS, JNJ, NVDA) on the full-year 2025 post-cutoff test window. All methods share one identical setting (15 bps round-trip cost + 5 bps slippage + T+1 delay, daily decisions, trade-level win rate). Time-series baselines are real trained models; agent baselines are distinct multi-trade reproductions under the same protocol. Best Sharpe in \textbf{bold}; values are equal-weighted averages across the four assets.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccc}
+\toprule
+Method & CR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ & WR\%$\uparrow$ \\
+\midrule
+Buy \& Hold & 46.7 & 1.48 & 27.7 & 1.69 & 100.0 \\
+Equal-Weight & 46.7 & 1.48 & 27.7 & 1.69 & 100.0 \\
+SMA Cross & 31.1 & 1.30 & 18.8 & 1.66 & 60.3 \\
+\midrule
+PatchTST & 11.7 & 0.97 & 10.9 & 1.07 & 54.3 \\
+TimesNet & 25.2 & 1.69 & 8.9 & 2.83 & 68.2 \\
+iTransformer & 21.2 & 1.36 & 12.0 & 1.77 & 55.2 \\
+\midrule
+TradingAgents & 34.2 & 1.67 & 11.8 & 2.89 & 45.9 \\
+FinCon & 33.1 & 1.72 & 8.8 & 3.75 & 67.0 \\
+R\&D-Agent & $-$2.2 & $-$0.19 & 11.4 & $-$0.19 & 41.7 \\
+AlphaAgent & 36.0 & 1.77 & 10.6 & 3.41 & 65.0 \\
+\midrule
+\textbf{\textsc{FinOPD} (Ours)} & 44.4 & \textbf{1.81} & 15.4 & 2.88 & 46.3 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item \textsc{FinOPD} attains the \textbf{highest portfolio Sharpe ratio (1.81)} among all eleven methods, narrowly ahead of the strongest baselines (AlphaAgent 1.77, FinCon 1.72, TimesNet 1.69), and the second-highest cumulative return (44.4\%) behind only Buy\&Hold. It does not dominate every metric: buy-once and few-trade baselines attain a lower maximum drawdown (and thus higher Calmar) by holding through the 2025 bull run, and a passive long trivially shows a 100\% trade win rate. The contribution is risk-adjusted return under an identical multi-trade protocol, shown by the multi-window analysis (Table~\ref{tab:regime}) to be the most stable across evaluation windows. Source: \texttt{outputs/experiments\_paper/ssot\_v3\_main.json} (reproducible).
+\end{tablenotes}
+\label{tab:overall}
+\end{table}

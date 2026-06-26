@@ -1,0 +1,60 @@
+\section{Visualizations}
+\label{appx:visualizations}
+
+\subsection{Visualization of Generated Time Series Images}
+
+The image generation module employs advanced techniques—frequency and periodicity Encoding, multi-scale convolution, interpolation and normalization—to create informative and discriminative image representations of time series data. These representations enhance downstream VLMs for improved forecasting. As shown in Figure~\ref{fig:time_series_images}, the generated images capture key temporal characteristics through the following features:
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/time_series_images.pdf}
+    \caption{Time series transformed images, capturing key temporal characteristics, including trends, stationarity, seasonality, sudden changes, and frequency-domain patterns.}
+    \label{fig:time_series_images}
+\end{figure}
+
+\begin{itemize}[leftmargin=*, itemsep=0pt]
+    \item \textbf{Frequency-Domain Information}: FFT integration captures frequency-domain characteristics, visualized as distinct textures—fine-grained for high-frequency components and broader color regions for low-frequency components.
+
+    \item \textbf{Multi-scale Periodic Encoding}: Temporal dependencies at multiple scales (e.g., daily, weekly) are encoded, visible as regular patterns such as repeating vertical bands for daily cycles or broader horizontal patterns for weekly cycles.
+    
+    \item \textbf{Image Interpolation}: Bilinear interpolation ensures smooth and coherent images, preserving essential time series characteristics through seamless transitions between color intensities.
+
+    \item \textbf{Color Trends}: Color intensity corresponds to time series values—darker regions (e.g., deep blue) indicate lower values, while brighter regions (e.g., yellow) represent higher values, enabling easy identification of trends.
+
+    \item \textbf{Abrupt Changes and Anomalies}: Sudden shifts in color intensity (e.g., sharp transitions from dark to bright) highlight abrupt changes or anomalies, crucial for identifying irregular events like traffic spikes or weather shifts.
+\end{itemize}    
+
+
+\subsection{Visualization of prediction results}
+
+The prediction results in Figures \ref{fig:vis_forecast_96}, \ref{fig:vis_forecast_192}, \ref{fig:vis_forecast_336}, and \ref{fig:vis_forecast_720} demonstrate \method's ability to accurately forecast time series across diverse datasets and prediction horizons. For datasets with clear periodic structures, such as the daily cycles in ETTh1 and ETTm1, \method captures both global trends and fine-grained temporal patterns effectively. This is evident in the close alignment between the true values (solid lines) and predicted values (dashed lines) across all horizons. Similarly, for the ECL dataset, which exhibits regular consumption patterns, \method delivers highly accurate forecasts, showcasing its strength in handling structured environments.
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/forecasting_result_96.pdf}
+    \caption{Prediction results visualization for ETTh1, ETTm1, ECL, and Traffic datasets at 96 prediction lengths. True values (solid line) and predicted values (dashed line) are shown for each dataset and horizon.}
+    \label{fig:vis_forecast_96}
+\end{figure*}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/forecasting_result_192.pdf}
+    \caption{Prediction results visualization for ETTh1, ETTm1, ECL, and Traffic datasets at 192 prediction lengths. True values (solid line) and predicted values (dashed line) are shown for each dataset and horizon.}
+    \label{fig:vis_forecast_192}
+\end{figure*}
+
+However, performance varies for datasets with irregular or abrupt changes. On the Traffic dataset, which is characterized by non-stationary patterns, \method shows slight deviations in capturing sudden fluctuations, particularly at longer horizons (e.g., 336 and 720). These deviations highlight the challenges of modeling highly irregular data and suggest opportunities for refining the time series-to-image transformation process to better handle such scenarios.
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/forecasting_result_336.pdf}
+    \caption{Prediction results visualization for ETTh1, ETTm1, ECL, and Traffic datasets at 336 prediction lengths. True values (solid line) and predicted values (dashed line) are shown for each dataset and horizon.}
+    \label{fig:vis_forecast_336}
+\end{figure*}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/forecasting_result_720.pdf}
+    \caption{Prediction results visualization for ETTh1, ETTm1, ECL, and Traffic datasets at 720 prediction lengths. True values (solid line) and predicted values (dashed line) are shown for each dataset and horizon.}
+    \label{fig:vis_forecast_720}
+\end{figure*}

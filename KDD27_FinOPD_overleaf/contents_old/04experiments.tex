@@ -1,0 +1,50 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Setup}
+
+\paragraph{Data and benchmark.} We evaluate on a dual-market benchmark. The US market pool consists of 25 representative Dow-30 equities spanning technology, consumer, energy, financial, and healthcare sectors, with OHLCV from yfinance, news from Alpaca and Reuters, and filings from SEC EDGAR. The China market supplement draws 10--15 high-liquidity CSI-300 constituents from Tushare. Training and self-evolution rollouts use 2019-01 to 2022-12; validation uses 2023-01 to 2023-12; the primary test interval is 2025-01 to 2025-12; and a live-forward window of 2026-05 to 2026-08 is reserved for post-submission evidence.
+
+\paragraph{Baselines.} We compare against twelve baselines in four categories. \emph{Numerical time-series models:} PatchTST, TimesNet, iTransformer. \emph{LLM financial multi-agent systems:} TradingAgents, FinCon, FinAgent, FinRobot, R\&D-Agent-Quant, AlphaAgent. \emph{Factor mining baselines:} CogAlpha, FactorMAD. \emph{Market benchmarks:} Buy \& Hold, equal-weight portfolio, 60-40, SMA(50,200) crossover, pure momentum.
+
+\paragraph{Metrics.} We report metrics at three levels. \emph{Prediction:} directional accuracy, IC, RankIC. \emph{Portfolio:} Sharpe ratio (with 15bps round-trip cost, 5bps slippage, 1-day execution delay), annualized return, maximum drawdown, Calmar, Sortino, win rate, profit factor. \emph{Self-evolution:} evolution curve (Sharpe versus iteration $k$), belief store size and hit rate, alpha decay versus $k$. All metrics are reported conditioned on regime (calm/normal/volatile $\times$ trending/ranging).
+
+\subsection{Main Results}
+
+[To be filled with experimental results upon completion of Stage 5.]
+
+\subsection{Ablation Studies}
+
+We conduct ten ablation experiments (A1--A10) to validate each component:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{llp{6cm}}
+\toprule
+ID & Configuration & Hypothesis Tested \\
+\midrule
+A1 & Full \textsc{FinOPD} & Upper bound \\
+A2 & Remove visual-geometric encoder & H1: value of geometric perception \\
+A3 & Freeze VLM (no LoRA) & Value of financial chart alignment \\
+A4 & Remove router, use fixed tool templates & H2: value of learnable routing \\
+A5 & Disable parametric self-evolution (verbal reinforcement only) & H3: value of OPSD \\
+A6a & Disable Shapley credit (uniform weights) & Value of credit assignment \\
+A6b & Disable non-parametric belief consolidation & H3: value of long-term memory \\
+A7 & Disable alignment guard & Necessity of drift protection \\
+A8 & Single-agent collapse (5 $\to$ 1) & Value of multi-agent decomposition \\
+A9 & Single iteration ($k{=}1$) vs.\ multi-iteration ($k{\geq}3$) & H4: evolution monotonicity \\
+A10 & Replace OPSD with trajectory-search self-evolution & Method selection justification \\
+\bottomrule
+\end{tabular}
+\caption{Ablation configurations and corresponding hypotheses.}
+\label{tab:ablations}
+\end{table}
+
+\subsection{Evolution Curve Analysis}
+
+[To be filled with evolution curve figures showing Sharpe vs.\ iteration $k$ across 3 seeds, demonstrating monotonic improvement under post-cutoff evaluation.]
+
+\subsection{Evaluation Rigor}
+
+We enforce three evaluation disciplines. \emph{Cutoff-aware rollout:} all test dates are strictly later than each model's pretraining cutoff. \emph{Counterfactual perturbation:} we apply three perturbation types (news sentiment polarity inversion, non-critical financial figure randomization, date token replacement) and report the Sharpe/accuracy delta $\Delta$; small $\Delta$ would indicate reliance on memorization rather than reasoning. \emph{Live-forward track:} a daemon pulls real-time data daily for inference without retraining, accumulating evidence for the rebuttal period.

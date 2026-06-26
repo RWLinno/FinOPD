@@ -1,0 +1,14 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Financial LLM agents.}
+Multi-agent LLM systems for trading coordinate specialist roles via debate~\cite{tradingagents2025,hedgeagents2025}, hierarchical management~\cite{fincon2024,finteam2025}, or automated factor research~\cite{rdagent2025,alphaagent2025,quantagent2026}. Platform-level efforts integrate diverse LLMs with real-time data~\cite{finrobot2024,finagent2024}. Self-improvement across all these systems is \emph{verbal}~\cite{reflexion2023,tradinggroup2025}: outcomes are reflected into prompts while parameters remain static. Recent evaluations show this is fragile, as live-trading benchmarks report net losses for frontier models~\cite{deepfund2025,profitmirage2025}. We differ by propagating risk-adjusted PnL into model weights through on-policy self-distillation.
+% 中文：用于交易的多智能体 LLM 系统通过辩论、层级管理或自动化因子研究来协调专家角色。平台级工作整合多种 LLM 与实时数据。这些系统的自我改进一律是语言式的：结果被反思进 prompt 而参数保持静态。近期评估表明这很脆弱，实盘基准显示前沿模型净亏损。我们的不同在于通过在线策略自蒸馏将风险调整 PnL 传播进模型权重。
+
+\paragraph{Self-evolution and on-policy distillation.}
+LLM agents increasingly learn from their own trajectories via revision~\cite{seagent2025}, self-play~\cite{selfchallenge2025,agent02026,sirius2025}, or trajectory recycling~\cite{rzero2026,seea2025}. The mechanism closest to ours is on-policy self-distillation: GKD~\cite{gkd2024} proves on-policy samples yield tighter bounds; OPSD~\cite{opsd2026} shows a single model can self-distill via privileged conditioning; CRISP~\cite{crisp2026} extends this iteratively; and RLSD~\cite{rlsd2026} integrates self-distillation with reward verification. DPO~\cite{dpo2023} and GRPO~\cite{grpo2024} provide complementary preference-optimization foundations. All assume a well-defined target (proofs, code tests) and a single learner; we adapt to multi-agent finance with hindsight PnL and Shapley credit.
+% 中文：LLM agent 越来越多通过修订、自博弈或轨迹回收从自身轨迹学习。与我们最接近的机制是在线策略自蒸馏：GKD 证明在线策略样本产生更紧的界；OPSD 表明单模型可通过特权条件化自蒸馏；CRISP 将其迭代扩展；RLSD 将自蒸馏与奖励验证整合。DPO 和 GRPO 提供互补的偏好优化基础。以上均假设有明确定义的目标和单一学习者；我们用事后 PnL 和 Shapley 信用将其适配到多智能体金融。
+
+\paragraph{Evaluation protocols and visual time-series modeling.}
+Backtest gains can be illusory: DeepFund~\cite{deepfund2025} and Look-Ahead-Bench~\cite{lookaheadbench2026} attribute them to pretraining leakage; FactFin~\cite{profitmirage2025} proposes counterfactual perturbation as a diagnostic. On the perception side, FinChart-Bench~\cite{finchartbench2025} and ChartMuseum~\cite{chartmuseum2025} quantify a 30-point VLM--expert gap, while Time-VLM~\cite{timevlm2025} and VisionTS~\cite{visionts2024} explore visual series representations. We adopt strict post-cutoff evaluation and counterfactual protocols, and extract structured geometry rather than ingesting raw chart images.
+% 中文：回测收益可能是幻觉：DeepFund 和 Look-Ahead-Bench 将其归因于预训练数据泄漏；FactFin 提出反事实扰动作为诊断手段。在感知侧，FinChart-Bench 和 ChartMuseum 量化了 VLM 与专家 30 个百分点的差距，Time-VLM 和 VisionTS 探索视觉序列表示。我们采用严格 post-cutoff 评估和反事实协议，并提取结构化几何而非直接吸收原始图表图像。

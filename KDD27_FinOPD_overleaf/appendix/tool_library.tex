@@ -1,0 +1,548 @@
+\section{Tool Library and Adaptive Selection}
+\label{appx:tool_library}
+
+MAS4TS employs a comprehensive library of modular tools for different time series analysis tasks. This appendix provides a detailed description of each tool, its architectural components, and the adaptive selection criteria used by the task executor agent.
+
+\subsection{Design Philosophy}
+\label{appx:tool_philosophy}
+
+Our tool library follows three key design principles:
+
+\begin{enumerate}[leftmargin=*, itemsep=2pt]
+    \item \textbf{Modularity}: Each tool is composed of reusable components (patch embedding, attention mechanisms, projection heads) that can be combined in different ways.
+    \item \textbf{Adaptive Selection}: Tools are dynamically selected based on data characteristics (sequence length, feature dimensionality, temporal patterns).
+    \item \textbf{Tool Chaining}: Multiple tools can be chained together, where the output of one tool serves as input to another, enabling complex analytical pipelines.
+\end{enumerate}
+
+\subsection{Core Modular Components}
+\label{appx:core_components}
+
+Before describing task-specific tools, we introduce the fundamental building blocks that compose our tool library.
+
+\subsubsection{Patch Embedding Module}
+\label{appx:patch_embedding}
+
+The patch embedding module converts continuous time series into discrete tokens suitable for transformer-based processing:
+
+\begin{equation}
+    \mathbf{P} = \text{Linear}(\text{Unfold}(\text{Pad}(\mathbf{X}))) + \mathbf{E}_{pos}
+\end{equation}
+
+where $\text{Unfold}(\cdot)$ extracts overlapping patches with length $p$ and stride $s$, and $\mathbf{E}_{pos}$ is the learnable positional embedding. Key parameters:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \texttt{patch\_len}: Length of each patch (default: 16)
+    \item \texttt{stride}: Step between patches (default: 8)
+    \item \texttt{d\_model}: Embedding dimension (default: 64)
+\end{itemize}
+
+This module captures local semantic information that point-wise tokenization cannot represent, significantly improving the model's ability to learn temporal patterns.
+
+\subsubsection{Multi-Head Self-Attention}
+\label{appx:mhsa}
+
+Our attention mechanism follows the standard transformer formulation:
+
+\begin{equation}
+    \text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}
+\end{equation}
+
+with multi-head extension that projects queries, keys, and values into $h$ subspaces, enabling the model to attend to information from different representation spaces.
+
+\subsubsection{TimesBlock (Periodic Feature Extraction)}
+\label{appx:timesblock}
+
+For tasks requiring periodic pattern capture (e.g., classification), we employ a specialized block that:
+
+\begin{enumerate}[leftmargin=*, itemsep=1pt]
+    \item Detects top-$k$ periods using FFT amplitude analysis
+    \item Reshapes 1D series to 2D representation based on detected periods
+    \item Applies 2D Inception-style convolution with multiple kernel sizes
+    \item Aggregates results with learned period weights
+\end{enumerate}
+
+\begin{equation}
+    \text{Period}(\mathbf{X}) = \text{FFT}^{-1}\left(\text{TopK}\left(|\text{FFT}(\mathbf{X})|, k\right)\right)
+\end{equation}
+
+\subsubsection{Normalization Strategies}
+\label{appx:normalization}
+
+We provide multiple normalization strategies optimized for non-stationary time series:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{RevIN} (Reversible Instance Normalization): Normalizes each instance independently and maintains statistics for denormalization, critical for preserving the original scale in forecasting tasks.
+    \item \textbf{Channel-Independent Normalization}: Normalizes each feature channel separately to avoid spurious cross-channel correlations.
+    \item \textbf{Robust Normalization}: Uses percentiles instead of mean/std, providing resistance to outliers in anomaly detection scenarios.
+\end{itemize}
+
+\subsubsection{Projection Heads}
+\label{appx:projection_heads}
+
+Our tool library includes several projection head architectures:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{FlattenProjectionHead}: Flattens patch features and projects to output dimension, supporting both channel-independent and shared modes.
+    \item \textbf{MLPProjectionHead}: Two-layer MLP with configurable activation (ReLU, GELU, Tanh).
+    \item \textbf{ResidualProjectionHead}: Includes skip connections for stable gradient flow.
+    \item \textbf{MultiScaleProjectionHead}: Fuses features from multiple temporal scales through pooling and interpolation.
+\end{itemize}
+
+%==============================================================================
+\subsection{Forecasting Tools}
+\label{appx:forecasting_tools}
+
+\begin{table}[h]
+\centering
+\caption{Forecasting Tools Overview}
+\label{tab:forecasting_tools}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Tool} & \textbf{Architecture} & \textbf{Key Components} & \textbf{Best For} \\
+\midrule
+\texttt{ForecastingTool} & Patch-Transformer & PatchEmbedding + Encoder + FlattenHead & General-purpose \\
+\texttt{TemporalFusionNetwork} & Attention + Gating & Variable Selection + Temporal Attention & Multi-horizon w/ covariates \\
+\texttt{NBeatsModel} & Residual Stacks & Basis Expansion + Doubly Residual & Interpretable forecasts \\
+\texttt{DecompositionTool} & Trend-Seasonal & MovingAverage + Channel Projection & Structured patterns \\
+\midrule
+\multicolumn{4}{l}{\textit{Supporting Components:}} \\
+\texttt{ReversibleInstanceNorm} & Normalization & Instance-wise normalize/denormalize & Non-stationary data \\
+\texttt{AdaptivePatchEmbedding} & Embedding & Dynamic patch size selection & Variable sequence lengths \\
+\texttt{WeightedEnsemble} & Aggregation & Multiple weighting schemes & Model combination \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsubsection{Patch-Transformer Forecasting Tool}
+
+This is our primary forecasting tool, combining patch embedding with transformer encoding:
+
+\begin{algorithm}[H]
+\caption{Patch-Transformer Forecasting}
+\label{alg:patch_forecast}
+\begin{algorithmic}[1]
+\REQUIRE Input $\mathbf{X} \in \mathbb{R}^{B \times T \times N}$, prediction horizon $H$
+\STATE $\mathbf{X}_{norm}, \mu, \sigma \leftarrow \text{RevIN}(\mathbf{X})$ \COMMENT{Instance normalization}
+\STATE $\mathbf{X}_{patch} \leftarrow \text{PatchEmbed}(\mathbf{X}_{norm})$ \COMMENT{$\mathbb{R}^{B \cdot N \times P \times d}$}
+\STATE $\mathbf{H} \leftarrow \text{TransformerEncoder}(\mathbf{X}_{patch})$ \COMMENT{Multi-layer attention + FFN}
+\STATE $\mathbf{Y}_{norm} \leftarrow \text{FlattenHead}(\mathbf{H})$ \COMMENT{Channel-independent projection}
+\STATE $\mathbf{Y} \leftarrow \text{RevIN}^{-1}(\mathbf{Y}_{norm}, \mu, \sigma)$ \COMMENT{Denormalize}
+\RETURN $\mathbf{Y} \in \mathbb{R}^{B \times H \times N}$
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Channel Independence}: Each feature channel is processed independently, which (1) improves robustness when channels have different statistical properties, (2) reduces inter-channel noise leakage, and (3) enables efficient parallel computation.
+
+\subsubsection{Temporal Fusion Network Tool}
+
+The TFN tool is designed for complex multi-horizon forecasting with static and temporal covariates:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Variable Selection Network}: Learns to select relevant input features through gating mechanisms.
+    \item \textbf{Temporal Attention}: Multi-head attention over the temporal dimension to capture long-range dependencies.
+    \item \textbf{Static Covariate Encoder}: Encodes time-invariant context (e.g., series metadata) to condition predictions.
+    \item \textbf{Gated Residual Connections}: GLU-style gating for controlled information flow.
+\end{itemize}
+
+\subsubsection{N-BEATS Tool}
+
+The N-BEATS tool provides interpretable forecasting through basis expansion:
+
+\begin{equation}
+    \hat{\mathbf{y}} = \sum_{k=1}^{K} \sum_{l=1}^{L} \mathbf{V}_{\theta_{k,l}} \cdot g_{\theta_{k,l}}(\mathbf{x})
+\end{equation}
+
+where $\mathbf{V}$ are learned basis functions (trend, seasonality) and $g$ are expansion coefficients. The doubly residual architecture enables:
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item Hierarchical signal decomposition
+    \item Interpretable trend/seasonality components
+    \item Strong inductive bias for time series structure
+\end{itemize}
+
+%==============================================================================
+\subsection{Classification Tools}
+\label{appx:classification_tools}
+
+\begin{table}[h]
+\centering
+\caption{Classification Tools Overview}
+\label{tab:classification_tools}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Tool} & \textbf{Architecture} & \textbf{Key Components} & \textbf{Best For} \\
+\midrule
+\texttt{ClassificationTool} & TimesBlock-based & 1D Conv Embed + FFT Period + 2D Conv & Periodic patterns \\
+\texttt{TemporalConvNet} & Dilated Convolutions & Multi-scale 1D Conv + Global Pool & Short sequences \\
+\texttt{AttentionLSTM} & BiLSTM + Attention & Bidirectional LSTM + Attention Weights & Long dependencies \\
+\texttt{InceptionTime} & Multi-branch CNN & Inception Modules + Residual Shortcuts & Multi-scale features \\
+\midrule
+\multicolumn{4}{l}{\textit{Supporting Components:}} \\
+\texttt{DataEmbedding} & Embedding & 1D Conv + Positional Encoding & Local pattern capture \\
+\texttt{AdaptivePooling} & Pooling & Adaptive output size for variable lengths & UEA datasets \\
+\texttt{ClassificationHead} & Output & Flatten + MLP with dropout & Class logits \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsubsection{TimesBlock Classification Tool}
+
+Our primary classification tool leverages FFT-based period discovery:
+
+\begin{enumerate}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Data Embedding}: Uses 1D convolution (not simple linear) to capture local patterns, combined with positional encoding.
+    \item \textbf{TimesBlock Stack}: Multiple blocks that detect periods via FFT, reshape to 2D, apply Inception-style 2D convolution, then reshape back.
+    \item \textbf{Padding Mask}: Critical for UEA datasets with variable-length sequences—zeros out padding before flattening.
+    \item \textbf{Full Sequence Projection}: Flattens $[\text{seq\_len} \times d_{\text{model}}]$ and projects to class logits.
+\end{enumerate}
+
+\subsubsection{Temporal Convolutional Network Tool}
+
+The TCN tool applies dilated causal convolutions:
+
+\begin{equation}
+    (\mathbf{X} *_d f)(t) = \sum_{i=0}^{k-1} f(i) \cdot \mathbf{X}_{t - d \cdot i}
+\end{equation}
+
+where $d$ is the dilation factor that increases exponentially with depth, enabling efficient capture of long-range dependencies with $O(\log T)$ layers.
+
+\subsubsection{Attention-LSTM Tool}
+
+Combines bidirectional LSTM with attention mechanism:
+
+\begin{align}
+    \mathbf{H} &= \text{BiLSTM}(\mathbf{X}) \\
+    \alpha_t &= \text{softmax}(\mathbf{W}_a \tanh(\mathbf{W}_h \mathbf{h}_t)) \\
+    \mathbf{c} &= \sum_t \alpha_t \mathbf{h}_t
+\end{align}
+
+The attention weights $\alpha$ provide interpretability by highlighting important time steps.
+
+\subsubsection{InceptionTime Tool}
+
+Multi-scale feature extraction through parallel convolution branches:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Bottleneck}: 1×1 convolution for dimensionality reduction
+    \item \textbf{Multi-scale Convolutions}: Kernel sizes 10, 20, 40 for different receptive fields
+    \item \textbf{Max Pooling Branch}: Captures salient features
+    \item \textbf{Residual Shortcuts}: Enable very deep networks (6+ blocks)
+\end{itemize}
+
+%==============================================================================
+\subsection{Imputation Tools}
+\label{appx:imputation_tools}
+
+\begin{table}[h]
+\centering
+\caption{Imputation Tools Overview}
+\label{tab:imputation_tools}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Tool} & \textbf{Architecture} & \textbf{Key Components} & \textbf{Best For} \\
+\midrule
+\texttt{ImputationTool} & Patch-Transformer & PatchEmbed + Encoder + Reconstruction & General-purpose \\
+\texttt{TimesNetImputer} & FFT + 2D Conv & Period Discovery + Inpainting & Periodic data (ETT) \\
+\texttt{SAITS} & Self-Attention & Diagonal Masked Attention + ORT & Sparse missing \\
+\texttt{BRITS} & Bidirectional RNN & Forward + Backward GRU + Decay & Sequential missing \\
+\texttt{TimeGAN} & GAN-based & Generator + Discriminator + Embedder & Generative imputation \\
+\midrule
+\multicolumn{4}{l}{\textit{Supporting Components:}} \\
+\texttt{MaskEncoding} & Embedding & Binary mask encoding + Feature concat & Missing indicator \\
+\texttt{ConsistencyLoss} & Loss & Bidirectional agreement constraint & Temporal coherence \\
+\texttt{ReconstructionHead} & Output & Same-length reconstruction & Sequence restoration \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsubsection{Patch-Transformer Imputation Tool}
+
+Adapts the patch-based architecture for reconstruction:
+
+\begin{algorithm}[H]
+\caption{Patch-Transformer Imputation}
+\label{alg:patch_impute}
+\begin{algorithmic}[1]
+\REQUIRE Input $\mathbf{X}$ with missing values, mask $\mathbf{M}$
+\STATE $\mathbf{X}_{masked} \leftarrow \mathbf{X} \odot (1 - \mathbf{M})$ \COMMENT{Zero out missing}
+\STATE $\mathbf{X}_{norm}, \mu, \sigma \leftarrow \text{Normalize}(\mathbf{X}_{masked})$
+\STATE $\mathbf{P} \leftarrow \text{PatchEmbed}(\mathbf{X}_{norm})$
+\STATE $\mathbf{H} \leftarrow \text{TransformerEncoder}(\mathbf{P})$
+\STATE $\hat{\mathbf{X}}_{norm} \leftarrow \text{ReconstructionHead}(\mathbf{H})$ \COMMENT{Same length as input}
+\STATE $\hat{\mathbf{X}} \leftarrow \text{Denormalize}(\hat{\mathbf{X}}_{norm}, \mu, \sigma)$
+\STATE $\mathbf{Y} \leftarrow \mathbf{X} \odot (1 - \mathbf{M}) + \hat{\mathbf{X}} \odot \mathbf{M}$ \COMMENT{Preserve known values}
+\RETURN $\mathbf{Y}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{SAITS Tool}
+
+Self-Attention based Imputation for Time Series:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Diagonal Masked Attention}: Prevents attending to missing values during early training.
+    \item \textbf{ORT (Observed Reconstruction Task)}: Auxiliary loss to reconstruct observed values.
+    \item \textbf{MIT (Masked Imputation Task)}: Primary objective for missing value prediction.
+    \item \textbf{Position-aware Embedding}: Encodes both value and temporal position.
+\end{itemize}
+
+\subsubsection{BRITS Tool}
+
+Bidirectional Recurrent Imputation:
+
+\begin{align}
+    \hat{\mathbf{x}}_t^f &= \mathbf{W}_z \cdot \mathbf{h}_{t-1}^f + \mathbf{b}_z \text{ (forward)} \\
+    \hat{\mathbf{x}}_t^b &= \mathbf{W}_z \cdot \mathbf{h}_{t+1}^b + \mathbf{b}_z \text{ (backward)} \\
+    \hat{\mathbf{x}}_t &= \frac{\gamma_t^f \hat{\mathbf{x}}_t^f + \gamma_t^b \hat{\mathbf{x}}_t^b}{\gamma_t^f + \gamma_t^b}
+\end{align}
+
+where $\gamma$ are learnable combination weights based on temporal decay from last observation.
+
+%==============================================================================
+\subsection{Anomaly Detection Tools}
+\label{appx:anomaly_tools}
+
+\begin{table}[h]
+\centering
+\caption{Anomaly Detection Tools Overview}
+\label{tab:anomaly_tools}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Tool} & \textbf{Architecture} & \textbf{Key Components} & \textbf{Best For} \\
+\midrule
+\texttt{AnomalyDetectionTool} & Multi-scale Patch & Multi-scale PatchEmbed + Reconstruction & General anomalies \\
+\texttt{VAEAnomalyDetector} & VAE & Encoder + Reparameterization + Decoder & Point anomalies \\
+\texttt{IsolationForest} & Tree Ensemble & Random Splits + Path Length & Contextual anomalies \\
+\texttt{LOFDetector} & Density-based & k-NN + Local Reachability & Collective anomalies \\
+\midrule
+\multicolumn{4}{l}{\textit{Supporting Components:}} \\
+\texttt{InstanceNormalization} & Normalization & Learnable affine parameters & Preserve anomaly magnitude \\
+\texttt{AnomalyAttention} & Attention & Anomaly localization weights & Interpretable detection \\
+\texttt{MultiScaleFusion} & Aggregation & Concatenate + MLP fusion & Multi-granularity \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsubsection{Multi-Scale Anomaly Detection Tool}
+
+Our primary anomaly detection tool uses multi-scale reconstruction:
+
+\begin{enumerate}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Instance Normalization}: Uses learnable affine parameters to preserve relative anomaly magnitude (unlike standard RevIN which removes it).
+    \item \textbf{Multi-Scale Processing}:
+    \begin{itemize}
+        \item Scale 1 (Fine): Small patches ($p=4$) for point anomalies
+        \item Scale 2 (Medium): Larger patches ($p=16$) for segment anomalies
+    \end{itemize}
+    \item \textbf{Multi-Scale Fusion}: Concatenates reconstructions from all scales and fuses through MLP.
+    \item \textbf{Anomaly Attention}: Sigmoid-gated attention to highlight suspicious regions.
+\end{enumerate}
+
+\textbf{Anomaly Score}: The reconstruction error serves as the anomaly score:
+\begin{equation}
+    s_t = \|\mathbf{x}_t - \hat{\mathbf{x}}_t\|_2^2 \cdot \alpha_t
+\end{equation}
+where $\alpha_t$ is the attention weight from the anomaly attention module.
+
+\subsubsection{VAE Anomaly Detector Tool}
+
+Probabilistic anomaly detection through reconstruction:
+
+\begin{align}
+    \mathbf{z} &\sim q_\phi(\mathbf{z}|\mathbf{x}) = \mathcal{N}(\mu_\phi(\mathbf{x}), \sigma_\phi^2(\mathbf{x})) \\
+    \hat{\mathbf{x}} &= p_\theta(\mathbf{x}|\mathbf{z})
+\end{align}
+
+Anomaly score combines reconstruction error and KL divergence:
+\begin{equation}
+    s = \|\mathbf{x} - \hat{\mathbf{x}}\|_2^2 + \beta \cdot D_{KL}(q_\phi \| p)
+\end{equation}
+
+\subsubsection{Isolation Forest Tool}
+
+Non-parametric anomaly detection through random partitioning:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Isolation Trees}: Randomly select feature and split value to isolate points.
+    \item \textbf{Path Length}: Anomalies require fewer splits to isolate (shorter path).
+    \item \textbf{Anomaly Score}: $s = 2^{-E[h(\mathbf{x})]/c(n)}$ where $h$ is path length and $c(n)$ is normalization factor.
+\end{itemize}
+
+%==============================================================================
+\subsection{Adaptive Tool Selection}
+\label{appx:adaptive_selection}
+
+The task executor agent employs intelligent tool selection based on data characteristics.
+
+\subsubsection{Selection Criteria}
+
+\begin{table}[h]
+\centering
+\caption{Data Characteristic Thresholds}
+\label{tab:selection_thresholds}
+\begin{tabular}{lll}
+\toprule
+\textbf{Category} & \textbf{Threshold} & \textbf{Implications} \\
+\midrule
+Short sequence & $T \leq 32$ & Smaller patches, fewer layers \\
+Medium sequence & $32 < T \leq 96$ & Standard configuration \\
+Long sequence & $T > 96$ & Larger patches, adaptive pooling \\
+\midrule
+Low dimension & $N \leq 10$ & Full model capacity \\
+Medium dimension & $10 < N \leq 50$ & Moderate regularization \\
+High dimension & $N > 200$ & Reduced layers, channel independence \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Tool Recommendation Matrix}
+
+\begin{table}[h]
+\centering
+\caption{Recommended Tools by Task and Data Characteristics}
+\label{tab:tool_recommendations}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llll}
+\toprule
+\textbf{Task} & \textbf{Data Type} & \textbf{Primary Tool} & \textbf{Fallback Tools} \\
+\midrule
+\multirow{4}{*}{Forecasting} 
+    & Short + Low dim & PatchTransformer & Linear \\
+    & Short + High dim & PatchTransformer & DLinear \\
+    & Long + Low dim & TFN & NBeats, PatchTransformer \\
+    & Long + High dim & PatchTransformer & DLinear \\
+\midrule
+\multirow{3}{*}{Classification}
+    & Short + Low dim & TimesBlock & TCN \\
+    & Long + Low dim & TimesBlock & AttentionLSTM, InceptionTime \\
+    & High dim & TimesBlock & - \\
+\midrule
+\multirow{2}{*}{Imputation}
+    & Short sequence & PatchTransformer & SAITS \\
+    & Long sequence & PatchTransformer & BRITS \\
+\midrule
+\multirow{2}{*}{Anomaly Detection}
+    & Low dim & Multi-scale & VAE, IsolationForest \\
+    & High dim & Multi-scale & LOF \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsubsection{Adaptive Parameter Selection}
+
+Based on data characteristics, the tool manager adjusts architectural parameters:
+
+\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily]
+STRATEGY_MAPPING = {
+    'short_sequence': {'patch_len': 4, 'stride': 2, 'e_layers': 1},
+    'medium_sequence': {'patch_len': 8, 'stride': 4, 'e_layers': 2},
+    'long_sequence': {'patch_len': 16, 'stride': 8, 'e_layers': 2},
+    'high_dimensional': {'d_model': 32, 'e_layers': 1},  # Reduce complexity
+}
+\end{lstlisting}
+
+%==============================================================================
+\subsection{Tool Chaining}
+\label{appx:tool_chaining}
+
+MAS4TS supports chaining multiple tools to create complex analytical pipelines.
+
+\subsubsection{Analysis Tool Chain}
+
+For comprehensive time series analysis, tools can be chained:
+
+\begin{enumerate}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Decomposition} $\rightarrow$ Separates trend/seasonal/residual
+    \item \textbf{Feature Extraction} $\rightarrow$ Statistical features, patch features
+    \item \textbf{Pattern Matching} $\rightarrow$ DTW similarity, motif discovery
+    \item \textbf{Task-Specific Tool} $\rightarrow$ Forecasting/Classification/etc.
+\end{enumerate}
+
+\subsubsection{Ensemble Pipeline}
+
+Multiple tools can be ensembled for robust predictions:
+
+\begin{equation}
+    \hat{\mathbf{y}} = \sum_{i=1}^{K} w_i \cdot \text{Tool}_i(\mathbf{x})
+\end{equation}
+
+where weights $w_i$ are determined by:
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Confidence-weighted}: Based on model confidence scores
+    \item \textbf{Error-weighted}: Inverse of validation error
+    \item \textbf{Uncertainty-weighted}: Inverse of prediction uncertainty
+    \item \textbf{Adaptive}: Learned through gradient descent
+\end{itemize}
+
+%==============================================================================
+\subsection{Utility Tools}
+\label{appx:utility_tools}
+
+Beyond task-specific tools, MAS4TS includes utility tools for data analysis:
+
+\begin{table}[h]
+\centering
+\caption{Utility Tools}
+\label{tab:utility_tools}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Category} & \textbf{Tool} & \textbf{Description} \\
+\midrule
+\multirow{3}{*}{Decomposition}
+    & \texttt{MovingAverageDecomposition} & Extract trend via MA filter \\
+    & \texttt{FourierDecomposition} & Separate low/high frequency components \\
+    & \texttt{HierarchicalDecomposition} & Multi-level trend extraction \\
+\midrule
+\multirow{3}{*}{Statistical}
+    & \texttt{AutocorrelationAnalysis} & Compute ACF/PACF \\
+    & \texttt{StationarityTest} & ADF test for stationarity \\
+    & \texttt{CrossCorrelation} & Inter-variable dependencies \\
+\midrule
+\multirow{2}{*}{Pattern}
+    & \texttt{DTWSimilarity} & Dynamic Time Warping distance \\
+    & \texttt{MotifDiscovery} & Recurring pattern detection \\
+\midrule
+\multirow{2}{*}{Aggregation}
+    & \texttt{WeightedEnsemble} & Combine multiple predictions \\
+    & \texttt{MultiScaleAggregator} & Fuse multi-resolution outputs \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Implementation Details}
+\label{appx:tool_implementation}
+
+All tools are implemented as PyTorch \texttt{nn.Module} subclasses, ensuring:
+
+\begin{itemize}[leftmargin=*, itemsep=1pt]
+    \item \textbf{Differentiability}: End-to-end gradient flow for joint optimization
+    \item \textbf{Device Compatibility}: Automatic GPU/CPU placement
+    \item \textbf{Serialization}: Easy model saving/loading via \texttt{state\_dict}
+    \item \textbf{Lazy Initialization}: Tools created on-demand to save memory
+\end{itemize}
+
+The \texttt{TaskToolManager} provides a unified interface:
+
+\begin{lstlisting}[language=Python, basicstyle=\small\ttfamily]
+# Get tool for specific task
+tool = tool_manager.get_tool_for_task(
+    task_name='forecasting',
+    num_classes=None  # Only for classification
+)
+
+# Forward pass with priors from data analyzer
+output = tool(data_embedding, priors, x_enc)
+\end{lstlisting}
+
+\newpage
+

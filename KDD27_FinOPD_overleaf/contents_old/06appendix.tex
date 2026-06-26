@@ -1,0 +1,53 @@
+\appendix
+\onecolumn
+
+\section{Additional Experimental Details}
+\label{sec:appendix_details}
+
+\subsection{Factor Library Composition}
+
+The factor library contains approximately 160 candidates organized into two groups. The first group consists of self-evolved alpha factors mined through iterative research cycles, with information ratios (after transaction costs) ranging from 0.17 to 3.04. Representative high-IR factors include residual momentum variants (RESI\_ZSCORE\_6\_5, IR=3.04), swing-point momentum composites (SWING\_POINT\_MOMENTUM\_R\_SQR, IR=2.56), and quantile-delta RSI interactions (QTLD5\_RSI\_Delta\_60\_7, IR=2.93). The second group supplements standard technical indicators computed via pandas\_ta.
+
+\subsection{Agent Role Specifications}
+
+The five specialist agents are defined as follows:
+\begin{enumerate}
+    \item \textbf{ChartAnalyst}: Interprets the structured ChartGeometry output, identifying actionable geometric configurations and their historical reliability.
+    \item \textbf{PatternReasoner}: Performs multi-timeframe pattern synthesis, evaluating whether patterns across daily, weekly, and monthly horizons align or conflict.
+    \item \textbf{EventAnalyst}: Processes news sentiment, earnings surprises, and filing signals, contextualizing them against the current geometric and factor state.
+    \item \textbf{RiskController}: Monitors portfolio-level risk metrics (VaR, drawdown trajectory, correlation regime) and can veto or scale down proposed positions.
+    \item \textbf{DecisionPM}: Synthesizes inputs from all agents through the shared memory, producing the final position size, entry/exit levels, and stop-loss parameters.
+\end{enumerate}
+
+\subsection{Hyperparameter Settings}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+Component & Parameter & Value \\
+\midrule
+Visual-Geometric Encoder & LoRA rank & 16 \\
+ & Target modules & vision encoder top-2 layers + cross-attn \\
+ & Training samples & 50,000 (weak) + 1,000 (verified) \\
+Factor Router & MLP layers & 2 (hidden dim 256) \\
+ & Gumbel temperature & 0.5 (annealed) \\
+ & Top-$k$ & 15 \\
+OPSD & JSD $\beta$ & 0.5 \\
+ & Per-token KL cap $c$ & 5.0 \\
+ & Shapley samples $m$ & 8 \\
+ & KL budget $\epsilon$ & 0.1 \\
+ & Adversarial refresh interval & every 4 iterations \\
+Belief Store & Capacity & 10,000 quadruples \\
+ & Retrieval top-$k$ & 5 \\
+ & Admission threshold & 80th percentile of $J$ \\
+\bottomrule
+\end{tabular}
+\caption{Hyperparameter settings for all components.}
+\label{tab:hyperparams}
+\end{table}
+
+\subsection{Computational Budget}
+
+All experiments are conducted on a single node with 4$\times$A100 80GB GPUs. LoRA training of the visual-geometric encoder requires approximately 8 hours on 1 GPU. Each self-evolution iteration (student rollout + teacher forward + JSD update) takes approximately 4 hours on 2 GPUs for the full Dow-30 asset pool. The complete experimental pipeline including all ablations requires approximately 500 GPU-hours. LLM API costs for baseline comparisons are estimated at \$200.

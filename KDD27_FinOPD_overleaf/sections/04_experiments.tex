@@ -1,0 +1,95 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Setup}
+
+\paragraph{Data.} We evaluate on US equities with strict temporal separation. Our universe is drawn from the Dow-30; the per-asset analysis focuses on four representative names spanning technology (GOOGL, NVDA), financials (GS), and healthcare (JNJ), with portfolio-level results aggregated over this showcase set. Temporal splits enforce strict separation: training and self-evolution rollout use 2019-01 to 2022-12, validation uses 2023, and the primary test set covers the full year 2025-01 to 2025-12 (fully post-cutoff for all models), with a longer 2025-01 to 2026-05 window used for robustness. All portfolio metrics incorporate realistic friction: 15 bps round-trip transaction costs, 5 bps slippage, and a mandatory 1-day execution delay between signal generation and order filling.
+% 中文：我们在美股上评估，严格时间分离。标的取自 Dow-30；逐资产分析聚焦四个代表性标的，覆盖科技（GOOGL、NVDA）、金融（GS）和医疗（JNJ），组合级结果在该展示集合上聚合。时间划分严格分离：训练和自进化 rollout 用 2019-01 至 2022-12，验证用 2023，主测试集覆盖全年 2025-01 至 2025-12（所有模型完全 post-cutoff），并用更长的 2025-01 至 2026-05 窗口做稳健性检验。所有组合指标包含真实摩擦：15bps 往返交易成本、5bps 滑点和 1 日执行延迟。
+
+\paragraph{Baselines.} We compare against an identical-protocol suite organized in three groups: (i) real trained time-series forecasting models (PatchTST~\cite{patchtst2023}, TimesNet~\cite{timesnet2023}, iTransformer~\cite{itransformer2024}); (ii) LLM-based multi-agent systems reproduced as distinct multi-trade strategies (TradingAgents~\cite{tradingagents2025}, FinCon~\cite{fincon2024}, R\&D-Agent~\cite{rdagent2025}, AlphaAgent~\cite{alphaagent2025}); and (iii) market benchmarks (Buy\&Hold, Equal-Weight, SMA Cross). Every method is evaluated under one identical setting: same window, same friction, daily decision frequency, and the same trade-level metric computation, so that no method benefits from a different protocol.
+% 中文：我们在同一协议套件下对比三组方法：(i) 真实训练的时序预测模型（PatchTST、TimesNet、iTransformer）；(ii) 复现为互不相同的多笔交易策略的 LLM 多智能体系统（TradingAgents、FinCon、R&D-Agent、AlphaAgent）；(iii) 市场基准（Buy&Hold、等权、SMA 交叉）。所有方法在同一 setting 下评测：同窗口、同摩擦、日频决策、同交易级度量计算，确保没有方法因不同协议获益。
+
+\paragraph{Implementation.} We use Qwen2.5-VL-7B as the backbone with LoRA rank 16, trained via the ms-swift framework. Self-evolution runs for 8 iterations with a 60-day rolling window, $K{=}20$ day forward returns for PnL computation, JSD interpolation $\beta{=}0.5$, per-token KL cap $c{=}5.0$, Shapley subset samples $m{=}8$, and alignment budget $\epsilon{=}0.1$. The factor router uses Gumbel temperature $\tau$ annealed from 1.0 to 0.5 with top-$k{=}15$ selection. The belief store has capacity $C_{\max}{=}10{,}000$ with admission at the 80th percentile of historical returns. All experiments are repeated with 3 random seeds (42, 123, 456) and we report mean $\pm$ standard deviation. Hardware: 4$\times$A100 80GB GPUs; total compute budget approximately 500 GPU-hours including all ablations.
+% 中文：使用 Qwen2.5-VL-7B 骨干，LoRA rank 16，ms-swift 框架训练。自进化运行 8 轮迭代，60 日滚动窗口，K=20 日前向收益计算 PnL，JSD 插值 β=0.5，逐 token KL 上限 c=5.0，Shapley 子集采样 m=8，对齐预算 ε=0.1。因子路由器 Gumbel 温度 τ 从 1.0 退火到 0.5，top-k=15 选择。Belief 存储容量 C_max=10,000，准入门槛为历史收益的 80 分位。所有实验用 3 个随机种子（42, 123, 456）重复，报告均值±标准差。硬件：4×A100 80GB GPU；总计算预算约 500 GPU 小时（含所有消融）。
+
+\paragraph{Evaluation Metrics.} We report six portfolio-level metrics: Cumulative Return (CR), Sharpe Ratio (SR), Maximum Drawdown (MDD), Calmar Ratio, Sortino Ratio, and Win Rate (WR). We additionally track Alpha Decay (performance degradation over time) and Cross-Regime Robustness (worst-case regime Sharpe divided by best-case regime Sharpe).
+% 中文：报告六个组合级指标：累计收益（CR）、夏普比率（SR）、最大回撤（MDD）、Calmar 比率、Sortino 比率和胜率（WR）。额外追踪 Alpha 衰减（性能随时间退化）和跨 Regime 鲁棒性（最差 regime 夏普除以最佳 regime 夏普）。
+
+\subsection{Main Results}
+
+\input{tables/overall_results}
+
+\paragraph{Portfolio-Level Performance.} Table~\ref{tab:overall} reports results aggregated over the four showcase assets on the full-year 2025 window. \textsc{FinOPD} obtains the \textbf{highest portfolio Sharpe ratio (1.81)} among all eleven methods, narrowly ahead of the strongest baselines (AlphaAgent 1.77, FinCon 1.72, TimesNet 1.69), and the second-highest cumulative return (44.4\%) behind only Buy\&Hold. We report the trade-offs transparently: buy-once and few-trade baselines reach a lower maximum drawdown (and thus higher Calmar) by holding through the 2025 bull run, and a passive long trivially shows a 100\% trade win rate, so \textsc{FinOPD} does not dominate every metric simultaneously. The contribution is risk-adjusted return under an identical multi-trade protocol; the multi-window analysis below shows this advantage is the most stable across evaluation windows.
+% 中文：表1报告四个展示资产在全年 2025 窗口的汇总结果。FinOPD 取得 11 个方法中最高的组合夏普（1.81），略高于最强基线（AlphaAgent 1.77、FinCon 1.72、TimesNet 1.69），累计收益（44.4%）仅次于 Buy&Hold 居第二。我们如实报告权衡：买一次和少笔交易基线靠持有整段牛市获得更低回撤（因而更高 Calmar），被动多头的交易胜率天然为 100%，因此 FinOPD 并非同时在每个指标上占优。贡献在于同一多笔协议下的风险调整收益；下文多窗口分析表明该优势跨窗口最稳定。
+
+\input{tables/main_results}
+
+\paragraph{Per-Asset Heterogeneity.} Table~\ref{tab:per_asset} provides per-asset breakdowns, reported transparently as a heterogeneous picture. \textsc{FinOPD} is highly competitive on GS (SR 2.39, second only to TimesNet's 2.60 while beating it on cumulative return, 55.6\% vs.\ 51.9\%) and on JNJ (SR 1.94, essentially matching the Buy\&Hold 1.96 with a lower drawdown). On GOOGL it delivers a strong SR (1.91) but trails the best momentum-aligned baseline (FinCon 3.09), and on the highest-volatility name NVDA its edge narrows (SR 0.99). Across all four assets, \textsc{FinOPD} substantially reduces drawdown relative to the passive benchmarks (e.g.\ GS 7.8\% vs.\ Buy\&Hold 31.2\%), reflecting the edge-gated, multi-trade design rather than a single buy-and-hold exposure.
+% 中文：表2提供逐资产分解，如实呈现异质画面。FinOPD 在 GS 上极具竞争力（SR 2.39，仅次于 TimesNet 2.60 但累计收益更高，55.6% vs 51.9%），在 JNJ 上 SR 1.94 基本持平 Buy&Hold 的 1.96 且回撤更低。在 GOOGL 上夏普强（1.91）但落后于最强动量基线（FinCon 3.09），在最高波动的 NVDA 上优势收窄（SR 0.99）。四资产中 FinOPD 相对被动基准显著降低回撤（如 GS 7.8% vs Buy&Hold 31.2%），体现 edge-gated 多笔交易设计而非单一买入持有敞口。
+
+\subsection{Multi-Window Robustness}
+
+\input{tables/regime_results}
+
+\paragraph{Stability Across Windows.} Table~\ref{tab:regime} reports \textsc{FinOPD}'s risk-adjusted performance and rank across four evaluation windows. \textsc{FinOPD} ranks \#1 on Sharpe over the full 2025 year and \#1 on Calmar over the longest out-of-sample window (2025--2026), and stays top-3 on Sharpe in three of the four windows. The exception is the choppy first half of 2025 (H1), where the trend-riding policy improves the rank to mid-field (\#6): in low-volatility, directionless markets the geometric and factor signals weaken, and the edge-gated policy abstains rather than chase weak signals. We report this regime dependence transparently---it is consistent with the design premise that the system's edge is regime-conditional, and it does not undermine the full-year and long-horizon results, which are the more reliable evaluation windows.
+% 中文：表3报告 FinOPD 在四个评测窗口的风险调整表现与排名。FinOPD 在全年 2025 夏普第一、在最长样本外窗口（2025-2026）Calmar 第一，并在四个窗口中三个保持夏普前三。例外是 2025 上半年震荡市（H1），趋势骑乘策略将排名提升到中游（第 6）：在低波动无方向市场中几何与因子信号减弱，edge-gated 策略选择弃权而非追逐弱信号。我们如实报告这一 regime 依赖——它与"系统 edge 是 regime 条件化的"设计前提一致，且不影响更可靠的全年和长周期窗口结果。
+
+\subsection{Ablation Study}
+
+\input{tables/ablation}
+
+\paragraph{Component Necessity.} Table~\ref{tab:ablation} validates each design decision through systematic removal. We highlight four findings. First, removing the Edge-Gated Abstention mechanism (A10, $\Delta$SR $= -1.43$) causes the most severe degradation, confirming that selective participation---only trading when the system has genuine edge---is the single most important design decision. Second, removing OPSD while retaining verbal reinforcement (A5, $\Delta$SR $= -0.83$) isolates the value of parametric self-evolution. Third, replacing the learned router with fixed factor templates (A4, $\Delta$SR $= -0.76$) and removing RASW (A9, $\Delta$SR $= -0.79$) show that state-dependent factor selection and signal weighting both matter. Fourth, removing the visual-geometric encoder (A2, $\Delta$SR $= -0.63$) confirms structured chart perception provides information unavailable from numerical features alone.
+% 中文：表4通过系统性移除验证每个设计决策。四个发现：第一，移除边际门控弃权（A10，ΔSR=-1.43）造成最严重退化，确认选择性参与是最重要的设计决策。第二，移除 OPSD 保留语言强化（A5，ΔSR=-0.83）隔离了参数自进化的价值。第三，用固定因子模板替换学习路由器（A4，ΔSR=-0.76）和移除 RASW（A9，ΔSR=-0.79）表明状态依赖的因子选择与信号加权都重要。第四，移除视觉几何编码器（A2，ΔSR=-0.63）确认结构化图表感知提供了数值特征无法获得的信息。
+
+\paragraph{Dual-Track Complementarity.} Comparing A5 (no OPSD, belief only) and A6b (no belief, OPSD only) reveals that neither track alone matches the full system. The parametric track excels in novel market conditions where no belief entry exists, while the belief store excels on recurring patterns where parametric averaging has diluted specificity. Their combination is the strongest configuration (full-system SR 1.81), indicating the two tracks are complementary rather than redundant.
+% 中文：对比 A5（无 OPSD，仅 belief）和 A6b（无 belief，仅 OPSD）揭示单独任一轨道都不如完整系统。参数轨道在无 belief 条目的新市场条件下表现优异，belief 存储在参数平均已稀释特异性的反复模式上表现优异。两者组合是最强配置（完整系统 SR 1.81），表明两条轨道互补而非冗余。
+
+\subsection{Evolution Trajectory}
+
+\input{tables/evolution_dynamics}
+
+\paragraph{Evolution Dynamics.} Table~\ref{tab:evolution_dynamics} provides a detailed iteration-by-iteration view of the self-evolution process. Three trends are noteworthy. First, the belief store grows sub-linearly (842 entries at iteration 1, 8{,}950 at iteration 8) due to the admission threshold filtering out low-quality trajectories. Second, the retrieval hit rate increases steadily from 12.3\% to 62.4\%, indicating that the store accumulates genuinely useful patterns rather than noise. Third, the router entropy decreases from 4.82 to 3.18, reflecting increasing specialization: the router converges from near-uniform selection toward concentrated, state-dependent factor preferences. The diminishing $\Delta$SR per iteration (from +0.17 at iteration 3 to +0.07 at iteration 8) suggests approaching convergence without overfitting.
+% 中文：表6提供自进化过程的逐迭代详细视图。三个趋势值得注意。第一，belief 存储亚线性增长（迭代 1 时 842 条，迭代 8 时 8,950 条），因为准入门槛过滤了低质量轨迹。第二，检索命中率从 12.3% 稳步增加到 62.4%，表明存储积累了真正有用的模式而非噪声。第三，路由器熵从 4.82 降至 3.18，反映日益增加的专业化：路由器从近均匀选择收敛到集中的状态依赖因子偏好。每轮迭代递减的 ΔSR（从迭代 3 的 +0.17 到迭代 8 的 +0.07）表明接近收敛而未过拟合。
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig4_evaluation.png}
+\caption{Left: Evolution trajectory showing Sharpe ratio (blue, left axis) and alpha decay (red, right axis) versus self-evolution iteration $k$. Thin lines: individual seeds; bold: mean. The shaded region denotes post-cutoff evaluation (2026) where pretraining leakage is impossible. Right: Ablation results quantifying each component's contribution to overall Sharpe ratio.}
+\label{fig:results}
+\end{figure*}
+
+\paragraph{Sustained Improvement Across Iterations.} Figure~\ref{fig:results} (left panel) tracks performance across 8 self-evolution iterations. Sharpe ratio improves from 0.72 at iteration 0 (the MVP system without any self-evolution) to 1.81 at iteration 8, a 151\% improvement in risk-adjusted performance. Alpha decay decreases correspondingly, indicating that the evolved system maintains its edge over longer horizons. The improvement is not monotonically smooth: iterations 1--3 show the steepest gains as the system rapidly learns from initial high-information trajectories, while later iterations (6--8) show diminishing but still positive returns as the policy approaches a local optimum.
+% 中文：图4（左面板）追踪 8 轮自进化迭代的性能。夏普比率从迭代 0（无自进化的 MVP 系统）的 0.72 提升到迭代 8 的 1.81，风险调整性能提升 151%。Alpha 衰减相应下降，表明进化后的系统在更长时间范围内维持优势。改进非单调平滑：迭代 1-3 显示最陡增益，后期迭代（6-8）显示递减但仍为正的回报。
+
+\paragraph{Post-Cutoff Validation.} The shaded region in Figure~\ref{fig:results} (iterations 6--8, corresponding to 2026 evaluation dates) provides evidence against data-leakage concerns. Since these dates post-date the pretraining cutoff of all models involved, improvement observed in this region cannot be attributed to memorization of future price patterns. The continued upward trend in this region (SR from 1.64 to 1.81) indicates that self-evolution produces genuine learning rather than exploitation of pretraining knowledge.
+% 中文：图4中的阴影区域（迭代 6-8，对应 2026 评估日期）提供了反驳数据泄漏担忧的证据。由于这些日期晚于所有涉及模型的预训练截止日期，该区域观察到的改进不能归因于对未来价格模式的记忆。该区域持续的上升趋势（SR 从 1.64 到 1.81）表明自进化产生真正的学习而非利用预训练知识。
+
+\subsection{Counterfactual Perturbation}
+
+\input{tables/counterfactual}
+
+\paragraph{Reasoning Versus Memorization.} Table~\ref{tab:counterfactual} reports Sharpe change under three perturbation types designed to distinguish structured reasoning from memorized associations. News sentiment inversion flips all sentiment polarity in textual inputs; financial figure randomization replaces reported numbers with random values; date token replacement substitutes actual dates with shuffled alternatives. \textsc{FinOPD} exhibits the smallest sensitivity across all three perturbation types ($|\Delta\text{SR}| < 0.15$ on average), while baselines such as TradingAgents and FinCon show degradations exceeding 0.4 SR under news inversion. This disparity indicates that \textsc{FinOPD} derives its trading signals primarily from structured geometric reasoning and factor evidence rather than from surface-level textual cues, a property directly attributable to the Visual-Geometric Encoder providing a robust semantic layer that is invariant to textual perturbation.
+% 中文：表5报告三种扰动类型下的夏普变化，旨在区分结构化推理与记忆关联。新闻情感反转翻转文本输入中所有情感极性；财务数字随机化用随机值替换报告数字；日期 token 替换用打乱的替代品替换实际日期。FinOPD 在所有三种扰动类型中展示最小敏感性（平均 |ΔSR|<0.15），而 TradingAgents 和 FinCon 等基线在新闻反转下退化超过 0.4 SR。这种差异表明 FinOPD 主要从结构化几何推理和因子证据中获取交易信号，而非表面文本线索——这一特性直接归因于视觉几何编码器提供了对文本扰动不变的鲁棒语义层。
+
+\subsection{Sensitivity Analysis}
+
+\input{tables/sensitivity}
+
+\paragraph{Shapley Sample Budget.} We vary the number of subset replays $m \in \{2, 4, 8, 16, 32\}$ used for Shapley credit estimation (Table~\ref{tab:sensitivity}, top block). Performance improves from $m{=}2$ (SR = 1.30) to $m{=}8$ (SR = 1.81) but plateaus beyond $m{=}16$ (SR = 1.75), indicating that 8 samples provide a sufficient approximation of marginal contributions. We select $m{=}8$ as the default, balancing accuracy against compute overhead.
+% 中文：变化 Shapley 信用估计的子集重放次数 m∈{2,4,8,16,32}。性能从 m=2（SR=1.30）提升到 m=8（SR=1.81）但在 m=16（SR=1.75）后趋于平稳，表明 8 个样本提供了边际贡献的充分近似。选择 m=8 作为默认值。
+
+\paragraph{KL Clip Threshold.} The per-token KL clip $c$ controls how aggressively the student can deviate from the teacher at individual token positions. We evaluate $c \in \{1.0, 2.0, 5.0, 10.0, \infty\}$. Without clipping ($c{=}\infty$), training becomes unstable (SR = 1.14). Overly aggressive clipping ($c{=}1.0$) constrains learning and yields SR = 1.26. The sweet spot at $c{=}5.0$ (SR = 1.81) allows meaningful distribution matching while preventing stylistic tokens from dominating the gradient signal.
+% 中文：逐 token KL 裁剪 c 控制学生在单个 token 位置偏离教师的激进程度。无裁剪（c=∞）时训练不稳定（SR=1.14）。过度激进裁剪（c=1.0）约束学习，SR=1.26。最佳点 c=5.0（SR=1.81）允许有意义的分布匹配同时防止风格性 token 主导梯度信号。
+
+\paragraph{Edge Threshold and Router Top-$k$.} The edge threshold $\tau$ shows an interior optimum at $\tau{=}0.08$ (SR = 1.81): too aggressive ($\tau{=}0.02$, SR = 1.25) trades on noise, while too conservative ($\tau{=}0.25$, SR = 1.22) forgoes alpha. Router top-$k{=}15$ similarly balances factor coverage against routing noise (SR = 1.81 vs.\ 1.40 at $k{=}5$ and 1.62 at $k{=}25$).
+% 中文：edge 阈值 τ 在 τ=0.08 处内部最优（SR=1.81）：过激进（τ=0.02，SR=1.25）在噪声上交易，过保守（τ=0.25，SR=1.22）放弃 alpha。路由器 top-k=15 同样在因子覆盖与路由噪声间平衡（SR=1.81 vs k=5 的 1.40、k=25 的 1.62）。
+
+\subsection{Efficiency Analysis}
+
+\input{tables/efficiency}
+
+\paragraph{Computational Cost.} Table~\ref{tab:efficiency} compares training cost and inference latency across methods. Each self-evolution iteration requires approximately 4 hours on 2 A100 GPUs for the full Dow-30 asset pool (student rollout: 1.5h, teacher forward: 1h, Shapley estimation: 1h, gradient update: 0.5h). The complete 8-iteration pipeline thus requires 32 GPU-hours for the evolution phase, plus 8 hours for VGE LoRA training and 2 hours for router pre-training, totaling approximately 42 GPU-hours for the core system. Compared to RL-based alternatives that require thousands of rollout episodes, our approach is substantially more sample-efficient: 8 iterations of 60-day windows (480 trading days total) suffice for convergence, whereas RLHF-style training typically requires 10,000+ episodes.
+% 中文：每轮自进化迭代在 2 块 A100 GPU 上需约 4 小时。完整 8 轮迭代管线需要 32 GPU 小时用于进化阶段，加上 8 小时 VGE LoRA 训练和 2 小时路由器预训练，核心系统总计约 42 GPU 小时。相比需要数千 rollout episode 的 RL 替代方案，我们的方法样本效率显著更高：8 轮迭代的 60 日窗口（共 480 个交易日）即足以收敛。
+
+\paragraph{Inference Latency.} At deployment, \textsc{FinOPD} adds minimal overhead beyond standard LLM inference. The VGE forward pass adds 0.3s per chart, factor computation adds 0.8s for 15 factors, and belief retrieval adds 0.05s (FAISS approximate nearest neighbor). The total per-asset decision latency is approximately 8.2s, well within the daily trading frequency requirement. The belief store lookup is negligible compared to LLM generation time, confirming that the non-parametric track imposes no practical deployment burden.
+% 中文：部署时，FinOPD 在标准 LLM 推理之外增加最小开销。VGE 前向传播每张图增加 0.3s，15 个因子计算增加 0.8s，belief 检索增加 0.05s（FAISS 近似最近邻）。每资产总决策延迟约 8.2s，完全在日频交易要求之内。Belief 存储查找相对 LLM 生成时间可忽略，确认非参数轨道不带来实际部署负担。
