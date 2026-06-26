@@ -53,16 +53,18 @@
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/fig4_evaluation.png}
-\caption{Left: Evolution trajectory showing Sharpe ratio (blue, left axis) and alpha decay (red, right axis) versus self-evolution iteration $k$. Thin lines: individual seeds; bold: mean. The shaded region denotes post-cutoff evaluation (2026) where pretraining leakage is impossible. Right: Ablation results quantifying each component's contribution to overall Sharpe ratio.}
+\includegraphics[width=0.49\linewidth]{figures/fig_multiwindow.png}
+\hfill
+\includegraphics[width=0.49\linewidth]{figures/fig_ablation.png}
+\caption{Left: multi-window robustness---\textsc{FinOPD} portfolio Sharpe across four evaluation windows, annotated with its rank among all 11 methods (\#1 over the full year and over the longest out-of-sample window; \#6 in the choppy H1 regime). Right: real component ablation---change in portfolio Sharpe when each component is removed and the backtest re-run. Both panels are generated directly from the reproducible result JSONs.}
 \label{fig:results}
 \end{figure*}
 
-\paragraph{Sustained Improvement Across Iterations.} Figure~\ref{fig:results} (left panel) tracks performance across 8 self-evolution iterations. Sharpe ratio improves from 0.72 at iteration 0 (the MVP system without any self-evolution) to 1.78 at iteration 8, a 147\% improvement in risk-adjusted performance. Alpha decay decreases correspondingly, indicating that the evolved system maintains its edge over longer horizons. The improvement is not monotonically smooth: iterations 1--3 show the steepest gains as the system rapidly learns from initial high-information trajectories, while later iterations (6--8) show diminishing but still positive returns as the policy approaches a local optimum.
-% 中文：图4（左面板）追踪 8 轮自进化迭代的性能。夏普比率从迭代 0（无自进化的 MVP 系统）的 0.72 提升到迭代 8 的 1.78，风险调整性能提升 147%。Alpha 衰减相应下降，表明进化后的系统在更长时间范围内维持优势。改进非单调平滑：迭代 1-3 显示最陡增益，后期迭代（6-8）显示递减但仍为正的回报。
+\paragraph{Sustained Improvement Across Iterations.} Table~\ref{tab:evolution_dynamics} tracks performance across 8 self-evolution iterations. Sharpe ratio improves from 0.72 at iteration 0 (the MVP system without any self-evolution) to 1.81 at iteration 8, a 151\% improvement in risk-adjusted performance. The improvement is not monotonically smooth: iterations 1--3 show the steepest gains as the system rapidly learns from initial high-information trajectories, while later iterations (6--8) show diminishing but still positive returns as the policy approaches a local optimum.
+% 中文：表5追踪 8 轮自进化迭代的性能。夏普比率从迭代 0（无自进化的 MVP 系统）的 0.72 提升到迭代 8 的 1.81，风险调整性能提升 151%。改进非单调平滑：迭代 1-3 显示最陡增益，后期迭代（6-8）显示递减但仍为正的回报。
 
-\paragraph{Post-Cutoff Validation.} The shaded region in Figure~\ref{fig:results} (iterations 6--8, corresponding to 2026 evaluation dates) provides evidence against data-leakage concerns. Since these dates post-date the pretraining cutoff of all models involved, improvement observed in this region cannot be attributed to memorization of future price patterns. The continued upward trend in this region (SR from 1.62 to 1.78) indicates that self-evolution produces genuine learning rather than exploitation of pretraining knowledge.
-% 中文：图4中的阴影区域（迭代 6-8，对应 2026 评估日期）提供了反驳数据泄漏担忧的证据。由于这些日期晚于所有涉及模型的预训练截止日期，该区域观察到的改进不能归因于对未来价格模式的记忆。该区域持续的上升趋势（SR 从 1.62 到 1.78）表明自进化产生真正的学习而非利用预训练知识。
+\paragraph{Post-Cutoff Validation.} The later iterations (6--8) correspond to 2026 evaluation dates that post-date the pretraining cutoff of all models involved, so improvement there cannot be attributed to memorization of future price patterns. The continued upward trend (SR from 1.64 to 1.81) indicates that self-evolution produces genuine learning rather than exploitation of pretraining knowledge.
+% 中文：后期迭代（6-8）对应 2026 评估日期，晚于所有涉及模型的预训练截止日期，因此该区域的改进不能归因于对未来价格模式的记忆。持续的上升趋势（SR 从 1.64 到 1.81）表明自进化产生真正的学习而非利用预训练知识。
 
 \subsection{Counterfactual Perturbation}
 
