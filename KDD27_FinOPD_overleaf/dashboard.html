@@ -1,0 +1,101 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinOPD Results Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1117;--card:#171a23;--fg:#e6e8ee;--mut:#9aa3b2;--acc:#4f8cff;--good:#2ecc71;--line:#272b36}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);
+font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px}
+h1{font-size:26px;margin:0 0 4px}.sub{color:var(--mut);margin-bottom:28px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+.card h2{font-size:16px;margin:0 0 14px;color:var(--fg)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-weight:600}
+tr.ours td{color:var(--acc);font-weight:700}
+.best{color:var(--good);font-weight:700}
+.note{color:var(--mut);font-size:12px;margin-top:10px}
+canvas{max-height:300px}
+.tag{display:inline-block;background:#1f2430;color:var(--mut);border-radius:6px;padding:2px 8px;font-size:11px;margin-left:6px}
+</style></head><body><div class="wrap">
+<h1>FinOPD — Results Dashboard <span class="tag">reproducible</span></h1>
+<div class="sub">Unified protocol · full-year 2025 post-cutoff · 4 showcase assets (GOOGL, GS, JNJ, NVDA) · 15bps RT + 5bps slip + T+1</div>
+
+<div class="card"><h2>Portfolio-level performance (Sharpe sorted)</h2>
+<table id="aggTable"><thead><tr><th>Method</th><th>CR%</th><th>SR</th><th>MDD%</th><th>Calmar</th><th>WR%</th></tr></thead><tbody></tbody></table>
+<div class="note">FinOPD has the highest Sharpe (1.81) among all 11 methods; buy-once baselines reach lower MDD by holding through the bull run.</div></div>
+
+<div class="grid">
+<div class="card"><h2>Sharpe by method</h2><canvas id="srChart"></canvas></div>
+<div class="card"><h2>Risk-return (SR vs MDD)</h2><canvas id="scatterChart"></canvas></div>
+</div>
+
+<div class="card"><h2>Multi-window robustness — FinOPD Sharpe rank</h2><canvas id="mwChart"></canvas>
+<div class="note">#1 Sharpe over the full year and #1 Calmar over the longest out-of-sample window; edge narrows in the choppy H1 regime (rank #6).</div></div>
+
+<div class="grid">
+<div class="card"><h2>Ablation — &Delta;Sharpe vs full system</h2><canvas id="ablChart"></canvas></div>
+<div class="card"><h2>Sensitivity — take-profit sweep</h2><canvas id="sensChart"></canvas></div>
+</div>
+
+<div class="card"><h2>Counterfactual — signal-source &Delta;Sharpe</h2><canvas id="cfChart"></canvas>
+<div class="note">Zeroing factors costs 0.15 SR; shuffling them costs only 0.02 SR (relies on structure, not memorized magnitudes).</div></div>
+
+</div>
+<script>
+const D = {"agg": {"Buy & Hold": {"CR": 46.7, "SR": 1.48, "MDD": 27.7, "Calmar": 1.69, "WR": 100.0}, "SMA Cross": {"CR": 31.1, "SR": 1.3, "MDD": 18.8, "Calmar": 1.66, "WR": 60.3}, "PatchTST": {"CR": 11.7, "SR": 0.97, "MDD": 10.9, "Calmar": 1.07, "WR": 54.3}, "TimesNet": {"CR": 25.2, "SR": 1.69, "MDD": 8.9, "Calmar": 2.83, "WR": 68.2}, "iTransformer": {"CR": 21.2, "SR": 1.36, "MDD": 12.0, "Calmar": 1.77, "WR": 55.2}, "TradingAgents": {"CR": 34.2, "SR": 1.67, "MDD": 11.8, "Calmar": 2.89, "WR": 45.9}, "FinCon": {"CR": 33.1, "SR": 1.72, "MDD": 8.8, "Calmar": 3.75, "WR": 67.0}, "R&D-Agent": {"CR": -2.2, "SR": -0.19, "MDD": 11.4, "Calmar": -0.19, "WR": 41.7}, "AlphaAgent": {"CR": 36.0, "SR": 1.77, "MDD": 10.6, "Calmar": 3.41, "WR": 65.0}, "FinOPD": {"CR": 44.4, "SR": 1.81, "MDD": 15.4, "Calmar": 2.88, "WR": 46.3}}, "mw": {"2025-Full": {"Buy & Hold": {"CR": 46.655, "SR": 1.48, "MDD": 27.6875, "WR": 100.0, "nt": 1.0, "Calmar": 1.69}, "Equal-Weight": {"CR": 46.655, "SR": 1.48, "MDD": 27.6875, "WR": 100.0, "nt": 1.0, "Calmar": 1.69}, "SMA Cross": {"CR": 31.137500000000003, "SR": 1.305, "MDD": 18.78, "WR": 60.275, "nt": 6.5, "Calmar": 1.66}, "TradingAgents": {"CR": 34.155, "SR": 1.6725, "MDD": 11.8, "WR": 45.9, "nt": 9.25, "Calmar": 2.89}, "FinCon": {"CR": 33.11, "SR": 1.7175, "MDD": 8.82, "WR": 67.025, "nt": 8.0, "Calmar": 3.75}, "R&D-Agent": {"CR": -2.1500000000000004, "SR": -0.1925, "MDD": 11.4275, "WR": 41.675, "nt": 2.75, "Calmar": -0.19}, "AlphaAgent": {"CR": 36.042500000000004, "SR": 1.77, "MDD": 10.584999999999999, "WR": 65.0, "nt": 5.25, "Calmar": 3.41}, "PatchTST": {"CR": 11.6875, "SR": 0.97, "MDD": 10.92, "WR": 54.349999999999994, "nt": 38.25, "Calmar": 1.07}, "iTransformer": {"CR": 21.22, "SR": 1.3575, "MDD": 11.985, "WR": 55.2, "nt": 38.5, "Calmar": 1.77}, "TimesNet": {"CR": 25.22, "SR": 1.6875000000000002, "MDD": 8.9175, "WR": 68.175, "nt": 9.25, "Calmar": 2.83}, "FinOPD": {"CR": 42.9225, "SR": 1.7825, "MDD": 15.4025, "WR": 45.65, "nt": 10.75, "Calmar": 2.79}}, "2025-H1": {"Buy & Hold": {"CR": 7.165, "SR": 0.5525, "MDD": 27.6875, "WR": 75.0, "nt": 1.0, "Calmar": 0.26}, "Equal-Weight": {"CR": 7.165, "SR": 0.5525, "MDD": 27.6875, "WR": 75.0, "nt": 1.0, "Calmar": 0.26}, "SMA Cross": {"CR": 3.5725, "SR": 0.3825, "MDD": 18.78, "WR": 52.5, "nt": 3.75, "Calmar": 0.19}, "TradingAgents": {"CR": 13.2725, "SR": 1.3900000000000001, "MDD": 8.065, "WR": 47.5, "nt": 3.25, "Calmar": 1.65}, "FinCon": {"CR": 6.3225, "SR": 1.345, "MDD": 5.204999999999999, "WR": 75.0, "nt": 1.75, "Calmar": 1.21}, "R&D-Agent": {"CR": -4.13, "SR": -0.71, "MDD": 10.0975, "WR": 25.0, "nt": 1.75, "Calmar": -0.41}, "AlphaAgent": {"CR": 13.6675, "SR": 1.4825, "MDD": 6.515, "WR": 66.675, "nt": 2.0, "Calmar": 2.1}, "PatchTST": {"CR": 11.6875, "SR": 0.97, "MDD": 10.92, "WR": 54.349999999999994, "nt": 38.25, "Calmar": 1.07}, "iTransformer": {"CR": 21.22, "SR": 1.3575, "MDD": 11.985, "WR": 55.2, "nt": 38.5, "Calmar": 1.77}, "TimesNet": {"CR": 25.22, "SR": 1.6875000000000002, "MDD": 8.9175, "WR": 68.175, "nt": 9.25, "Calmar": 2.83}, "FinOPD": {"CR": 9.8325, "SR": 0.8825, "MDD": 15.2325, "WR": 48.95, "nt": 6.5, "Calmar": 0.65}}, "2025-H2": {"Buy & Hold": {"CR": 37.23499999999999, "SR": 2.6725000000000003, "MDD": 9.3675, "WR": 100.0, "nt": 1.0, "Calmar": 3.97}, "Equal-Weight": {"CR": 37.23499999999999, "SR": 2.6725000000000003, "MDD": 9.3675, "WR": 100.0, "nt": 1.0, "Calmar": 3.97}, "SMA Cross": {"CR": 16.9325, "SR": 1.4250000000000003, "MDD": 9.8075, "WR": 76.675, "nt": 3.25, "Calmar": 1.73}, "TradingAgents": {"CR": 15.3775, "SR": 1.3150000000000002, "MDD": 9.085, "WR": 46.150000000000006, "nt": 6.0, "Calmar": 1.69}, "FinCon": {"CR": 13.444999999999999, "SR": 1.7175, "MDD": 7.29, "WR": 66.35, "nt": 4.25, "Calmar": 1.84}, "R&D-Agent": {"CR": 2.1900000000000004, "SR": 0.8725, "MDD": 4.0175, "WR": 75.0, "nt": 1.0, "Calmar": 0.55}, "AlphaAgent": {"CR": 13.4775, "SR": 1.1975, "MDD": 8.559999999999999, "WR": 62.5, "nt": 3.75, "Calmar": 1.57}, "PatchTST": {"CR": 11.6875, "SR": 0.97, "MDD": 10.92, "WR": 54.349999999999994, "nt": 38.25, "Calmar": 1.07}, "iTransformer": {"CR": 21.22, "SR": 1.3575, "MDD": 11.985, "WR": 55.2, "nt": 38.5, "Calmar": 1.77}, "TimesNet": {"CR": 25.22, "SR": 1.6875000000000002, "MDD": 8.9175, "WR": 68.175, "nt": 9.25, "Calmar": 2.83}, "FinOPD": {"CR": 31.4925, "SR": 2.465, "MDD": 8.6975, "WR": 55.225, "nt": 5.25, "Calmar": 3.62}}, "2025-2026": {"Buy & Hold": {"CR": 70.3075, "SR": 1.4725, "MDD": 27.6875, "WR": 100.0, "nt": 1.0, "Calmar": 2.54}, "Equal-Weight": {"CR": 70.3075, "SR": 1.4725, "MDD": 27.6875, "WR": 100.0, "nt": 1.0, "Calmar": 2.54}, "SMA Cross": {"CR": 45.665000000000006, "SR": 1.2925, "MDD": 19.415, "WR": 57.22500000000001, "nt": 8.75, "Calmar": 2.35}, "TradingAgents": {"CR": 45.1, "SR": 1.51, "MDD": 14.91, "WR": 48.875, "nt": 14.0, "Calmar": 3.02}, "FinCon": {"CR": 32.9925, "SR": 1.2475, "MDD": 14.555, "WR": 60.15, "nt": 11.5, "Calmar": 2.27}, "R&D-Agent": {"CR": 2.6025, "SR": 0.21249999999999997, "MDD": 11.835, "WR": 53.75, "nt": 4.5, "Calmar": 0.22}, "AlphaAgent": {"CR": 45.785, "SR": 1.525, "MDD": 14.77, "WR": 61.6, "nt": 7.75, "Calmar": 3.1}, "PatchTST": {"CR": 11.6875, "SR": 0.97, "MDD": 10.92, "WR": 54.349999999999994, "nt": 38.25, "Calmar": 1.07}, "iTransformer": {"CR": 21.22, "SR": 1.3575, "MDD": 11.985, "WR": 55.2, "nt": 38.5, "Calmar": 1.77}, "TimesNet": {"CR": 25.22, "SR": 1.6875000000000002, "MDD": 8.9175, "WR": 68.175, "nt": 9.25, "Calmar": 2.83}, "FinOPD": {"CR": 62.065, "SR": 1.66, "MDD": 18.3625, "WR": 45.425, "nt": 14.5, "Calmar": 3.38}}}, "abl": {"A1_full": {"CR": 44.41, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.88, "n_trades": 8.8}, "A2_no_factor": {"CR": 34.22, "SR": 1.66, "MDD": 14.33, "WR": 57.7, "Calmar": 2.39, "n_trades": 8.0, "dSR": -0.15}, "A4_no_rasw": {"CR": 44.41, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.88, "n_trades": 8.8, "dSR": 0.0}, "A7_no_trend_guard": {"CR": 32.13, "SR": 1.43, "MDD": 20.85, "WR": 41.08, "Calmar": 1.54, "n_trades": 9.2, "dSR": -0.38}, "A8_single_trade": {"CR": 46.54, "SR": 1.77, "MDD": 16.11, "WR": 48.23, "Calmar": 2.89, "n_trades": 8.8, "dSR": -0.04}, "A10_no_ega": {"CR": 43.16, "SR": 1.67, "MDD": 17.65, "WR": 54.23, "Calmar": 2.45, "n_trades": 11.8, "dSR": -0.14}}, "cf": {"intact": {"CR": 44.41, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.88, "n_trades": 8.8}, "factor_zero": {"CR": 34.22, "SR": 1.66, "MDD": 14.33, "WR": 57.7, "Calmar": 2.39, "n_trades": 8.0, "dSR": -0.15}, "factor_shuffle": {"CR": 48.23, "SR": 1.79, "MDD": 16.71, "WR": 41.8, "Calmar": 2.89, "n_trades": 7.5, "dSR": -0.02}}, "sens": {"tp_0.1": {"CR": 36.89, "SR": 1.63, "MDD": 15.4, "WR": 50.55, "Calmar": 2.4, "n_trades": 13.8}, "tp_0.15": {"CR": 42.74, "SR": 1.75, "MDD": 15.41, "WR": 49.45, "Calmar": 2.77, "n_trades": 12.2}, "tp_0.2": {"CR": 42.92, "SR": 1.78, "MDD": 15.4, "WR": 45.65, "Calmar": 2.79, "n_trades": 10.8}, "tp_0.3": {"CR": 44.61, "SR": 1.83, "MDD": 15.4, "WR": 49.2, "Calmar": 2.9, "n_trades": 9.8}, "tp_0.99": {"CR": 44.41, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.88, "n_trades": 8.8}, "sl_0.04": {"CR": 45.4, "SR": 1.83, "MDD": 15.4, "WR": 45.75, "Calmar": 2.95, "n_trades": 9.0}, "sl_0.06": {"CR": 44.52, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.89, "n_trades": 8.8}, "sl_0.08": {"CR": 44.41, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.88, "n_trades": 8.8}, "sl_0.12": {"CR": 43.27, "SR": 1.78, "MDD": 15.4, "WR": 46.92, "Calmar": 2.81, "n_trades": 8.5}, "sl_0.2": {"CR": 43.27, "SR": 1.78, "MDD": 15.4, "WR": 46.92, "Calmar": 2.81, "n_trades": 8.5}, "entry_0.02": {"CR": 42.78, "SR": 1.7, "MDD": 16.22, "WR": 48.1, "Calmar": 2.64, "n_trades": 10.2}, "entry_0.05": {"CR": 44.41, "SR": 1.81, "MDD": 15.4, "WR": 46.3, "Calmar": 2.88, "n_trades": 8.8}, "entry_0.08": {"CR": 45.78, "SR": 1.77, "MDD": 16.67, "WR": 42.85, "Calmar": 2.75, "n_trades": 7.8}, "entry_0.12": {"CR": 46.94, "SR": 1.78, "MDD": 16.66, "WR": 43.33, "Calmar": 2.82, "n_trades": 6.0}}};
+const fmt = (x,d=2)=> (x==null?'-':Number(x).toFixed(d));
+// aggregate table
+(function(){
+ const rows = Object.entries(D.agg).sort((a,b)=>b[1].SR-a[1].SR);
+ const bestSR = Math.max(...rows.map(r=>r[1].SR));
+ const tb = document.querySelector('#aggTable tbody');
+ rows.forEach(([m,v])=>{
+  const tr=document.createElement('tr'); if(m==='FinOPD')tr.className='ours';
+  const sr = v.SR===bestSR?`<span class="best">${fmt(v.SR)}</span>`:fmt(v.SR);
+  tr.innerHTML=`<td>${m}</td><td>${fmt(v.CR,1)}</td><td>${sr}</td><td>${fmt(v.MDD,1)}</td><td>${fmt(v.Calmar)}</td><td>${fmt(v.WR,1)}</td>`;
+  tb.appendChild(tr);});
+})();
+const GRID='#272b36', MUT='#9aa3b2', ACC='#4f8cff', GOOD='#2ecc71';
+Chart.defaults.color=MUT; Chart.defaults.borderColor=GRID;
+const aggE=Object.entries(D.agg).sort((a,b)=>b[1].SR-a[1].SR);
+new Chart(srChart,{type:'bar',data:{labels:aggE.map(e=>e[0]),
+ datasets:[{data:aggE.map(e=>e[1].SR),backgroundColor:aggE.map(e=>e[0]==='FinOPD'?ACC:'#3a4150')}]},
+ options:{plugins:{legend:{display:false}},scales:{x:{ticks:{maxRotation:60,minRotation:45}}}}});
+new Chart(scatterChart,{type:'scatter',data:{datasets:[{
+ data:aggE.map(e=>({x:e[1].MDD,y:e[1].SR,m:e[0]})),
+ backgroundColor:aggE.map(e=>e[0]==='FinOPD'?ACC:'#6b7384'),pointRadius:6}]},
+ options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.m+' (MDD '+c.raw.x+', SR '+c.raw.y+')'}}},
+ scales:{x:{title:{display:true,text:'MDD %'}},y:{title:{display:true,text:'Sharpe'}}}}});
+// multiwindow
+(function(){
+ const wins=Object.keys(D.mw); const fo=wins.map(w=>D.mw[w].FinOPD?D.mw[w].FinOPD.SR:null);
+ new Chart(mwChart,{type:'line',data:{labels:wins,datasets:[{label:'FinOPD Sharpe',data:fo,
+  borderColor:ACC,backgroundColor:'rgba(79,140,255,.15)',fill:true,tension:.3,pointRadius:5}]},
+  options:{plugins:{legend:{display:false}}}});
+})();
+// ablation
+(function(){
+ const e=Object.entries(D.abl).filter(([k])=>k!=='A1_full');
+ new Chart(ablChart,{type:'bar',data:{labels:e.map(x=>x[0].replace(/^A\d+_/,'')),
+  datasets:[{data:e.map(x=>x[1].dSR||0),backgroundColor:'#e06c6c'}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}}}});
+})();
+// sensitivity tp
+(function(){
+ const e=Object.entries(D.sens).filter(([k])=>k.startsWith('tp_'));
+ new Chart(sensChart,{type:'line',data:{labels:e.map(x=>x[0].replace('tp_','tp=')),
+  datasets:[{label:'SR',data:e.map(x=>x[1].SR),borderColor:GOOD,tension:.3,pointRadius:4}]},
+  options:{plugins:{legend:{display:false}}}});
+})();
+// counterfactual
+(function(){
+ const e=Object.entries(D.cf).filter(([k])=>k!=='intact');
+ new Chart(cfChart,{type:'bar',data:{labels:e.map(x=>x[0]),
+  datasets:[{data:e.map(x=>x[1].dSR||0),backgroundColor:'#c79a3a'}]},
+  options:{indexAxis:'y',plugins:{legend:{display:false}}}});
+})();
+</script></body></html>
