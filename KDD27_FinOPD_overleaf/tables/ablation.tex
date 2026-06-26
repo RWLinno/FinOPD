@@ -1,31 +1,26 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Ablation study on the four showcase assets (2025 full-year test). $\Delta$ denotes change vs.\ full \textsc{FinOPD}. The full system is anchored to the reproducible portfolio Sharpe (1.81); each row removes one component.}
+\caption{Real component ablation on the four showcase assets (full-year 2025, identical protocol). Each row toggles one actual component of the deployed multi-trade \textsc{FinOPD} and re-runs the backtest; $\Delta$SR is the change in portfolio Sharpe vs.\ the full system. Source: \texttt{real\_ablation.json} (reproducible).}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{clcccc}
+\begin{tabular}{clccccc}
 \toprule
-ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD\%$\downarrow$ & $\Delta$WR \\
+ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD\%$\downarrow$ & Calmar$\uparrow$ & Trades \\
 \midrule
-A1 & Full \textsc{FinOPD} & 1.81 & 0.00 & 15.4 & 0.0 \\
+A1 & Full \textsc{FinOPD} & 1.81 & 0.00 & 15.4 & 2.88 & 8.8 \\
 \midrule
-A2 & w/o Visual-Geometric Encoder & 1.15 & $-$0.63 & 21.1 & $-$15.2 \\
-A3 & Frozen VLM (no LoRA) & 1.32 & $-$0.46 & 19.4 & $-$10.5 \\
-A4 & w/o Factor Router (fixed templates) & 1.02 & $-$0.76 & 22.8 & $-$18.8 \\
-A5 & w/o OPSD (verbal reinforcement only) & 0.95 & $-$0.83 & 24.1 & $-$22.5 \\
-A6a & w/o Shapley credit (uniform) & 1.49 & $-$0.29 & 18.1 & $-$7.2 \\
-A6b & w/o Belief consolidation & 1.39 & $-$0.39 & 18.8 & $-$9.8 \\
-A7 & w/o Alignment guard & 1.42 & $-$0.36 & 27.1 & $-$4.5 \\
-A8 & Single agent (5$\to$1) & 0.82 & $-$0.96 & 29.4 & $-$25.2 \\
-A9 & w/o RASW (fixed signal weights) & 0.99 & $-$0.79 & 22.4 & $-$16.5 \\
-A10 & w/o EGA (no edge-gated abstention) & 0.35 & $-$1.43 & 33.1 & $-$38.2 \\
+A2 & w/o Factor signals & 1.66 & $-$0.15 & 14.3 & 2.39 & 8.0 \\
+A4 & w/o RASW (fixed weights) & 1.81 & 0.00 & 15.4 & 2.88 & 8.8 \\
+A7 & w/o Trend-break guard & 1.43 & $-$0.38 & 20.9 & 1.54 & 9.2 \\
+A8 & Single-shot (no scaling) & 1.77 & $-$0.04 & 16.1 & 2.89 & 8.8 \\
+A10 & w/o Edge-Gated Abstention & 1.67 & $-$0.14 & 17.7 & 2.45 & 11.8 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item The two decision-layer mechanisms are the most critical: removing Edge-Gated Abstention (A10, $\Delta$SR$=-$1.43) and Regime-Adaptive Signal Weighting (A9, $\Delta$SR$=-$0.79) cause the largest drops, alongside the learning-layer OPSD (A5, $\Delta$SR$=-$0.83). The Alignment guard (A7) mainly controls drawdown (MDD 15.4\%$\to$27.1\%).
+\item The trend-break guard (A7) is the single most important component for risk-adjusted return: removing it drops Sharpe by 0.38 and inflates drawdown from 15.4\% to 20.9\%. Edge-Gated Abstention (A10) is the key over-trading control: without it the system makes 34\% more trades (8.8$\to$11.8), lowering Sharpe and raising drawdown. Factor signals (A2) contribute $+$0.15 SR. The regime-adaptive weighting (A4) has negligible effect under the trend-riding configuration, which we report honestly: in this setting the trend-break guard and edge gating already capture the regime dependence that RASW targets.
 \end{tablenotes}
 \label{tab:ablation}
 \end{table}

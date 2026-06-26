@@ -1,0 +1,28 @@
+{
+  "intact": {
+    "CR": 44.41,
+    "SR": 1.81,
+    "MDD": 15.4,
+    "WR": 46.3,
+    "Calmar": 2.88,
+    "n_trades": 8.8
+  },
+  "factor_zero": {
+    "CR": 34.22,
+    "SR": 1.66,
+    "MDD": 14.33,
+    "WR": 57.7,
+    "Calmar": 2.39,
+    "n_trades": 8.0,
+    "dSR": -0.15
+  },
+  "factor_shuffle": {
+    "CR": 48.23,
+    "SR": 1.79,
+    "MDD": 16.71,
+    "WR": 41.8,
+    "Calmar": 2.89,
+    "n_trades": 7.5,
+    "dSR": -0.02
+  }
+}
