@@ -12,7 +12,7 @@ small result JSONs are in git. Credentials are never committed (see `.env.exampl
   - `processed/us_dow30.csv`, `processed/cn_csi300.csv`
   - `results/*.json` (ssot_v3_main, multiwindow, real_ablation/counterfactual/sensitivity, baselines)
 - LoRA adapter (Qwen3.5-9B OPD): https://huggingface.co/rwlinno/FinOPD-lora
-  - `lora/checkpoint-988/` (adapter weights; optimizer states excluded)
+  - `lora/checkpoint-988/` (adapter_model.safetensors + config; optimizer/RNG states excluded)
 
 ## Weights & Biases
 - Project: `finopd` — training curves for the OPD LoRA self-evolution runs.
