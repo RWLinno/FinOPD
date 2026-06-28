@@ -1,7 +1,7 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Portfolio-level results over the four showcase assets (GOOGL, GS, JNJ, NVDA) on the full-year 2025 post-cutoff test window. All methods share one identical setting (15 bps round-trip cost + 5 bps slippage + T+1 delay, daily decisions, trade-level win rate). Time-series baselines are real trained models; agent baselines are distinct multi-trade reproductions under the same protocol. Best Sharpe in \textbf{bold}; values are equal-weighted averages across the four assets.}
+\caption{Portfolio-level results over the four showcase assets (GOOGL, GS, JNJ, NVDA) on the full-year 2025 post-cutoff test window. All methods share one identical setting (15 bps round-trip cost + 5 bps slippage + T+1 delay, daily decisions, trade-level win rate). Time-series baselines are real trained models; agent baselines are distinct multi-trade reproductions under the same protocol. Column-best in \textbf{\textcolor{FBest}{green}}; \textsc{FinOPD} row in \textbf{bold}. Values are equal-weighted averages across the four assets.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{3pt}
@@ -9,20 +9,20 @@
 \toprule
 Method & CR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ & WR\%$\uparrow$ \\
 \midrule
-Buy \& Hold & 46.7 & 1.48 & 27.7 & 1.69 & 100.0 \\
+Buy \& Hold & \textbf{\textcolor{FBest}{46.7}} & 1.48 & 27.7 & 1.69 & \textbf{\textcolor{FBest}{100.0}} \\
 Equal-Weight & 46.7 & 1.48 & 27.7 & 1.69 & 100.0 \\
 SMA Cross & 31.1 & 1.30 & 18.8 & 1.66 & 60.3 \\
 \midrule
 PatchTST & 11.7 & 0.97 & 10.9 & 1.07 & 54.3 \\
-TimesNet & 25.2 & 1.69 & 8.9 & 2.83 & 68.2 \\
+TimesNet & 25.2 & 1.69 & \textbf{\textcolor{FBest}{8.9}} & 2.83 & 68.2 \\
 iTransformer & 21.2 & 1.36 & 12.0 & 1.77 & 55.2 \\
 \midrule
 TradingAgents & 34.2 & 1.67 & 11.8 & 2.89 & 45.9 \\
-FinCon & 33.1 & 1.72 & 8.8 & 3.75 & 67.0 \\
+FinCon & 33.1 & 1.72 & 8.8 & \textbf{\textcolor{FBest}{3.75}} & 67.0 \\
 R\&D-Agent & $-$2.2 & $-$0.19 & 11.4 & $-$0.19 & 41.7 \\
 AlphaAgent & 36.0 & 1.77 & 10.6 & 3.41 & 65.0 \\
 \midrule
-\textbf{\textsc{FinOPD} (Ours)} & 44.4 & \textbf{1.81} & 15.4 & 2.88 & 46.3 \\
+\textbf{\textsc{FinOPD} (Ours)} & \textbf{44.4} & \textbf{\textcolor{FBest}{1.81}} & \textbf{15.4} & \textbf{2.88} & \textbf{46.3} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
