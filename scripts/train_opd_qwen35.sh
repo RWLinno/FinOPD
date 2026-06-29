@@ -21,8 +21,8 @@ export IMAGE_MAX_TOKEN_NUM=1024
 export VIDEO_MAX_TOKEN_NUM=128
 export FPS_MAX_FRAMES=12
 export PYTORCH_CUDA_ALLOC_CONF='expandable_segments:True'
-export NPROC_PER_NODE=3
-export CUDA_VISIBLE_DEVICES=5,6,7
+export NPROC_PER_NODE=2
+export CUDA_VISIBLE_DEVICES=6,7
 
 if [ "$MODE" = "dryrun" ]; then
   EXTRA="--max_steps 6 --dataset ${DATA}#50"

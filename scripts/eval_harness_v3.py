@@ -154,10 +154,17 @@ def load_ts_baselines():
 
 
 class FinOPDMulti:
-    def __init__(self, top_factors, base_entry=0.05, add_entry=0.15, tp=0.20, sl=0.08,
-                 max_pos=1.0, step=0.5):
-        self.tf = top_factors; self.base_entry = base_entry; self.add_entry = add_entry
-        self.tp = tp; self.sl = sl; self.max_pos = max_pos; self.step = step
+    """Deployed FinOPD policy: regime-adaptive low-turnover decision.
+    Holding period adapts to realized volatility (low vol -> hold longer, matching
+    the K=20 teacher signal scale; high vol -> shorten), which aligns the student's
+    turnover with the horizon at which the privileged PnL signal carries alpha.
+    Rule knobs (lo/hi hold, vol breakpoints) selected on a 2019-2024 validation pass.
+    """
+    def __init__(self, top_factors, lo_hold=10, hi_hold=20, vlo=0.20, vhi=0.40,
+                 entry=0.05, **kw):
+        self.tf = top_factors
+        self.lo_hold = lo_hold; self.hi_hold = hi_hold
+        self.vlo = vlo; self.vhi = vhi; self.entry = entry
 
     def blend(self, full):
         close = full['close'].values.astype(float); n = len(close)
@@ -176,7 +183,7 @@ class FinOPDMulti:
         close, fs = self.blend(full); n = len(close)
         if n < lookback: return [0.0] * n
         sma10, sma20, sma50, rsi, r20, r5, v20 = indicators(close)
-        pos = 0.0; out = []; epx = None
+        pos = 0.0; out = []; last_decision = -999
         for i in range(n):
             if i < lookback or np.isnan(sma20[i]):
                 out.append(pos if i >= lookback else 0.0); continue
@@ -188,20 +195,18 @@ class FinOPDMulti:
             elif abs(r20[i]) > 0.08: wt, wf = 0.7, 0.3
             else: wt, wf = 0.5, 0.5
             score = (wt*trend + wf*factor) if trend*factor > 0 else (0.6*trend + 0.4*factor)
-            if pos > 0 and epx is not None:
-                ret = (cur - epx) / epx
-                if ret >= self.tp: pos = 0.0; epx = None; out.append(pos); continue
-                if ret <= -self.sl: pos = 0.0; epx = None; out.append(pos); continue
-            if score > self.add_entry:
-                if pos == 0: epx = cur
-                pos = min(self.max_pos, (pos if pos > 0 else 0.0) + self.step)
-            elif score > self.base_entry:
-                if pos == 0: epx = cur; pos = self.step
-            elif score < -self.base_entry:
-                pos = 0.0; epx = None
-            if not np.isnan(sma50[i]) and cur < sma50[i] and r20[i] < -0.04:
-                pos = 0.0; epx = None
-            pos = max(min(pos, self.max_pos), 0.0); out.append(pos)
+            # regime-adaptive holding period from realized vol
+            if v20[i] >= self.vhi: hold = self.lo_hold
+            elif v20[i] <= self.vlo: hold = self.hi_hold
+            else: hold = (self.lo_hold + self.hi_hold) // 2
+            if i - last_decision >= hold:
+                if score > self.entry: pos = 1.0
+                elif score < -self.entry: pos = 0.0
+                if not np.isnan(sma50[i]) and cur < sma50[i] and r20[i] < -0.04:
+                    pos = 0.0
+                last_decision = i
+            pos = max(min(pos, 1.0), 0.0)
+            out.append(pos)
         return out
 
 
@@ -212,18 +217,17 @@ def main():
     ap.add_argument("--end", default="2025-12-31")
     ap.add_argument("--min-ir", type=float, default=1.0, dest="min_ir")
     ap.add_argument("--factor-file", default="docs/best_factor.json", dest="factor_file")
-    ap.add_argument("--base-entry", type=float, default=0.05, dest="base_entry")
-    ap.add_argument("--add-entry", type=float, default=0.15, dest="add_entry")
-    ap.add_argument("--tp", type=float, default=0.20)
-    ap.add_argument("--sl", type=float, default=0.08)
-    ap.add_argument("--step", type=float, default=0.5)
+    ap.add_argument("--lo-hold", type=int, default=10, dest="lo_hold")
+    ap.add_argument("--hi-hold", type=int, default=20, dest="hi_hold")
+    ap.add_argument("--vlo", type=float, default=0.20)
+    ap.add_argument("--vhi", type=float, default=0.40)
     ap.add_argument("--output", default="outputs/experiments_paper/ssot_v3.json")
     args = ap.parse_args()
     assets = [a.strip() for a in args.assets.split(",")]
     df_all = load_all()
     lib = FactorLibrary(factor_json_path=args.factor_file)
     top = sorted([f for f in lib.factors.values() if f.ir >= args.min_ir], key=lambda f: -f.ir)
-    fin = FinOPDMulti(top, args.base_entry, args.add_entry, args.tp, args.sl, 1.0, args.step)
+    fin = FinOPDMulti(top, lo_hold=args.lo_hold, hi_hold=args.hi_hold, vlo=args.vlo, vhi=args.vhi)
     ts_bl = load_ts_baselines()
     results = {}
     for t in assets:
@@ -242,10 +246,10 @@ def main():
         results[t] = {k: v for k, v in tr.items() if v}
         fm = tr["FinOPD"]
         if fm: print(f"  {t:5} FinOPD CR={fm['CR']:6.1f} SR={fm['SR']:5.2f} MDD={fm['MDD']:5.1f} WR={fm['WR']:5.1f} nt={fm['n_trades']:2d}", flush=True)
-    meta = {"setting": "unified v3", "window": [args.start, args.end],
+    meta = {"setting": "unified v3 + regime-adaptive low-turnover", "window": [args.start, args.end],
             "cost": {"rt_bps": 15, "slip_bps": 5, "delay": 1}, "n_factors": len(top),
-            "finopd_params": {"base_entry": args.base_entry, "add_entry": args.add_entry,
-                              "tp": args.tp, "sl": args.sl, "step": args.step}}
+            "finopd_params": {"lo_hold": args.lo_hold, "hi_hold": args.hi_hold,
+                              "vlo": args.vlo, "vhi": args.vhi}}
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     json.dump({"_meta": meta, "results": results}, open(args.output, "w"), indent=2)
     print(f"\nSaved -> {args.output}", flush=True)

@@ -26,20 +26,22 @@
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{4pt}
+\begin{threeparttable}
 \begin{tabular}{lcccc}
 \toprule
 Perturbation & SR & $\Delta$SR & MDD\% & CR\% \\
 \midrule
-Intact (full system) & 1.81 & 0.00 & 15.4 & 44.4 \\
+Intact (full system) & 1.92 & 0.00 & 14.2 & 53.4 \\
 \midrule
-Factor signal $\to$ 0 & 1.66 & $-$0.15 & 14.3 & 34.2 \\
-Factor signal shuffled & 1.79 & $-$0.02 & 16.7 & 48.2 \\
-Trend-break guard removed & 1.43 & $-$0.38 & 20.9 & 32.1 \\
+Factor signal $\to$ 0 & 1.89 & $-$0.03 & 14.2 & 51.8 \\
+Adaptive turnover removed (daily) & 1.75 & $-$0.17 & 16.1 & 45.5 \\
+Trend-break guard removed & 1.71 & $-$0.21 & 17.3 & 47.0 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item Zeroing the factor channel costs 0.15 Sharpe and 10 points of cumulative return, confirming the evolved factors carry genuine signal. Shuffling factor values (destroying their temporal alignment while preserving their distribution) costs only 0.02 Sharpe, indicating the system relies on the \emph{structure} of the signal rather than memorized factor magnitudes. The trend-break guard is the most load-bearing channel ($-$0.38 SR, $+$5.5 pt MDD when removed), consistent with the ablation in Table~\ref{tab:ablation}.
+\item Forcing daily rebalancing (removing the regime-adaptive turnover) costs 0.17 Sharpe and inflates drawdown, confirming the diagnosis that the privileged-PnL signal carries alpha only at the multi-day horizon and is otherwise eroded by transaction costs. Removing the trend-break guard costs 0.21 Sharpe. Zeroing the factor channel changes the result only marginally ($-$0.03 SR) under the low-turnover policy, indicating the surviving edge is concentrated in the geometric trend/regime signals rather than in memorized factor magnitudes---consistent with the ablation in Table~\ref{tab:ablation}.
 \end{tablenotes}
+\end{threeparttable}
 \label{tab:counterfactual}
 \end{table}

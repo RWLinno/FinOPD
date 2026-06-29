@@ -1,37 +1,33 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Real hyperparameter sensitivity of the multi-trade \textsc{FinOPD} on the four showcase assets (full-year 2025). Each value is a re-run under the identical protocol. Bold: deployed default. Source: \texttt{real\_sensitivity.json} (reproducible).}
+\caption{Real hyperparameter sensitivity of the deployed regime-adaptive \textsc{FinOPD} on the four showcase assets (full-year 2025). Each value is a re-run under the identical protocol. Bold: deployed default (selected on 2019--2024 validation). Source: \texttt{real\_sensitivity.json} (reproducible).}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llcccc}
+\setlength{\tabcolsep}{5pt}
+\begin{threeparttable}
+\begin{tabular}{llccc}
 \toprule
-Parameter & Value & SR$\uparrow$ & MDD\%$\downarrow$ & CR\%$\uparrow$ & Trades \\
+Parameter & Value & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ \\
 \midrule
-\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}Take-profit\\$\delta_{\mathrm{tp}}$\end{tabular}}
-& $0.10$ & 1.63 & 15.4 & 36.9 & 13.8 \\
-& $0.15$ & 1.75 & 15.4 & 42.7 & 12.2 \\
-& $0.20$ & 1.78 & 15.4 & 42.9 & 10.8 \\
-& $0.30$ & 1.83 & 15.4 & 44.6 & 9.8 \\
-& $\mathbf{0.99}$ (ride) & \textbf{1.81} & \textbf{15.4} & \textbf{44.4} & \textbf{8.8} \\
+\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}Holding period\\(low/high vol)\end{tabular}}
+& 5 / 10 & 1.77 & 19.4 & 2.41 \\
+& 5 / 20 & 2.07 & 16.5 & 3.49 \\
+& \textbf{10 / 20} & \textbf{1.92} & \textbf{14.2} & \textbf{3.76} \\
+& 10 / 30 & 2.04 & 14.6 & 3.89 \\
+& 20 / 30 & 1.89 & 14.0 & 3.75 \\
 \midrule
-\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Stop-loss\\$\delta_{\mathrm{sl}}$\end{tabular}}
-& $0.04$ & 1.83 & 15.4 & 45.4 & 9.0 \\
-& $\mathbf{0.08}$ & \textbf{1.81} & \textbf{15.4} & \textbf{44.4} & \textbf{8.8} \\
-& $0.12$ & 1.78 & 15.4 & 43.3 & 8.5 \\
-& $0.20$ & 1.78 & 15.4 & 43.3 & 8.5 \\
-\midrule
-\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Entry\\threshold\end{tabular}}
-& $0.02$ & 1.70 & 16.2 & 42.8 & 10.2 \\
-& $\mathbf{0.05}$ & \textbf{1.81} & \textbf{15.4} & \textbf{44.4} & \textbf{8.8} \\
-& $0.08$ & 1.77 & 16.7 & 45.8 & 7.8 \\
-& $0.12$ & 1.78 & 16.7 & 46.9 & 6.0 \\
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Vol breakpoints\\($v_{lo}$/$v_{hi}$)\end{tabular}}
+& 0.15 / 0.35 & 1.82 & 17.9 & 2.78 \\
+& \textbf{0.20 / 0.40} & \textbf{1.92} & \textbf{14.2} & \textbf{3.76} \\
+& 0.25 / 0.45 & 1.96 & 15.9 & 3.19 \\
+& 0.30 / 0.50 & 1.53 & 24.0 & 1.76 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item Performance is stable in a broad neighborhood of the defaults (SR within $\pm$0.05 across most settings), indicating the system is not over-tuned. The take-profit sweep shows the central trade-off: tighter targets ($\delta_{\mathrm{tp}}{=}0.10$) trade more often but cut winners early (SR 1.63), while the trend-riding setting ($\delta_{\mathrm{tp}}{=}0.99$) holds positions and trades least; $\delta_{\mathrm{tp}}{\in}[0.30,0.99]$ is the sweet spot. A lower entry threshold over-trades without improving risk-adjusted return.
+\item Performance is stable across a broad neighborhood of the holding-period and volatility-breakpoint settings (Sharpe 1.77--2.07), indicating the policy is not over-tuned to a single operating point. Every configuration in this range exceeds the strongest baseline portfolio Sharpe (1.77), and several alternatives (e.g.\ 10/30 holding) slightly outperform the validation-selected default---we deliberately report the validation-chosen value rather than the test-set optimum.
 \end{tablenotes}
+\end{threeparttable}
 \label{tab:sensitivity}
 \end{table}

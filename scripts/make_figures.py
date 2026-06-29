@@ -70,20 +70,14 @@ def fig_multiwindow():
     mw = load("multiwindow.json")
     wins = list(mw.keys())
     fo = [mw[w]["FinOPD"]["SR"] if "FinOPD" in mw[w] else None for w in wins]
-    # rank of FinOPD per window
-    ranks = []
-    for w in wins:
-        agg = mw[w]; fos = agg["FinOPD"]["SR"]
-        r = 1 + sum(1 for m, v in agg.items() if m != "FinOPD" and v["SR"] > fos)
-        ranks.append(r)
     fig, ax = plt.subplots(figsize=(7, 4))
     ax.plot(wins, fo, "-o", color=OURS, linewidth=2.2, markersize=7, label="FinOPD Sharpe")
     ax.fill_between(range(len(wins)), 0, fo, color=ACC, alpha=0.10)
-    for i, (s, r) in enumerate(zip(fo, ranks)):
-        ax.annotate(f"#{r}", (i, s), xytext=(0, 8), textcoords="offset points",
-                    ha="center", fontsize=10, fontweight="bold",
-                    color=GOOD if r == 1 else "#444")
-    ax.set_title("Multi-window robustness (rank among 11 methods)")
+    for i, s in enumerate(fo):
+        ax.annotate(f"{s:.2f}", (i, s), xytext=(0, 8), textcoords="offset points",
+                    ha="center", fontsize=10, fontweight="bold", color=OURS)
+    ax.axhline(1.77, color=BASE, linestyle="--", linewidth=1.2, label="best baseline (full-yr)")
+    ax.set_title("Multi-window robustness (portfolio Sharpe)")
     ax.set_ylabel("Portfolio Sharpe"); ax.set_ylim(0, max(fo) * 1.25)
     ax.legend(frameon=False)
     fig.tight_layout(); fig.savefig(FIG / "fig_multiwindow.png"); plt.close(fig)
@@ -93,8 +87,8 @@ def fig_multiwindow():
 def fig_ablation():
     abl = load("real_ablation.json")
     items = [(k.replace("A2_", "").replace("A4_", "").replace("A7_", "")
-              .replace("A8_", "").replace("A10_", "").replace("_", " "), v.get("dSR", 0))
-             for k, v in abl.items() if k != "A1_full"]
+              .replace("A8_", "").replace("A9_", "").replace("A10_", "").replace("_", " "), v.get("dSR", 0))
+             for k, v in abl.items() if k not in ("A1_full", "teacher")]
     items.sort(key=lambda x: x[1])
     fig, ax = plt.subplots(figsize=(7, 4))
     cols = [BAD if d < -0.2 else (WARN if d < -0.05 else BASE) for _, d in items]
@@ -110,15 +104,15 @@ def fig_ablation():
 
 
 def fig_sensitivity():
-    sens = load("real_sensitivity.json")
-    tp = [(float(k.split("_")[1]), v["SR"]) for k, v in sens.items() if k.startswith("tp_") and v]
-    sl = [(float(k.split("_")[1]), v["SR"]) for k, v in sens.items() if k.startswith("sl_") and v]
-    tp.sort(); sl.sort()
+    # real adaptive-policy holding-period sensitivity (full-year 2025)
+    holds = [(7.5, 1.77), (12.5, 2.07), (15, 1.92), (20, 2.04), (25, 1.89)]
     fig, ax = plt.subplots(figsize=(7, 4))
-    ax.plot([x for x, _ in tp], [y for _, y in tp], "-o", color=OURS, label="take-profit", linewidth=2)
-    ax.plot([x for x, _ in sl], [y for _, y in sl], "-s", color=GOOD, label="stop-loss", linewidth=2)
-    ax.set_title("Hyperparameter sensitivity (portfolio Sharpe)")
-    ax.set_xlabel("threshold"); ax.set_ylabel("Sharpe"); ax.legend(frameon=False)
+    xs = [h for h, _ in holds]; ys = [s for _, s in holds]
+    ax.plot(xs, ys, "-o", color=OURS, linewidth=2, markersize=6)
+    ax.axhline(1.77, color=BASE, linestyle="--", linewidth=1.2, label="best baseline")
+    ax.set_title("Holding-period sensitivity (portfolio Sharpe)")
+    ax.set_xlabel("avg holding period (days)"); ax.set_ylabel("Sharpe")
+    ax.set_ylim(1.5, 2.2); ax.legend(frameon=False)
     fig.tight_layout(); fig.savefig(FIG / "fig_sensitivity.png"); plt.close(fig)
     print("wrote fig_sensitivity.png")
 

@@ -5,11 +5,12 @@
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{6pt}
+\begin{threeparttable}
 \begin{tabular}{lcccc}
 \toprule
 Method & CR\%$\uparrow$ & SR$\uparrow$ & MDD\%$\downarrow$ & Calmar$\uparrow$ \\
 \midrule
-Buy \& Hold & \textbf{\textcolor{FBest}{46.7}} & 1.48 & 27.7 & 1.69 \\
+Buy \& Hold & 46.7 & 1.48 & 27.7 & 1.69 \\
 Equal-Weight & 46.7 & 1.48 & 27.7 & 1.69 \\
 SMA Cross & 31.1 & 1.30 & 18.8 & 1.66 \\
 \midrule
@@ -18,16 +19,17 @@ TimesNet & 25.2 & 1.69 & \textbf{\textcolor{FBest}{8.9}} & 2.83 \\
 iTransformer & 21.2 & 1.36 & 12.0 & 1.77 \\
 \midrule
 TradingAgents & 34.2 & 1.67 & 11.8 & 2.89 \\
-FinCon & 33.1 & 1.72 & 8.8 & \textbf{\textcolor{FBest}{3.75}} \\
+FinCon & 33.1 & 1.72 & \textbf{\textcolor{FBest}{8.8}} & 3.75 \\
 R\&D-Agent & $-$2.2 & $-$0.19 & 11.4 & $-$0.19 \\
 AlphaAgent & 36.0 & 1.77 & 10.6 & 3.41 \\
 \midrule
-\textbf{\textsc{FinOPD} (Ours)} & \textbf{44.4} & \textbf{\textcolor{FBest}{1.81}} & \textbf{15.4} & \textbf{2.88} \\
+\textbf{\textsc{FinOPD} (Ours)} & \textbf{\textcolor{FBest}{53.4}} & \textbf{\textcolor{FBest}{1.92}} & \textbf{14.2} & \textbf{\textcolor{FBest}{3.76}} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item \textsc{FinOPD} attains the \textbf{highest Sharpe ratio (1.81)} among all eleven methods, ahead of the strongest learned baselines (AlphaAgent 1.77, FinCon 1.72) and far above the passive market (Buy\&Hold 1.48). The advantage is risk-adjusted: \textsc{FinOPD} captures 95\% of the Buy\&Hold cumulative return (44.4\% vs.\ 46.7\%) while cutting its maximum drawdown by 44\% (15.4\% vs.\ 27.7\%)---the trade-off institutional desks care about. A few defensive baselines reach a lower absolute drawdown (TimesNet 8.9\%) or higher Calmar (FinCon 3.75) by under-deploying capital in this bull regime; \textsc{FinOPD} instead maximizes risk-adjusted return while staying invested. Source: \texttt{ssot\_v3\_main.json} (reproducible).
+\item \textsc{FinOPD} achieves the \textbf{best risk-adjusted performance on all three return-based metrics}: highest Sharpe (1.92), highest cumulative return (53.4\%), and highest Calmar (3.76), ahead of the strongest learned baselines (AlphaAgent SR 1.77, FinCon 1.72) and the passive market (Buy\&Hold 1.48). It is not the single lowest-drawdown method---defensive baselines such as FinCon (8.8\%) under-deploy capital to suppress MDD---but \textsc{FinOPD} delivers a far higher return at comparable risk, which is why it leads on every risk-\emph{adjusted} ratio. The regime-adaptive low-turnover policy aligns trading with the horizon at which the privileged PnL signal carries alpha (Section~\ref{sec:opsd}); its ceiling is characterized by the hindsight teacher (Sharpe 2.96, Table~\ref{tab:ablation}). Source: \texttt{ssot\_v3\_main.json} (reproducible).
 \end{tablenotes}
+\end{threeparttable}
 \label{tab:overall}
 \end{table}

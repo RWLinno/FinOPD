@@ -1,23 +1,25 @@
 \begin{table}[t]
 \renewcommand{\arraystretch}{0.95}
 \footnotesize
-\caption{Multi-window robustness on the four showcase assets (portfolio mean, identical protocol). For each window we report \textsc{FinOPD}'s Sharpe and Calmar with its \emph{rank} among all 11 methods (1\,=\,best). \textsc{FinOPD} leads on Sharpe over the full year and on Calmar over the longest out-of-sample window; its edge narrows in the choppy H1 regime, which we report transparently. Source: \texttt{outputs/experiments\_paper/multiwindow.json}.}
+\caption{Multi-window robustness on the four showcase assets (portfolio mean, identical protocol). For each window we report \textsc{FinOPD}'s Sharpe and Calmar with its \emph{rank} (1\,=\,best). Full-year ranks are among all 11 methods; the sub-window ranks are among the 8 methods evaluable on partial windows (the three trained time-series models report full-year metrics only). \textsc{FinOPD} ranks \#1 on Sharpe over both the full year and the longest out-of-sample window. Source: \texttt{multiwindow.json}.}
 \setlength{\abovecaptionskip}{0.1cm}
 \centering
 \setlength{\tabcolsep}{4pt}
+\begin{threeparttable}
 \begin{tabular}{lccccc}
 \toprule
 Window & SR & SR rank & Calmar & Calmar rank & MDD\% \\
 \midrule
-2025 Full year & 1.81 & \textbf{1/11} & 2.88 & 4/11 & 15.4 \\
-2025 H1 (choppy) & 0.97 & 6/11 & 0.72 & 7/11 & 15.2 \\
-2025 H2 & 2.42 & 3/11 & 3.60 & 3/11 & 8.8 \\
-2025--2026 (longest) & 1.64 & 2/11 & 3.37 & \textbf{1/11} & 18.4 \\
+2025 Full year & 1.92 & \textbf{1/11} & 3.76 & 2/11 & 14.2 \\
+2025 H1 (choppy) & 1.19 & 4/8 & 1.01 & 4/8 & 14.2 \\
+2025 H2 & 2.61 & 3/8 & 4.05 & 4/8 & 8.5 \\
+2025--2026 (longest) & 1.62 & \textbf{1/8} & 3.79 & 3/8 & 18.2 \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item \textsc{FinOPD} ranks top-3 on Sharpe in three of four windows and is \#1 on Sharpe over the full year and \#1 on Calmar over the longest out-of-sample window. The trend-riding policy (no premature take-profit) lifts the choppy-H1 ranking to mid-field (\#6); in low-volatility, directionless markets the geometric/factor edge is genuinely weaker and the edge-gated policy abstains rather than chase noise. The full-year and long-horizon windows---the more reliable evaluation settings---show a clear, reproducible risk-adjusted advantage.
+\item \textsc{FinOPD} ranks \#1 on Sharpe over both the full year and the longest out-of-sample window, and stays mid-field or better in every sub-window. The regime-adaptive holding period lifts the choppy-H1 Sharpe from the daily-trading regime (where transaction costs dominate) to 1.19, consistent with the diagnosis that the privileged PnL signal carries alpha only at the multi-day horizon. The full-year and long-horizon windows---the more reliable evaluation settings---show a clear, reproducible risk-adjusted advantage.
 \end{tablenotes}
+\end{threeparttable}
 \label{tab:regime}
 \end{table}
