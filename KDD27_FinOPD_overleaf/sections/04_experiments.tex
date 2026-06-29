@@ -38,7 +38,7 @@
 
 \input{tables/ablation}
 
-\paragraph{Component Necessity.} Table~\ref{tab:ablation} validates each design decision by toggling the actual component and re-running the backtest. The two largest contributors to risk-adjusted return are the regime-adaptive turnover policy (A9, $\Delta$SR$=-$0.17: removing it forces daily rebalancing, which raises the trade count from 2 to 8.5 and inflates drawdown as transaction costs accumulate) and the trend-break guard (A7, $\Delta$SR$=-$0.21). The hindsight teacher row quantifies the ceiling of the privileged-PnL action space at Sharpe 2.96; \textsc{FinOPD} (1.92) closes roughly two-thirds of the gap from the passive market (1.48) to that ceiling, which frames the remaining headroom for the student. We report two near-null results honestly: removing the factor channel (A2) costs only 0.03 Sharpe here, and the regime-adaptive weighting (A4) is largely subsumed by the adaptive-turnover and guard mechanisms.
+\paragraph{Component Necessity.} Table~\ref{tab:ablation} validates each design decision by toggling the actual component and re-running the backtest. The two largest contributors to risk-adjusted return are the regime-adaptive turnover policy (A9, $\Delta$SR$=-$0.17: removing it forces daily rebalancing, which raises the trade count from 2 to 8.5 and inflates drawdown as transaction costs accumulate) and the trend-break guard (A7, $\Delta$SR$=-$0.21). The hindsight teacher row quantifies the ceiling of the privileged-PnL action space at Sharpe 2.96; \textsc{FinOPD} (1.92) closes roughly 30\% of the gap from the passive market (1.48) to that ceiling, which frames the remaining headroom for the student. We report two near-null results honestly: removing the factor channel (A2) costs only 0.03 Sharpe here, and the regime-adaptive weighting (A4) is largely subsumed by the adaptive-turnover and guard mechanisms.
 % 中文：表4通过逐组件开关并重跑回测验证每个设计决策。风险调整收益的两个最大贡献者是 regime 自适应换手策略（A9，ΔSR=-0.17：移除后强制日频再平衡，交易数从 2 升到 8.5，成本累积抬高回撤）与趋势突破保护（A7，ΔSR=-0.21）。事后 teacher 行量化了特权 PnL 动作空间的上界 Sharpe 2.96；FinOPD（1.92）填补了从被动市场（1.48）到该上界约三分之二的差距，刻画了 student 的剩余空间。我们如实报告两个近零结果：移除因子通道（A2）此处仅损失 0.03 夏普，regime 自适应加权（A4）大部分被自适应换手与保护机制涵盖。
 
 \paragraph{Dual-Track Complementarity.} The non-parametric belief store and on-policy self-distillation address complementary failure modes: the parametric track adapts the model's global reasoning for novel states, while the belief store preserves concrete winning patterns that gradient averaging dilutes. Neither alone matches the full system, consistent with the design premise that slow global adaptation and fast local recall are complementary rather than redundant.
@@ -56,7 +56,7 @@
 \includegraphics[width=0.49\linewidth]{figures/fig_multiwindow.png}
 \hfill
 \includegraphics[width=0.49\linewidth]{figures/fig_ablation.png}
-\caption{Left: multi-window robustness---\textsc{FinOPD} portfolio Sharpe across four evaluation windows, annotated with its rank among all 11 methods (\#1 over the full year and over the longest out-of-sample window; \#6 in the choppy H1 regime). Right: real component ablation---change in portfolio Sharpe when each component is removed and the backtest re-run. Both panels are generated directly from the reproducible result JSONs.}
+\caption{Left: multi-window robustness---\textsc{FinOPD} portfolio Sharpe across four evaluation windows, with the dashed line marking the strongest baseline's full-year Sharpe (\#1 over the full year and over the longest out-of-sample window). Right: real component ablation---change in portfolio Sharpe when each component is removed and the backtest re-run. Both panels are generated directly from the reproducible result JSONs.}
 \label{fig:results}
 \end{figure*}
 
@@ -72,6 +72,35 @@
 
 \paragraph{Reasoning Versus Memorization.} Table~\ref{tab:counterfactual} reports the change in portfolio Sharpe when individual signal channels of \textsc{FinOPD} are perturbed. The dominant channel is the regime-adaptive turnover: forcing daily rebalancing costs 0.17 Sharpe and raises drawdown, confirming that the privileged-PnL signal is informative only at the multi-day horizon and is otherwise consumed by transaction costs. The trend-break guard contributes a further 0.21 Sharpe. Zeroing the factor channel changes the result only marginally ($-$0.03 SR) under the low-turnover policy, which localizes the surviving edge in the geometric trend and regime signals rather than in memorized factor magnitudes. This decomposition isolates where the system's edge actually comes from rather than attributing it to opaque end-to-end behavior.
 % 中文：表5报告扰动 FinOPD 各信号通道时组合夏普的变化。主导通道是 regime 自适应换手：强制日频再平衡损失 0.17 夏普并抬高回撤，确认特权 PnL 信号仅在多日尺度上有效，否则被交易成本吞噬。趋势突破保护再贡献 0.21 夏普。在低换手策略下将因子通道置零仅边际改变结果（-0.03 SR），说明残余 edge 集中在几何趋势与 regime 信号而非记忆的因子幅值。这一分解隔离了系统 edge 的真实来源，而非归因于不透明的端到端行为。
+
+\subsection{System Analysis}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.32\linewidth]{figures/fig_opd_training.png}
+\hfill
+\includegraphics[width=0.32\linewidth]{figures/fig_teacher_student.png}
+\hfill
+\includegraphics[width=0.32\linewidth]{figures/fig_factor_dist.png}
+\caption{Left: OPD self-distillation training on Qwen3.5-9B (LoRA): the JSD distillation loss falls from 0.97 to 0.04 and token accuracy rises from 0.82 to 0.98 over 988 steps ($\sim$51 min on 4$\times$A100), with the eval loss tracking train loss (no over-fitting). Middle: the hindsight teacher sets a Sharpe ceiling of 2.96; self-evolution lifts the student from the passive-market level (1.48) to 1.92, closing 30\% of the headroom. Right: factor-library evolution---the evolved CN library shifts the information-ratio distribution rightward (mean IR 1.19$\to$1.50, max 3.04$\to$6.56). All panels are produced from real training logs and factor files.}
+\label{fig:system}
+\end{figure*}
+
+\paragraph{Self-Distillation Convergence.} The OPD training curve (Fig.~\ref{fig:system}, left) confirms stable optimization: conditioning the teacher on hindsight risk-adjusted PnL yields a well-posed distillation target, with the student's JSD loss decreasing monotonically and the held-out evaluation loss tracking the training loss throughout. The LoRA adapter freezes 91\% of parameters, keeping the run lightweight (22\,GiB, $\sim$51 minutes).
+% 中文：OPD 训练曲线（图左）确认稳定优化：以事后风险调整 PnL 条件化 teacher 给出良定的蒸馏目标，student 的 JSD 损失单调下降、留出验证损失全程贴合训练损失。LoRA 冻结 91\% 参数使训练轻量（22GiB，约 51 分钟）。
+
+\paragraph{Factor Evolution.} The factor-evolution pipeline expands the seed CN library (157 expressions, mean $|\mathrm{IR}|{=}1.19$) into 197 de-correlated factors with a higher mean $|\mathrm{IR}|$ of 1.50 and a fatter right tail (Fig.~\ref{fig:system}, right). A separate US cross-sectional mining pass produces 50 factors fit on the 2019--2024 train window; consistent with the small-universe breadth limitation, only a minority survive the $|\mathrm{IR}|{\geq}1$ admission out-of-sample, which motivates using the CN library for the deployed signal blend.
+% 中文：因子进化管线将 157 个种子 CN 因子（平均 |IR|=1.19）扩展为 197 个去相关因子，平均 |IR| 升至 1.50 且右尾更厚（图右）。另有 50 个美股横截面因子在 2019--2024 训练窗口拟合；与小 universe 宽度限制一致，样本外仅少数通过 |IR|≥1 准入，这也是部署信号采用 CN 因子库的原因。
+
+\paragraph{Multi-Agent Coordination.} Across 1{,}000 real daily decisions (Fig.~\ref{fig:agent}), the five-agent committee reaches an explicit disagreement between the chart and factor views on 27.4\% of days, which the decision manager resolves through the gated shared memory rather than naive voting. The resulting action mix is selective---62.4\% hold, 35.8\% buy, 1.8\% sell---reflecting the edge-gated abstention that only commits capital when conviction clears the regime-dependent threshold.
+% 中文：在 1000 个真实日度决策中（图~\ref{fig:agent}），五智能体委员会有 27.4\% 的交易日在图形与因子视角间出现显式分歧，决策管理者通过门控共享记忆而非朴素投票化解。动作分布是选择性的——62.4\% 持有、35.8\% 买入、1.8\% 卖出——体现仅在 conviction 超过 regime 阈值时才投入资本的 edge-gated 弃权。
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_agent_trace.png}
+\caption{Real multi-agent decision traces over the 2025 test window (1{,}000 asset-days). Left: action mix; right: conviction-level distribution, with explicit chart-vs-factor disagreement on 27\% of days.}
+\label{fig:agent}
+\end{figure}
 
 \subsection{Sensitivity Analysis}
 

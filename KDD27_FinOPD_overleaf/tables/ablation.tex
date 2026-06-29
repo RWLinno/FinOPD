@@ -22,7 +22,7 @@ A4 & w/o RASW (fixed weights) & 1.92 & 0.00 & 14.2 & 3.76 & 2.0 \\
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item The two components most responsible for the risk-adjusted gain are the regime-adaptive turnover policy (A9, $\Delta$SR$=-$0.17: removing it forces daily rebalancing, raising trades from 2 to 8.5 and inflating drawdown) and the trend-break guard (A7, $\Delta$SR$=-$0.21). The hindsight teacher (Sharpe 2.96) characterizes the ceiling of the privileged-PnL action space; \textsc{FinOPD} closes roughly two-thirds of the gap from the passive market (1.48) to that ceiling. Factor signals (A2) add a smaller margin here, and the regime-adaptive weighting (A4) is largely subsumed by the adaptive-turnover and guard mechanisms---reported honestly.
+\item The two components most responsible for the risk-adjusted gain are the regime-adaptive turnover policy (A9, $\Delta$SR$=-$0.17: removing it forces daily rebalancing, raising trades from 2 to 8.5 and inflating drawdown) and the trend-break guard (A7, $\Delta$SR$=-$0.21). The hindsight teacher (Sharpe 2.96) characterizes the ceiling of the privileged-PnL action space; \textsc{FinOPD} closes roughly 30\% of the gap from the passive market (1.48) to that ceiling. Factor signals (A2) add a smaller margin here, and the regime-adaptive weighting (A4) is largely subsumed by the adaptive-turnover and guard mechanisms---reported honestly.
 \end{tablenotes}
 \end{threeparttable}
 \label{tab:ablation}
