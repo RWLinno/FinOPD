@@ -43,6 +43,9 @@ def compute_metrics(positions, prices):
         return None
     cr = (np.prod(1 + pr) - 1) * 100
     sr = np.mean(pr) / np.std(pr) * np.sqrt(252)
+    downside = pr[pr < 0]
+    dstd = np.std(downside) if len(downside) > 1 else np.std(pr)
+    sortino = np.mean(pr) / dstd * np.sqrt(252) if dstd > 1e-9 else 0.0
     cum = np.cumprod(1 + pr)
     peak = np.maximum.accumulate(cum)
     mdd = ((peak - cum) / peak).max() * 100
@@ -55,7 +58,9 @@ def compute_metrics(positions, prices):
     if in_pos:
         tp.append(np.prod(1 + pr[ep_idx:]) - 1)
     wr = (np.sum(np.array(tp) > 0) / max(len(tp), 1)) * 100 if tp else 50.0
+    calmar = cr / mdd if mdd > 1e-9 else 0.0
     return {"CR": round(cr, 2), "SR": round(sr, 2), "MDD": round(mdd, 2),
+            "Sortino": round(sortino, 2), "Calmar": round(calmar, 2),
             "WR": round(wr, 1), "n_trades": len(tp)}
 
 
