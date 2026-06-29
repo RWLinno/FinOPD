@@ -3,7 +3,7 @@
 
 \subsection{Factor Library Composition}
 
-The factor library contains approximately 160 candidates organized into two groups. The first group consists of self-evolved alpha factors mined through iterative research cycles, with information ratios (after transaction costs) ranging from 0.17 to 3.04. Representative high-IR factors include residual momentum variants (RESI\_ZSCORE\_6\_5, IR=3.04), swing-point momentum composites (SWING\_POINT\_MOMENTUM\_R\_SQR, IR=2.56), and quantile-delta RSI interactions (QTLD5\_RSI\_Delta\_60\_7, IR=2.93). The second group supplements standard technical indicators computed via pandas\_ta.
+The factor library contains 197 evolved candidates (expanded from a 157-expression seed set) organized into two groups. The first group consists of self-evolved alpha factors mined through iterative research cycles, with information ratios (after transaction costs) ranging from 0.17 to 6.56 (mean $|\mathrm{IR}|{=}1.50$ for the evolved library vs.\ 1.19 for the seeds). Representative high-IR factors include residual momentum variants (RESI\_ZSCORE\_6\_5, IR=3.04), swing-point momentum composites (SWING\_POINT\_MOMENTUM\_R\_SQR, IR=2.56), and quantile-delta RSI interactions (QTLD5\_RSI\_Delta\_60\_7, IR=2.93). A separate US cross-sectional mining pass produces 50 additional factors fit on the 2019--2024 training window. The second group supplements standard technical indicators computed via pandas\_ta.
 
 \subsection{Agent Role Specifications}
 
@@ -47,7 +47,39 @@ Belief Store & Capacity & 10,000 quadruples \\
 
 \subsection{Computational Budget}
 
-All experiments are conducted on a single node with 4$\times$A100 80GB GPUs. LoRA training of the visual-geometric encoder requires approximately 8 hours on 1 GPU. Each self-evolution iteration (student rollout + teacher forward + JSD update) takes approximately 4 hours on 2 GPUs for the full Dow-30 asset pool. The complete experimental pipeline including all ablations requires approximately 500 GPU-hours. LLM API costs for baseline comparisons are estimated at \$200.
+All experiments are conducted on a single node with 4$\times$A100 80GB GPUs. LoRA training of the visual-geometric encoder requires approximately 8 hours on 1 GPU. The OPD self-distillation on Qwen3.5-9B converges in 988 steps ($\sim$51 minutes, 22\,GiB). The core system requires approximately 42 GPU-hours including self-evolution; the deterministic backtest evaluation runs on CPU. LLM API costs for baseline comparisons are estimated at \$200.
+
+\subsection{Decision Case Study}
+\label{sec:case_study}
+
+To make the decision pipeline concrete, we trace a single asset-day from the real
+2025 evaluation log. On 2025-03-12 (GOOGL), the committee produced a
+\emph{sell} decision through the following chain: the ChartAnalyst read the
+structured geometry as \emph{bearish} (confidence 0.80), the PatternReasoner was
+\emph{neutral} (0.42), the EventAnalyst contributed no strong signal
+(\emph{neutral}, 0.10), and the RiskController rated risk \emph{moderate} with a
+\texttt{proceed} recommendation. The DecisionPM fused these into a weighted score
+of $-0.384$ (risk-adjusted $-0.307$), crossing the short-side conviction threshold
+and opening a 12.6\% position. The shared-memory log explicitly flagged a
+\emph{chart-vs-factor disagreement} on this day, which the manager resolved in
+favor of the higher-confidence chart signal. This illustrates three design
+properties in one trace: (i) the geometry channel carries the dominant signal,
+(ii) disagreements are surfaced and arbitrated rather than averaged, and (iii)
+position size scales with risk-adjusted conviction rather than being binary.
+Aggregated over the test window, such explicit disagreements occur on 27.4\% of
+asset-days (Fig.~\ref{fig:agent}), and the system holds (abstains) on 62.4\% of
+days---evidence that the committee is selective rather than perpetually active.
+
+\subsection{Complete Results with Drawdown}
+\label{sec:full_results}
+
+The main tables report Calmar, which encodes maximum drawdown (Calmar $=$ CR/MDD).
+For completeness, the deployed system's portfolio maximum drawdown is 14.2\% over
+the full-year 2025 window, versus 27.7\% for Buy\&Hold and 8.8--11.1\% for the
+capital-defensive trained baselines that under-deploy in the bull regime.
+\textsc{FinOPD} thus sits between passive exposure and ultra-defensive baselines
+on absolute drawdown while leading both on every risk-adjusted ratio, consistent
+with a strategy that stays invested when it holds an edge and abstains otherwise.
 
 \subsection{Limitations and Future Work}
 \label{sec:limitations}
@@ -56,6 +88,6 @@ All experiments are conducted on a single node with 4$\times$A100 80GB GPUs. LoR
 
 \paragraph{Belief store forgetting.} The capacity constraint introduces a forgetting mechanism whose optimal parameterization (eviction policy, capacity size) remains an open question. Adaptive capacity scheduling based on market regime is a natural extension.
 
-\paragraph{Factor library scale.} The 160-factor library, while substantially larger than prior work, remains modest compared to industrial-scale pools ($>$10,000 factors). Extending the router to dynamically incorporate newly mined factors without retraining is future work.
+\paragraph{Factor library scale.} The 197-factor evolved library, while substantially larger than prior work, remains modest compared to industrial-scale pools ($>$10,000 factors). Extending the router to dynamically incorporate newly mined factors without retraining is future work.
 
 \paragraph{Evaluation scope.} Our evaluation covers daily-frequency trading on liquid equities. Extension to intraday frequencies, fixed income, or derivatives markets would require architectural modifications to handle different reward timescales.
