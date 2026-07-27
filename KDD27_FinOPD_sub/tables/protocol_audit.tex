@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Information and update contract. ``Available'' means the field may enter that stage; a dash means it is structurally absent.}
+\label{tab:protocol_audit}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lcccccc}
+\toprule
+Stage & Point-in-time evidence & Future OHLCV & Mature utility & 27B teacher & Policy update & Memory write \\
+\midrule
+Decision / deployment & yes & -- & -- & -- & -- & -- \\
+Horizon closure & archived only & evaluation only & computed & -- & -- & -- \\
+Teacher annotation & archived only & -- & summary only & yes & -- & -- \\
+OPD optimization & student prefix & -- & credit only & logits only & yes & -- \\
+Episode admission & archived only & -- & threshold only & -- & -- & yes \\
+\bottomrule
+\end{tabular}
+\end{table*}

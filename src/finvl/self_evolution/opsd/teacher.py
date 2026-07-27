@@ -7,7 +7,7 @@ Teacher weights are frozen throughout training.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import torch
 
@@ -41,9 +41,8 @@ class OPSDTeacher:
             from swift.llm import PtEngine
             self.model = PtEngine(self.model_path, adapters=[self.lora_path])
             logger.info(f"Teacher loaded: {self.model_path} + {self.lora_path}")
-        except ImportError:
-            logger.warning("ms-swift not available, using placeholder teacher")
-            self.model = None
+        except ImportError as exc:
+            raise RuntimeError("ms-swift is required for an evidence-bearing OPD run") from exc
 
     def build_hindsight_prompt(
         self,
@@ -73,8 +72,7 @@ class OPSDTeacher:
             ]
 
         if self.model is None:
-            batch_size = len(prompts)
-            return [torch.randn(1, 100, 32000) for _ in range(batch_size)]
+            raise RuntimeError("teacher must be loaded before forward()")
 
         logits_list = []
         for prompt in prompts:

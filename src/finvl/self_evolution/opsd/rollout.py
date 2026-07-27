@@ -40,7 +40,7 @@ class Trajectory:
 
     @property
     def score(self) -> float:
-        return self.metrics.get("sharpe", 0.0)
+        return self.metrics.get("utility", float("-inf"))
 
 
 class StudentRollout:
@@ -97,7 +97,7 @@ class StudentRollout:
 
         for date in dates:
             try:
-                window_df = provider.get_window(date, lookback=60)
+                window_df = provider.get_window(date, lookback=60, asset=asset)
                 if len(window_df) < 10:
                     continue
 
@@ -134,31 +134,29 @@ class StudentRollout:
         if not traj.steps:
             return
 
-        returns = []
+        from finvl.self_evolution.opsd.utility import outcome_utility
+
+        market = provider._asset_frame(traj.asset)["close"].astype(float)
+        target = np.zeros(len(market), dtype=float)
+        date_to_location = {timestamp.strftime("%Y-%m-%d"): i for i, timestamp in enumerate(market.index)}
         for step in traj.steps:
-            signal = {"buy": 1.0, "sell": -1.0, "hold": 0.0}.get(step.action, 0.0)
-            returns.append(signal * 0.01 * step.confidence)
-
-        returns_arr = np.array(returns)
-        if len(returns_arr) < 2 or returns_arr.std() < 1e-8:
-            traj.metrics = {"sharpe": 0.0, "mdd": 0.0, "sortino": 0.0, "cvar": 0.0}
-            return
-
-        sharpe = float(returns_arr.mean() / returns_arr.std() * np.sqrt(252))
-        cumulative = np.cumprod(1 + returns_arr)
-        peak = np.maximum.accumulate(cumulative)
-        mdd = float(((peak - cumulative) / peak).max())
-
-        downside = returns_arr[returns_arr < 0]
-        downside_std = downside.std() if len(downside) > 1 else 1e-8
-        sortino = float(returns_arr.mean() / downside_std * np.sqrt(252))
-
-        cvar_threshold = np.percentile(returns_arr, 5)
-        cvar = float(returns_arr[returns_arr <= cvar_threshold].mean()) if any(returns_arr <= cvar_threshold) else 0.0
-
-        traj.metrics = {
-            "sharpe": sharpe,
-            "mdd": mdd,
-            "sortino": sortino,
-            "cvar": cvar,
-        }
+            location = date_to_location.get(step.date)
+            if location is None:
+                continue
+            direction = {"buy": 1.0, "sell": -1.0, "hold": 0.0}.get(step.action.lower(), 0.0)
+            target[location] = direction * float(step.position_size)
+        # Decisions at t are executed at t+1 and then held until changed.
+        positions = pd.Series(target, index=market.index).replace(0.0, np.nan).ffill().fillna(0.0)
+        positions = positions.shift(1).fillna(0.0)
+        price_returns = market.pct_change().fillna(0.0)
+        turnover_series = positions.diff().abs().fillna(positions.abs())
+        cost_rate = 0.002  # 15 bps transaction cost + 5 bps slippage
+        net = positions * price_returns - turnover_series * cost_rate
+        selected_dates = [date for date in traj.steps if date.date in date_to_location]
+        if not selected_dates:
+            raise ValueError("trajectory dates do not overlap provider data")
+        start = min(date_to_location[step.date] for step in selected_dates)
+        end = min(len(net), max(date_to_location[step.date] for step in selected_dates) + self.forward_days + 1)
+        window_returns = net.iloc[start:end].to_numpy()
+        turnover = float(turnover_series.iloc[start:end].sum())
+        traj.metrics = outcome_utility(window_returns, turnover)

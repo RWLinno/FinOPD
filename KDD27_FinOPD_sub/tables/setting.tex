@@ -7,16 +7,19 @@
 \toprule
 Component & Parameter & Value \\
 \midrule
- Encoder & LoRA rank & 16 \\
+ Encoder / student & Backbone & Qwen3.5-9B \\
+ & LoRA rank & 16 \\
  & Target modules & vision encoder top-2 layers + cross-attn \\
  & Training samples & 50,000 (weak) + 1,000 (verified) \\
 Factor Router & MLP layers & 2 (hidden dim 256) \\
  & Gumbel temperature & 0.5 (annealed) \\
  & Top-$k$ & 15 \\
 OPD & JSD $\beta$ & 0.5 \\
+ & Frozen teacher & Qwen3.5-27B \\
  & Per-token KL cap $c$ & 5.0 \\
  & Shapley samples $m$ & 8 \\
  & KL budget $\epsilon$ & 0.1 \\
+ & Utility weights $(R,\mathrm{MDD},\mathrm{CVaR},\mathrm{TO})$ & $(1.0,0.5,0.5,0.1)$ \\
  & Adversarial refresh interval & every 4 iterations \\
 Belief Store & Capacity & 10,000 quadruples \\
  & Retrieval top-$k$ & 5 \\

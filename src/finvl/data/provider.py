@@ -34,19 +34,34 @@ class OHLCVProvider:
             f"({self.df.index.min():%Y-%m-%d} to {self.df.index.max():%Y-%m-%d})"
         )
 
+    def _asset_frame(self, asset: Optional[str] = None) -> pd.DataFrame:
+        if "ticker" not in self.df.columns:
+            return self.df
+        if asset is None:
+            tickers = self.df["ticker"].dropna().unique()
+            if len(tickers) > 1:
+                raise ValueError("multi-asset data requires an explicit asset")
+            return self.df
+        selected = self.df[self.df["ticker"] == asset]
+        if selected.empty:
+            raise ValueError(f"asset not found: {asset}")
+        return selected
+
     def get_window(
         self,
         end_date: str,
         lookback: int = 60,
         start_date: Optional[str] = None,
+        asset: Optional[str] = None,
     ) -> pd.DataFrame:
         """
         Return OHLCV data up to `end_date` (inclusive) with `lookback` bars.
         Guarantees no future data leakage.
         """
         end_ts = pd.Timestamp(end_date)
-        mask = self.df.index <= end_ts
-        available = self.df.loc[mask]
+        frame = self._asset_frame(asset)
+        mask = frame.index <= end_ts
+        available = frame.loc[mask]
 
         if start_date is not None:
             start_ts = pd.Timestamp(start_date)
@@ -57,15 +72,20 @@ class OHLCVProvider:
 
         return available.iloc[-lookback:].copy()
 
-    def get_date_range(self, start_date: str, end_date: str) -> pd.DataFrame:
+    def get_date_range(
+        self, start_date: str, end_date: str, asset: Optional[str] = None
+    ) -> pd.DataFrame:
         """Return OHLCV data for a date range (inclusive)."""
         s = pd.Timestamp(start_date)
         e = pd.Timestamp(end_date)
-        return self.df.loc[(self.df.index >= s) & (self.df.index <= e)].copy()
+        frame = self._asset_frame(asset)
+        return frame.loc[(frame.index >= s) & (frame.index <= e)].copy()
 
-    def trading_dates(self, start_date: str, end_date: str) -> list[str]:
+    def trading_dates(
+        self, start_date: str, end_date: str, asset: Optional[str] = None
+    ) -> list[str]:
         """Return list of trading date strings in range."""
-        sub = self.get_date_range(start_date, end_date)
+        sub = self.get_date_range(start_date, end_date, asset=asset)
         return [d.strftime("%Y-%m-%d") for d in sub.index]
 
     @property

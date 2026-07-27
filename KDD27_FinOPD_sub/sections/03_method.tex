@@ -61,15 +61,15 @@ a_{t,j}&=\mathbf 1[j\in\mathcal I_t],
 &=\operatorname{sg}(\mathbf a_t-k\mathbf z_t)+k\mathbf z_t.
 \end{aligned}
 \end{equation}
-Here, $\operatorname{sg}$ stops gradients, so $\widetilde{\mathbf a}_t$ equals the hard mask in the forward pass and follows the scaled relaxation in the backward pass; $\tau$ anneals from $1.0$ to $0.5$. At evaluation, perturbations are removed and $\mathcal I_t=\operatorname{TopK}_k(\boldsymbol\ell_t)$. The induced subset distribution $P_{\psi}(\mathcal I_t\mid\mathbf g_t,\rho_t)$ is updated from centered matured utility,
+Here, $\operatorname{sg}$ stops gradients, so $\widetilde{\mathbf a}_t$ equals the hard mask in the forward pass and follows the scaled relaxation in the backward pass; $\tau$ anneals from $1.0$ to $0.5$. At evaluation, perturbations are removed and $\mathcal I_t=\operatorname{TopK}_k(\boldsymbol\ell_t)$. The router uses the same straight-through mask in an advantage-weighted surrogate,
 \begin{equation}
 \label{eq:router_loss}
 \mathcal L_{\mathrm{route}}(\psi)=
 -\frac{1}{|\mathcal B_r^H|}\sum_{b_t\in\mathcal B_r^H}
-(U_t^H-\bar U_r^H)
-\log P_{\psi}(\mathcal I_t\mid\mathbf g_t,\rho_t),
+(U_t^H-\bar U_r^H)\frac{1}{k}\sum_{j=1}^{M}
+\widetilde a_{t,j}\log\operatorname{softmax}(\boldsymbol\ell_t)_j,
 \end{equation}
-where $\mathcal B_r^H$ is the matured subset of round-$r$ records and $\bar U_r^H$ is its mean utility. This update changes the router, not the frozen manifest.
+where $\mathcal B_r^H$ is the matured subset of round-$r$ records and $\bar U_r^H$ is its mean utility. This computable surrogate avoids claiming a closed-form probability for an unordered Gumbel top-$k$ set. It changes the router, not the frozen manifest.
 % 中文翻译：路由器把图形嵌入与市场状态编码映射为 157 维 logits。训练时，独立 Gumbel 扰动同时定义实际使用的 top-15 索引集合和用于反向传播的连续松弛；前向计算使用硬选择，梯度使用 straight-through 松弛。评估时移除随机扰动，直接按 logits 确定性选择最大的 15 项。路由器由已经成熟的中心化轨迹效用更新，该更新只改变选择分布，不改变冻结因子清单。
 
 \subsection{On-Policy Distillation}
@@ -89,7 +89,7 @@ p_{t,i,n}^{\mathrm{ref}}(\cdot)
 \end{aligned}
 \end{equation}
 The student and decision agents use rank-16 LoRA over Qwen3.5-9B, while the training-only teacher is a separate frozen Qwen3.5-27B checkpoint~\cite{qwen35_2026}. Both expose the same tokenizer vocabulary for token-level alignment. The reference is the frozen round-start 9B student, not the teacher. Deployment evaluates only $p^\theta$ and omits both the 27B teacher and $\widehat{\mathbf h}_t^H$.
-% 中文翻译：第 $r$ 轮由当前学生仅利用决策时信息生成 token 与动作，因此教师监督作用在当前策略产生的前缀上，而不是固定语料上。结果窗口闭合后，成熟结果向量被转换为关于成本调整收益、回撤、CVaR 与换手率的估计事后摘要，其中不包含未来图表、原始价格路径或 OHLCV 数组。在相同的学生生成前缀与时点安全上下文上，本文定义学生、教师和 round-start reference 三个完整词表分布。教师是独立冻结的 Qwen3.5-9B checkpoint，学生在同一骨干上使用 rank-16 LoRA；reference 是每轮开始时的冻结学生，而不是教师。部署时只计算学生分布，且不提供事后摘要。
+% 中文翻译：第 $r$ 轮由当前学生仅利用决策时信息生成 token 与动作，因此教师监督作用在当前策略产生的前缀上，而不是固定语料上。结果窗口闭合后，成熟结果向量被转换为关于成本调整收益、回撤、CVaR 与换手率的估计事后摘要，其中不包含未来图表、原始价格路径或 OHLCV 数组。在相同的学生生成前缀与时点安全上下文上，本文定义学生、教师和 round-start reference 三个完整词表分布。教师是独立冻结的 Qwen3.5-27B checkpoint，学生在 Qwen3.5-9B 骨干上使用 rank-16 LoRA；reference 是每轮开始时的冻结学生，而不是教师。部署时只计算学生分布，且不提供事后摘要。
 
 \begin{figure}[t]
 \centering
@@ -101,7 +101,14 @@ The student and decision agents use rank-16 LoRA over Qwen3.5-9B, while the trai
 \end{figure}
 
 \paragraph{Post-horizon agent credit.}
-Joint utility $U_t^H=u(\boldsymbol\xi_t^H)$ is shared. For coalition $S$, set $\widetilde m_t^j(S)=m_t^j$ if $j\in S$ and to role-typed null $m_\varnothing^j$ otherwise. Counterfactual replay on the same horizon gives
+For net daily returns $r_{t:t+H}^{\mathrm{net}}$, turnover $\mathrm{TO}_t^H$, maximum drawdown $\mathrm{MDD}_t^H$, and positive loss magnitude $\mathrm{CVaR}_{.05,t}^H$, routing, memory admission, and coalition replay share one utility:
+\begin{equation}
+\label{eq:utility}
+U_t^H=R_t^H-0.5\,\mathrm{MDD}_t^H
+-0.5\,\mathrm{CVaR}_{.05,t}^H-0.1\,\mathrm{TO}_t^H,
+\quad R_t^H=\prod_{s=t}^{t+H}(1+r_s^{\mathrm{net}})-1.
+\end{equation}
+All terms use decimal units; $r^{\mathrm{net}}$ already includes the stated costs, slippage, and execution delay. For coalition $S$, set $\widetilde m_t^j(S)=m_t^j$ if $j\in S$ and to role-typed null $m_\varnothing^j$ otherwise. Counterfactual replay on the same horizon gives
 \begin{equation}
 \label{eq:agent_credit}
 \begin{aligned}

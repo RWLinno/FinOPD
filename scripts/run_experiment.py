@@ -69,7 +69,7 @@ async def run_pipeline_on_dates(
     decisions = []
     for i, date in enumerate(dates):
         try:
-            window_df = provider.get_window(date, lookback=lookback)
+            window_df = provider.get_window(date, lookback=lookback, asset=asset)
             if len(window_df) < 10:
                 continue
 
@@ -154,20 +154,20 @@ def main():
         sys.exit(1)
 
     provider = OHLCVProvider(data_path)
+    asset = cfg.get("scenario", {}).get("market", "ASSET").upper()
     split_cfg = cfg.get("evaluation", {}).get("temporal_split", {})
     test_start = split_cfg.get("test_start", "2017-01-01")
     test_end = split_cfg.get("test_end", "2020-12-31")
-    test_dates = provider.trading_dates(test_start, test_end)
+    test_dates = provider.trading_dates(test_start, test_end, asset=asset)
     if not test_dates:
         logger.warning("Configured test range has no data, fallback to provider full range")
-        test_dates = provider.trading_dates(*provider.date_range)
+        test_dates = provider.trading_dates(*provider.date_range, asset=asset)
     if args.max_dates:
         test_dates = test_dates[: args.max_dates]
 
     orchestrator = AgentOrchestrator(cfg)
     renderer = _build_chart_renderer(cfg, str(chart_dir))
     vlm_runtime = _build_vlm_runtime(cfg)
-    asset = cfg.get("scenario", {}).get("market", "ASSET").upper()
 
     decisions = asyncio.run(
         run_pipeline_on_dates(

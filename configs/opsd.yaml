@@ -9,6 +9,13 @@ opsd:
   alignment_epsilon: 0.1
   seeds: [42, 123, 456]
 
+  utility:
+    return_weight: 1.0
+    drawdown_weight: 0.5
+    cvar_weight: 0.5
+    turnover_weight: 0.1
+    cvar_alpha: 0.05
+
   teacher:
     freeze_weights: true
     backbone: "Qwen/Qwen3.5-27B"

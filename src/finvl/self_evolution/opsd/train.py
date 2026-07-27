@@ -10,7 +10,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, FrozenSet, List
 
 import numpy as np
 import yaml
@@ -59,7 +59,6 @@ class OPSDTrainer:
             window_days=opsd_cfg.get("rolling_window_days", 60),
             forward_days=opsd_cfg.get("forward_return_days", 20),
         )
-        self.shapley = ShapleyCredit(num_samples=self.shapley_samples)
         self.belief_extractor = BeliefExtractor()
         self.belief_index = BeliefIndex(
             capacity=opsd_cfg.get("belief", {}).get("capacity", 10000),
@@ -82,8 +81,18 @@ class OPSDTrainer:
         assets: List[str],
         output_dir: str,
         seeds: List[int] = None,
+        coalition_value: Callable[[Trajectory, FrozenSet[str]], float] | None = None,
     ):
-        """Run the full OPSD training loop."""
+        """Run OPSD with a deterministic, same-horizon coalition replay evaluator."""
+        if coalition_value is None:
+            raise ValueError(
+                "coalition_value is required: pass a deterministic evaluator that "
+                "replays each trajectory horizon with exactly the supplied agents enabled"
+            )
+        shapley = ShapleyCredit(
+            num_samples=self.shapley_samples,
+            coalition_value=coalition_value,
+        )
         seeds = seeds or [42, 123, 456]
         output = Path(output_dir)
         output.mkdir(parents=True, exist_ok=True)
@@ -96,7 +105,9 @@ class OPSDTrainer:
 
             all_trajectories: List[Trajectory] = []
             for asset in assets:
-                dates = data_provider.trading_dates("2019-01-01", "2022-12-31")
+                dates = data_provider.trading_dates(
+                    "2019-01-01", "2022-12-31", asset=asset
+                )
                 trajs = self.rollout.generate_trajectories(
                     orchestrator=None,
                     provider=data_provider,
@@ -116,7 +127,7 @@ class OPSDTrainer:
             ]
 
             for traj in high_score_trajs:
-                credits = self.shapley.estimate(traj)
+                credits = shapley.estimate(traj)
                 traj.agent_contributions = credits
 
             beliefs = self.belief_extractor.extract_from_trajectories(high_score_trajs)

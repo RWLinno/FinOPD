@@ -30,9 +30,9 @@ Our contributions are threefold:
 \begin{itemize}[leftmargin=*,nosep]
 \item We formulate self-evolution in financial multi-agent systems as learning from delayed portfolio outcomes under a strict point-in-time boundary, and identify endogenous current-policy data, shared agent credit, and asynchronously updated knowledge as its defining challenges.
 % 中文翻译：我们把金融多智能体系统的自进化形式化为严格时点信息边界下的延迟组合结果学习问题，并将当前策略内生数据、多智能体共享信用和异步知识更新确定为其核心挑战。
-\item We propose \textsc{FinOPD}, which combines current-policy distillation with a separate hindsight-informed frozen teacher, stabilized token-level alignment, a frozen library of 150+ evolved factors, time-safe episodic memory, and selective execution in one temporally ordered framework.
+\item We propose \textsc{FinOPD}, which combines a deployable 9B current policy with a training-only 27B hindsight teacher, one explicit cost-aware utility, deterministic coalition credit, stabilized token alignment, a content-addressed 157-factor library, and time-safe memory in one ordered protocol.
 % 中文翻译：我们提出 FinOPD，在统一且具有明确时间顺序的框架中结合当前策略蒸馏、独立的事后信息辅助冻结教师、稳定化 token 级对齐、冻结的 150+ 进化因子库、时间安全情节记忆和选择性执行。
-\item We evaluate \textsc{FinOPD} on four U.S. large-cap equities over a held-out 17-month window against 12 baselines under a common cost and execution protocol. It ranks first in macro-averaged per-asset cumulative return, Sharpe ratio, and Calmar ratio; we explicitly separate these descriptive summaries from synchronized portfolio metrics.
+\item We evaluate \textsc{FinOPD} on four U.S. large-cap equities over a held-out 17-month window against 12 baselines under a common cost and execution protocol. It ranks first in macro-averaged per-asset cumulative return, Sharpe ratio, and Calmar ratio; temporal, intervention, and execution audits delimit rather than conceal the measured edge.
 % 中文翻译：我们在四只美国大盘股和一个留出的 17 个月窗口上评估 FinOPD，并在统一成本与执行协议下与 12 个基线比较。FinOPD 在聚合累计收益、Sharpe ratio 和 Calmar ratio 上均排名第一，同时通过消融、反事实与时间分析检验性能增益的来源和稳定性。
 \end{itemize}
 

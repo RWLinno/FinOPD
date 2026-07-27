@@ -5,6 +5,9 @@
 
 \paragraph{Evaluation universe and temporal separation.}
 We study four U.S. large-cap equities (GOOGL, NVDA, AAPL, and JPM). The held-out test window spans January 2025 through May 2026 (17 months, approximately 350 trading days). OPD rollouts use 2019--2022 data and model selection uses 2023; factor research and every policy update are completed before the test begins. At each test date, the deployed student receives only point-in-time inputs. Estimated hindsight is constructed only after its outcome horizon closes and is available to the frozen teacher during training, never to the deployed policy. Every backtest applies 15\,bps round-trip cost, 5\,bps slippage, and a one-day delay between signal and execution.
+Because Qwen3.5 was released after the test window began, this experiment establishes input-time discipline but not model-weight non-contamination. We therefore call it a retrospective point-in-time backtest, mask no uncertainty behind a ``strict post-cutoff'' label, and reserve live or contamination-free claims for a future forward window. Table~\ref{tab:protocol_audit} states the narrower guarantee that the executable pipeline enforces.
+
+\input{tables/protocol_audit}
 % 中文翻译：我们研究四只美国大盘股（GOOGL、NVDA、AAPL 和 JPM）。留出的测试窗口为 2025 年 1 月至 2026 年 5 月，共 17 个月、约 350 个交易日。OPD rollout 使用 2019--2022 年数据，模型选择使用 2023 年数据；因子研究和全部策略更新都在测试开始前完成。在每个测试时点，部署学生只能接收当时可得的信息。估计的事后信息仅在结果窗口闭合后构造，并且只在训练时提供给冻结教师，部署策略从不接收。所有回测统一计入 15 个基点的双边交易成本、5 个基点滑点，以及信号到执行之间的一天延迟。
 
 \paragraph{Baselines.}
@@ -39,9 +42,9 @@ Table~\ref{tab:per_asset} makes the boundary of that claim explicit. \textsc{Fin
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_multiwindow_ablation.pdf}
-\caption{Temporal robustness and local attribution. \textsc{FinOPD} is first overall and top-four in every slice (left). Among the focused interventions, trend-break protection and adaptive turnover produce the largest local SR changes (right); the hindsight-teacher ceiling is not deployable.}
+\caption{Temporal robustness and local attribution. \textsc{FinOPD} is first overall and top-four in every slice (left). Among the focused interventions, trend-break protection and adaptive turnover produce the largest local SR changes (right); the privileged diagnostic policy is not deployable.}
 % 中文翻译（图注）：时间稳健性与局部归因。FinOPD 在完整窗口中排名第一，并在每个时间切片中保持前四（左）。在重点干预中，趋势断裂保护与自适应换手产生最大的局部 Sharpe 变化（右）；事后教师上界不可部署。
-\Description{Two-panel figure. The left panel shows FinOPD Sharpe ratios and ranks over the full test window and three temporal slices. The right panel shows the diagnostic Sharpe ratios of the intact system and three focused component interventions, together with the frozen hindsight-teacher ceiling.}
+\Description{Two-panel figure. The left panel shows FinOPD Sharpe ratios and ranks over the full test window and three temporal slices. The right panel shows the diagnostic Sharpe ratios of the intact system and three focused component interventions, together with the privileged frozen hindsight policy.}
 \label{fig:results}
 \end{figure*}
 
@@ -52,7 +55,7 @@ Table~\ref{tab:per_asset} makes the boundary of that claim explicit. \textsc{Fin
 \subsection{Mechanism Ablation}
 
 \paragraph{What matters locally.}
-The diagnostic ablation (Fig.~\ref{fig:results}, right; Table~\ref{tab:ablation}) uses a learning-phase window and is therefore not numerically comparable to the held-out SR of 1.41. Removing the trend-break guard causes the largest loss ($\Delta$SR $=-0.21$) and raises MDD from 14.2\% to 17.3\%. Replacing adaptive turnover with daily turnover loses 0.17 SR, raises MDD to 16.1\%, and increases the trade count from 2.0 to 8.5; zeroing factor signals produces the smaller local change of $-0.03$ SR. The paired degradation in SR and drawdown identifies protection and activity control, rather than raw trading frequency, as the principal measured drivers in this diagnostic window. The frozen teacher reaches SR 2.96 only with post-horizon estimated hindsight; its 1.04 gap over the student measures training headroom, not deployable superiority.
+The diagnostic ablation (Fig.~\ref{fig:results}, right; Table~\ref{tab:ablation}) uses a learning-phase window and is therefore not numerically comparable to the held-out SR of 1.41. Removing the trend-break guard causes the largest loss ($\Delta$SR $=-0.21$) and raises MDD from 14.2\% to 17.3\%. Replacing adaptive turnover with daily turnover loses 0.17 SR, raises MDD to 16.1\%, and increases the trade count from 2.0 to 8.5; zeroing factor signals produces the smaller local change of $-0.03$ SR. The paired degradation in SR and drawdown identifies protection and activity control, rather than raw trading frequency, as the principal measured drivers in this diagnostic window. The frozen teacher reaches SR 2.96 only with post-horizon estimated hindsight; its 1.04 difference from the student is a privileged diagnostic gap, not an upper bound or deployable superiority.
 % 中文翻译：该消融（图 4 右；表 6）使用学习阶段诊断窗口，因此不能与留出测试上的 1.41 Sharpe 直接进行数值比较。移除趋势断裂保护造成最大损失（$\Delta$SR $=-0.21$），并将最大回撤从 14.2\% 提高到 17.3\%。用日频换手替代自适应换手使 Sharpe 下降 0.17、最大回撤升至 16.1\%，交易次数从 2.0 增加到 8.5；将因子信号置零只产生 $-0.03$ 的较小局部变化。Sharpe 与回撤同时恶化，说明在该诊断窗口中，保护机制和交易活跃度控制才是主要测得驱动因素，而不是原始交易频率。冻结教师只有在获得窗口闭合后的估计事后信息时才达到 2.96 Sharpe；它相对学生的 1.04 差距衡量训练改进空间，而非可部署优势。
 
 \subsection{Dual-Track Evolution Diagnostics}

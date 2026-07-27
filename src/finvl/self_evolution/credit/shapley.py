@@ -6,7 +6,7 @@ via leave-subset-out replay with random agent subsets.
 from __future__ import annotations
 
 import logging
-from typing import Dict, List
+from typing import Callable, Dict, FrozenSet, List
 
 import numpy as np
 
@@ -22,9 +22,17 @@ class ShapleyCredit:
     and estimates marginal contributions via leave-subset-out replay.
     """
 
-    def __init__(self, num_samples: int = 8, agents: List[str] = None):
+    def __init__(
+        self,
+        num_samples: int = 8,
+        agents: List[str] = None,
+        coalition_value: Callable[[object, FrozenSet[str]], float] | None = None,
+        seed: int = 42,
+    ):
         self.num_samples = num_samples
         self.agents = agents or AGENT_NAMES
+        self.coalition_value = coalition_value
+        self.rng = np.random.default_rng(seed)
 
     def estimate(self, trajectory) -> Dict[str, float]:
         """
@@ -37,17 +45,21 @@ class ShapleyCredit:
         n_agents = len(self.agents)
         marginals = {agent: [] for agent in self.agents}
 
-        full_score = trajectory.score
+        if self.coalition_value is None:
+            raise RuntimeError(
+                "Shapley credit requires a deterministic coalition evaluator; "
+                "heuristic/noisy replay is not permitted."
+            )
 
         for _ in range(self.num_samples):
-            perm = np.random.permutation(n_agents)
-            prev_score = 0.0
+            perm = self.rng.permutation(n_agents)
+            coalition: set[str] = set()
+            prev_score = self.coalition_value(trajectory, frozenset())
 
             for idx in perm:
                 agent = self.agents[idx]
-                current_score = self._simulate_with_subset(
-                    trajectory, self.agents[:idx + 1]
-                )
+                coalition.add(agent)
+                current_score = self.coalition_value(trajectory, frozenset(coalition))
                 marginal = current_score - prev_score
                 marginals[agent].append(marginal)
                 prev_score = current_score
@@ -62,19 +74,6 @@ class ShapleyCredit:
             shapley_values = {k: v / total for k, v in shapley_values.items()}
 
         return shapley_values
-
-    def _simulate_with_subset(self, trajectory, agent_subset: List[str]) -> float:
-        """
-        Simulate trajectory performance with only a subset of agents active.
-        In practice, this would re-run the orchestrator with disabled agents.
-        Here we use a heuristic based on trajectory step confidences.
-        """
-        if not trajectory.steps:
-            return 0.0
-
-        active_ratio = len(agent_subset) / len(self.agents)
-        noise = np.random.normal(0, 0.1)
-        return trajectory.score * active_ratio + noise
 
     def compute_distillation_weights(
         self, shapley_values: Dict[str, float]

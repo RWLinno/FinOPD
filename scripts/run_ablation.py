@@ -15,9 +15,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
-import numpy as np
-import pandas as pd
-
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from finvl.core.config import load_config, merge_ablation_config
@@ -49,6 +46,7 @@ async def run_variant(
     provider: OHLCVProvider,
     dates: List[str],
     lookback: int,
+    asset: str,
 ) -> Dict[str, float]:
     """Run a single ablation variant and return metrics."""
     orchestrator = AgentOrchestrator(config)
@@ -56,7 +54,7 @@ async def run_variant(
     decisions = []
     for date in dates:
         try:
-            window_df = provider.get_window(date, lookback=lookback)
+            window_df = provider.get_window(date, lookback=lookback, asset=asset)
             if len(window_df) < 10:
                 continue
             chart_path = None
@@ -65,7 +63,7 @@ async def run_variant(
 
                 chart_dir = config.get("chart", {}).get("output_dir", "outputs/ablation_charts")
                 renderer = ChartRenderer({**config.get("chart", {}), "output_dir": chart_dir})
-                chart_path, _ = renderer.render_candlestick(window_df, asset="ASSET", save_path=f"{chart_dir}/ASSET_{date}.png")
+                chart_path, _ = renderer.render_candlestick(window_df, asset=asset, save_path=f"{chart_dir}/{asset}_{date}.png")
             except Exception:
                 chart_path = None
 
@@ -77,7 +75,7 @@ async def run_variant(
             inputs = {
                 "ohlcv_df": window_df,
                 "current_price": float(window_df["close"].iloc[-1]),
-                "asset": "ASSET",
+                "asset": asset,
                 "timeframe": "daily",
                 "start_date": window_df.index[0].strftime("%Y-%m-%d"),
                 "end_date": date,
@@ -98,7 +96,7 @@ async def run_variant(
     bt = VectorizedBacktester(BacktestConfig(
         transaction_cost_bps=config.get("evaluation", {}).get("transaction_cost_bps", 15),
     ))
-    test_df = provider.get_date_range(dates[0], dates[-1])
+    test_df = provider.get_date_range(dates[0], dates[-1], asset=asset)
     result = bt.run(decisions, test_df)
     return result.metrics
 
@@ -109,6 +107,7 @@ def main():
     parser.add_argument("--data", required=True, help="OHLCV data path")
     parser.add_argument("--max-dates", type=int, default=50)
     parser.add_argument("--output-dir", default="outputs/experiments")
+    parser.add_argument("--asset", required=True)
     args = parser.parse_args()
 
     base_cfg = load_config(args.config)
@@ -118,11 +117,11 @@ def main():
     split = eval_cfg.get("temporal_split", {})
     test_dates = provider.trading_dates(
         split.get("test_start", "2017-01-01"),
-        split.get("test_end", "2020-12-31"),
+        split.get("test_end", "2020-12-31"), asset=args.asset,
     )
     if not test_dates:
         # Fallback for custom datasets whose date range does not overlap default config.
-        all_dates = provider.trading_dates(*provider.date_range)
+        all_dates = provider.trading_dates(*provider.date_range, asset=args.asset)
         test_dates = all_dates
     if args.max_dates:
         test_dates = test_dates[: args.max_dates]
@@ -137,7 +136,9 @@ def main():
         else:
             cfg = base_cfg
 
-        metrics = asyncio.run(run_variant(cfg, provider, test_dates, lookback))
+        metrics = asyncio.run(
+            run_variant(cfg, provider, test_dates, lookback, args.asset)
+        )
         all_results[name] = metrics
         logger.info(f"  {name}: Sharpe={metrics.get('sharpe_ratio', 0):.3f}")
 
