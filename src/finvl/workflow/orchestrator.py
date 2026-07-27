@@ -17,7 +17,7 @@ from finvl.agents.event_analyst import EventAnalystAgent
 from finvl.agents.pattern_reasoner import PatternReasonerAgent
 from finvl.agents.risk_controller import RiskControllerAgent
 from finvl.core.memory import SharedMemory
-from finvl.core.types import ChartGeometry, DecisionOutput, Implication, RegimeState
+from finvl.core.types import ChartGeometry, DecisionOutput, Implication
 
 logger = logging.getLogger(__name__)
 
@@ -171,3 +171,47 @@ class AgentOrchestrator:
 
     def get_disagreements(self) -> List[str]:
         return self.memory.detect_disagreements()
+
+    @property
+    def last_factor_ids(self) -> List[int]:
+        for agent in self.agents:
+            if isinstance(agent, DecisionPMAgent):
+                return list(agent._last_factor_ids)
+        return []
+
+    @property
+    def last_router_features(self) -> List[float]:
+        for agent in self.agents:
+            if isinstance(agent, DecisionPMAgent):
+                return list(agent._last_router_features)
+        return []
+
+    @property
+    def last_router_regime(self) -> List[float]:
+        for agent in self.agents:
+            if isinstance(agent, DecisionPMAgent):
+                return list(agent._last_router_regime)
+        return []
+
+    @property
+    def last_router_selected_indices(self) -> List[int]:
+        for agent in self.agents:
+            if isinstance(agent, DecisionPMAgent):
+                return list(agent._last_router_selected_indices)
+        return []
+
+    @property
+    def factor_router(self):
+        for agent in self.agents:
+            if isinstance(agent, DecisionPMAgent):
+                agent._get_factor_lib()
+                return agent._router
+        return None
+
+    @property
+    def router_factor_names(self) -> List[str]:
+        for agent in self.agents:
+            if isinstance(agent, DecisionPMAgent):
+                agent._get_factor_lib()
+                return list(agent._router_factor_names)
+        return []

@@ -1,14 +1,13 @@
 """
 Factor Router: 2-layer MLP with Gumbel-Softmax top-k selection.
-Input: (geometry_embedding, regime_onehot)
+Input: (point-in-time factor-state features, regime_onehot)
 Output: factor ID list with selection probabilities
 """
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import List, Tuple
 
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class FactorRouter(nn.Module):
     """
-    Geometry-conditioned factor router.
+    Point-in-time factor-state-conditioned router.
     Uses Gumbel-Softmax for differentiable discrete factor selection.
     """
 
@@ -58,7 +57,7 @@ class FactorRouter(nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
-            geometry_embedding: (batch, geometry_dim) from VLM last layer
+            geometry_embedding: (batch, geometry_dim) normalized factor-state features
             regime_onehot: (batch, 4) one-hot regime encoding
             hard: if True, use straight-through Gumbel-Softmax
 
@@ -66,8 +65,7 @@ class FactorRouter(nn.Module):
             selection: (batch, num_factors) binary mask (top-k)
             logits: (batch, num_factors) raw logits for GRPO
         """
-        x = torch.cat([geometry_embedding, regime_onehot], dim=-1)
-        logits = self.mlp(x)
+        logits = self.compute_logits(geometry_embedding, regime_onehot)
 
         if self.training:
             selection = self._gumbel_top_k(logits, self.top_k, self.tau, hard)
@@ -78,11 +76,18 @@ class FactorRouter(nn.Module):
 
         return selection, logits
 
+    def compute_logits(
+        self,
+        geometry_embedding: torch.Tensor,
+        regime_onehot: torch.Tensor,
+    ) -> torch.Tensor:
+        """Return factor logits without sampling a new top-k action."""
+        return self.mlp(torch.cat([geometry_embedding, regime_onehot], dim=-1))
+
     def _gumbel_top_k(
         self, logits: torch.Tensor, k: int, tau: float, hard: bool
     ) -> torch.Tensor:
         """Differentiable top-k via repeated Gumbel-Softmax."""
-        batch_size = logits.shape[0]
         selection = torch.zeros_like(logits)
         remaining_logits = logits.clone()
 

@@ -9,7 +9,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader, Dataset
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from finvl.factors.dsl_engine import FactorDSL
+from finvl.factors.library import FactorLibrary
 from finvl.factors.router import FactorRouter
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -57,32 +57,29 @@ class FactorReturnDataset(Dataset):
     Router learns to select factors whose values best predict forward returns.
     """
 
-    def __init__(self, ohlcv_path: str, factor_json: str, lookback: int = 60,
-                 forward_days: int = 5, max_samples: int = 2000):
+    def __init__(self, ohlcv_path: str, factor_artifact: str, asset: str | None = None,
+                 lookback: int = 60, forward_days: int = 5,
+                 max_samples: int = 2000):
         self.samples: List[Dict] = []
-        dsl = FactorDSL()
 
-        # Load factors
-        factor_exprs = []
-        with open(factor_json, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if not line or line == 'null':
-                    continue
-                try:
-                    d = json.loads(line)
-                    if d and 'expr' in d:
-                        factor_exprs.append((d['name'], d['expr'], d.get('Information_Ratio_with_cost', 0)))
-                except:
-                    pass
-
-        self.num_factors = len(factor_exprs)
-        self.factor_names = [f[0] for f in factor_exprs]
+        library = FactorLibrary(factor_artifact)
+        factors = [
+            factor for factor in library.factors.values()
+            if factor.category == "evolved"
+        ]
+        self.num_factors = len(factors)
+        self.factor_names = [factor.name for factor in factors]
         logger.info(f"Loading {self.num_factors} factors for router training")
 
         # Load OHLCV
         df = pd.read_csv(ohlcv_path, parse_dates=True, index_col=0)
         df.columns = [c.lower() for c in df.columns]
+        if "ticker" in df.columns:
+            if not asset:
+                raise ValueError("multi-asset router data requires --asset")
+            df = df[df["ticker"] == asset].copy()
+            if df.empty:
+                raise ValueError(f"asset not found in router data: {asset}")
 
         # Generate samples
         dates = df.index[lookback:-forward_days]
@@ -106,14 +103,22 @@ class FactorReturnDataset(Dataset):
 
             # Compute all factor values at this date
             factor_vals = np.zeros(self.num_factors)
-            for i, (name, expr, ir) in enumerate(factor_exprs):
+            for i, factor in enumerate(factors):
                 try:
-                    result = dsl.evaluate(expr, window)
+                    result = factor.compute(window)
                     val = result.iloc[-1]
                     if np.isfinite(val):
                         factor_vals[i] = val
-                except:
-                    pass
+                except Exception as exc:
+                    logger.debug("Factor %s failed on %s: %s", factor.name, dt, exc)
+
+            finite = np.isfinite(factor_vals)
+            if finite.any():
+                median = float(np.median(factor_vals[finite]))
+                mad = float(np.median(np.abs(factor_vals[finite] - median)))
+                scale = max(1.4826 * mad, 1e-6)
+                factor_vals = np.clip((factor_vals - median) / scale, -5.0, 5.0)
+            factor_vals[~np.isfinite(factor_vals)] = 0.0
 
             # Factor "returns": correlation of factor value with forward return
             # Positive factor value * positive forward return = good selection
@@ -148,7 +153,8 @@ class FactorReturnDataset(Dataset):
 
 def train_router(
     ohlcv_path: str,
-    factor_json: str,
+    factor_artifact: str,
+    asset: str | None,
     output_dir: str,
     epochs: int = 30,
     lr: float = 3e-4,
@@ -159,7 +165,12 @@ def train_router(
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)
 
-    dataset = FactorReturnDataset(ohlcv_path, factor_json, max_samples=max_samples)
+    dataset = FactorReturnDataset(
+        ohlcv_path,
+        factor_artifact,
+        asset=asset,
+        max_samples=max_samples,
+    )
     if len(dataset) < 10:
         logger.error("Not enough training samples")
         return
@@ -202,7 +213,10 @@ def train_router(
             loss = -selected_reward.mean()
 
             # Entropy regularization (encourage exploration early)
-            entropy = router.compute_entropy(logits)
+            probabilities = torch.softmax(logits, dim=-1)
+            entropy = -(
+                probabilities * probabilities.clamp_min(1e-8).log()
+            ).sum(dim=-1).mean()
             entropy_coeff = 0.05 * (1 - progress)
             loss = loss - entropy_coeff * entropy
 
@@ -244,7 +258,11 @@ def train_router(
 def main():
     parser = argparse.ArgumentParser(description="Train Factor Router")
     parser.add_argument("--data", default="data/raw/AAPL_ohlcv.csv")
-    parser.add_argument("--factor-json", default="docs/best_factor.json")
+    parser.add_argument("--asset", default=None)
+    parser.add_argument(
+        "--factor-artifact",
+        default="src/finvl/factors/frozen_factors.bin",
+    )
     parser.add_argument("--output", default="outputs/router/")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--lr", type=float, default=3e-4)
@@ -255,7 +273,8 @@ def main():
 
     train_router(
         ohlcv_path=args.data,
-        factor_json=args.factor_json,
+        factor_artifact=args.factor_artifact,
+        asset=args.asset,
         output_dir=args.output,
         epochs=args.epochs,
         lr=args.lr,

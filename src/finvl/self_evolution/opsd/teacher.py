@@ -1,15 +1,11 @@
 """
 Teacher module for OPSD.
-Teacher shares LoRA weights with student but receives hindsight information
-(serialized risk-adjusted returns) as privileged context.
-Teacher weights are frozen throughout training.
+Compatibility inference wrapper for the frozen hindsight teacher.
 """
 from __future__ import annotations
 
 import logging
 from typing import Dict, List, Optional
-
-import torch
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +13,7 @@ logger = logging.getLogger(__name__)
 class OPSDTeacher:
     """
     Teacher for On-Policy Self-Distillation.
-    - Shares initial LoRA checkpoint with student
+    - Uses a distinct Qwen3.5-27B checkpoint
     - Receives hindsight prefix with realized returns
     - Weights frozen during entire training
     """
@@ -25,7 +21,7 @@ class OPSDTeacher:
     def __init__(
         self,
         model_path: str,
-        lora_path: str,
+        lora_path: str | None = None,
         hindsight_prefix: str = "[HINDSIGHT]",
         device: str = "cuda",
     ):
@@ -36,11 +32,17 @@ class OPSDTeacher:
         self.model = None
 
     def load(self):
-        """Load teacher model with frozen LoRA weights."""
+        """Load the teacher through the current ms-swift inference API."""
         try:
-            from swift.llm import PtEngine
-            self.model = PtEngine(self.model_path, adapters=[self.lora_path])
-            logger.info(f"Teacher loaded: {self.model_path} + {self.lora_path}")
+            from swift.infer_engine import TransformersEngine
+
+            adapters = [self.lora_path] if self.lora_path else None
+            self.model = TransformersEngine(
+                self.model_path,
+                adapters=adapters,
+                device_map=self.device,
+            )
+            logger.info("Teacher loaded: %s", self.model_path)
         except ImportError as exc:
             raise RuntimeError("ms-swift is required for an evidence-bearing OPD run") from exc
 
@@ -60,10 +62,12 @@ class OPSDTeacher:
         prompts: List[str],
         images: Optional[List[str]] = None,
         realized_returns: Optional[List[Dict[str, float]]] = None,
-    ) -> List[torch.Tensor]:
+    ) -> List[object]:
         """
-        Teacher forward pass with hindsight.
-        Returns logits distributions for each position in the trajectory.
+        Generate frozen-teacher annotations with token log-probability metadata.
+
+        Full-vocabulary differentiable logits for training are provided by
+        ``LocalQwenOPSDBackend``; this method is for inference/protocol audits.
         """
         if realized_returns:
             prompts = [
@@ -74,11 +78,25 @@ class OPSDTeacher:
         if self.model is None:
             raise RuntimeError("teacher must be loaded before forward()")
 
-        logits_list = []
-        for prompt in prompts:
-            messages = [{"role": "user", "content": prompt}]
-            with torch.no_grad():
-                output = self.model.infer(messages=messages, images=images)
-            logits_list.append(output)
+        from swift.infer_engine import InferRequest, RequestConfig
 
-        return logits_list
+        requests = []
+        for index, prompt in enumerate(prompts):
+            request_images = []
+            if images and index < len(images) and images[index]:
+                request_images = [images[index]]
+            requests.append(
+                InferRequest(
+                    messages=[{"role": "user", "content": prompt}],
+                    images=request_images,
+                )
+            )
+        return self.model.infer(
+            requests,
+            RequestConfig(
+                max_tokens=128,
+                temperature=0.0,
+                logprobs=True,
+                top_logprobs=20,
+            ),
+        )

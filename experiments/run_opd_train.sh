@@ -1,15 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 # FinOPD: On-Policy Distillation Training
-# Uses ms-swift to fine-tune Qwen2.5-VL-7B with hindsight direction labels
+# Uses ms-swift to fine-tune the deployable Qwen3.5-9B student.
 cd "$(dirname "$0")/.."
 
 if [ -f .env ]; then set -a; source .env; set +a; fi
 export NO_PROXY=localhost,127.0.0.1
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1
 export WANDB_PROJECT=finopd
 
-MODEL_PATH="/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-7B-Instruct"
+MODEL_PATH="${FINOPD_STUDENT_MODEL:-.models/Qwen3.5-9B}"
 DATASET="data/opd_train/opd_train.jsonl"
 OUTPUT_DIR="outputs/opd_lora"
 

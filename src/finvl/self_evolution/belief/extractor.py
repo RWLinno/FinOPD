@@ -16,12 +16,13 @@ logger = logging.getLogger(__name__)
 @dataclass
 class BeliefEntry:
     """A single belief store entry (quadruple)."""
-    geometry_signature: np.ndarray  # mean-pooled VLM geometry token embedding
+    geometry_signature: np.ndarray  # deterministic point-in-time state signature
     factor_set: List[int]  # selected factor IDs
     action_pattern: str  # e.g., "buy_high_confidence"
     realized_j: float  # realized performance score
     asset: str = ""
     date: str = ""
+    available_date: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -45,7 +46,9 @@ class BeliefExtractor:
 
             geometry_sig = self._compute_geometry_signature(traj)
 
-            factor_set = list(range(15))
+            factor_set = sorted(
+                {factor_id for step in traj.steps for factor_id in step.factor_ids}
+            )
 
             action_counts = {}
             for step in traj.steps:
@@ -62,6 +65,7 @@ class BeliefExtractor:
                 realized_j=traj.score,
                 asset=traj.asset,
                 date=traj.steps[-1].date if traj.steps else "",
+                available_date=traj.available_date,
             )
             beliefs.append(entry)
 
@@ -70,7 +74,25 @@ class BeliefExtractor:
 
     def _compute_geometry_signature(self, trajectory) -> np.ndarray:
         """
-        Compute geometry signature as mean-pooled embedding.
-        In production, this would use VLM last-layer geometry tokens.
+        Compute a deterministic point-in-time state signature from the rollout.
         """
-        return np.random.randn(self.embedding_dim).astype(np.float32)
+        vectors = []
+        for step in trajectory.steps:
+            raw = np.asarray(
+                step.observation.get("state_signature", []), dtype=np.float32
+            )
+            if raw.size:
+                vectors.append(raw)
+        if not vectors:
+            raise ValueError("trajectory has no point-in-time state signature")
+        width = max(vector.size for vector in vectors)
+        matrix = np.zeros((len(vectors), width), dtype=np.float32)
+        for row, vector in enumerate(vectors):
+            matrix[row, : vector.size] = vector
+        pooled = matrix.mean(axis=0)
+        signature = np.zeros(self.embedding_dim, dtype=np.float32)
+        signature[: min(self.embedding_dim, pooled.size)] = pooled[: self.embedding_dim]
+        norm = float(np.linalg.norm(signature))
+        if norm > 0:
+            signature /= norm
+        return signature

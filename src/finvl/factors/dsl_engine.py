@@ -1,5 +1,5 @@
 """
-Factor DSL Engine: evaluates factor expressions from best_factor.json.
+Factor DSL Engine: evaluates expressions from the frozen factor artifact.
 Implements all 45 DSL functions used in the evolved factor library.
 """
 from __future__ import annotations
@@ -25,7 +25,8 @@ class FactorDSL:
         """Evaluate a factor expression on OHLCV DataFrame."""
         try:
             env = self._build_env(df)
-            result = self._eval_expr(expr, env)
+            with np.errstate(all="ignore"):
+                result = self._eval_expr(expr, env)
             if isinstance(result, (int, float, bool)):
                 return pd.Series(float(result), index=df.index)
             if isinstance(result, np.ndarray):

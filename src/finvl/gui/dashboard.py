@@ -1,7 +1,7 @@
 """
 FinOPD Experiment Dashboard - 增强版可视化 GUI
 展示实验进度、结果对比、因子分析、系统架构、实时监控
-启动: cd /Knowin/foundation/weilinruan/FinOPD && python -m finvl.gui.dashboard
+启动: cd /mnt/nas/weilinruan/FinOPD && python -m finvl.gui.dashboard
 """
 from __future__ import annotations
 
@@ -18,7 +18,6 @@ except ImportError:
 
 try:
     import plotly.graph_objects as go
-    from plotly.subplots import make_subplots
 except ImportError:
     raise ImportError("pip install plotly>=5.0")
 
@@ -29,73 +28,52 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 
 def load_experiment_log():
     return [
-        {"date": "05-28 15:00", "stage": "S0", "event": "环境搭建", "detail": "4xA800 + PyTorch 2.10 + conda", "status": "✅"},
-        {"date": "05-28 16:00", "stage": "S1", "event": "数据构建", "detail": "Dow-30 OHLCV 52775行 + ChartGeometry 2375样本", "status": "✅"},
-        {"date": "KDD", "stage": "S2", "event": "vLLM 配置", "detail": "Qwen3.5-9B student / Qwen3.5-27B teacher", "status": "✅"},
-        {"date": "05-30 20:20", "stage": "v0", "event": "MVP 首跑", "detail": "SR=-1.57, VLM parse失败47/50", "status": "❌"},
-        {"date": "05-30 21:10", "stage": "v1", "event": "Parser修复", "detail": "处理//注释+trailing comma → 99.7%成功", "status": "✅"},
-        {"date": "05-30 23:20", "stage": "v2", "event": "Backtest修复", "detail": "HOLD保持仓位 → SR: -1.57→-0.55", "status": "✅"},
-        {"date": "05-31 11:25", "stage": "v3", "event": "趋势跟随+仓位", "detail": "SMA20+30%仓位 → SR=+0.51 首次转正!", "status": "✅"},
-        {"date": "05-31 15:08", "stage": "v5", "event": "手写因子", "detail": "RSI+RSV+R²+vol-corr → Mean SR=+0.59", "status": "✅"},
-        {"date": "05-31 16:45", "stage": "DSL", "event": "因子DSL引擎", "detail": "45函数, 118/157因子可计算 (75.2%)", "status": "✅"},
-        {"date": "05-31 17:50", "stage": "v6", "event": "DSL因子接入", "detail": "30个高IR因子 → Mean SR=+0.82 (5/5正)", "status": "✅"},
-        {"date": "05-31 16:50", "stage": "Router", "event": "Factor Router", "detail": "Gumbel-Softmax top-15, 30 epochs", "status": "✅"},
+        {"date": "KDD", "stage": "Factors", "event": "Binary artifact audit", "detail": "157/157 finite; source manifest not exposed", "status": "✅"},
+        {"date": "KDD", "stage": "Router", "event": "Recorded-mask routing", "detail": "ordered checkpoint; deterministic top-15", "status": "✅"},
+        {"date": "KDD", "stage": "Memory", "event": "Availability filter", "detail": "future outcomes excluded before similarity search", "status": "✅"},
+        {"date": "KDD", "stage": "OPSD", "event": "Dual-model smoke", "detail": "Qwen3.5-9B update + frozen Qwen3.5-27B teacher", "status": "✅"},
+        {"date": "KDD", "stage": "Finance", "event": "Locked factorial matrix", "detail": "0/27 auditable arm/seed runs available", "status": "⏳"},
     ]
 
 
 def create_sr_evolution():
-    labels = ['原始\n(VLM only)', 'Parser\n修复', 'Backtest\n修复', '趋势跟随\n+仓位', '手写\n因子', 'DSL\n因子库']
-    sr_values = [-0.85, -0.85, -0.55, 0.51, 0.59, 0.82]
-    colors = ['#ef5350' if v < 0 else '#26a69a' for v in sr_values]
+    labels = ["Factor artifact", "Router", "Time-safe memory", "9B/27B smoke"]
+    passed = [1, 1, 1, 1]
 
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=labels, y=sr_values, marker_color=colors,
-                         text=[f'{v:.2f}' for v in sr_values], textposition='outside'))
-    fig.add_hline(y=0, line_dash="dash", line_color="gray", line_width=2)
-    fig.add_annotation(x='DSL\n因子库', y=0.82, text="当前最佳", showarrow=True, arrowhead=2, font=dict(size=12, color="green"))
-    fig.update_layout(title="Sharpe Ratio 迭代演进", yaxis_title="Mean Sharpe Ratio",
+    fig.add_trace(go.Bar(x=labels, y=passed, marker_color="#26a69a",
+                         text=["PASS"] * len(labels), textposition="inside"))
+    fig.update_layout(title="可复核组件审计（不代表金融收益）", yaxis_title="Audit pass",
+                      yaxis=dict(range=[0, 1.15], tickvals=[0, 1]),
                       template="plotly_white", height=420, margin=dict(t=50, b=80))
     return fig
 
 
 def create_ticker_chart():
-    tickers = ['AAPL', 'MSFT', 'NVDA', 'JPM', 'GS']
-    srs = [0.4630, 0.5073, 0.7347, 1.1237, 1.2591]
-    wrs = [52.6, 52.2, 50.6, 55.8, 56.2]
-    crs = [1.05, 1.66, 2.49, 3.97, 5.53]
-
-    fig = make_subplots(rows=1, cols=3, subplot_titles=("Sharpe Ratio", "Win Rate (%)", "Cumulative Return (%)"))
-    fig.add_trace(go.Bar(x=tickers, y=srs, marker_color=['#1976d2']*5, showlegend=False), row=1, col=1)
-    fig.add_trace(go.Bar(x=tickers, y=wrs, marker_color=['#388e3c']*5, showlegend=False), row=1, col=2)
-    fig.add_trace(go.Bar(x=tickers, y=crs, marker_color=['#f57c00']*5, showlegend=False), row=1, col=3)
-    fig.add_hline(y=0, line_dash="dash", line_color="gray", row=1, col=1)
-    fig.add_hline(y=50, line_dash="dash", line_color="gray", row=1, col=2)
-    fig.update_layout(title="v6 Per-Ticker Performance (20 trading days, Jan 2025)",
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=["Expected arm/seed runs", "Complete", "Missing"],
+        y=[27, 0, 27],
+        marker_color=["#1976d2", "#26a69a", "#ef5350"],
+        text=["27", "0", "27"],
+        textposition="outside",
+    ))
+    fig.update_layout(title="锁定金融实验矩阵状态", yaxis_title="Runs",
                       template="plotly_white", height=350)
     return fig
 
 
 def create_factor_ir_chart():
-    factor_path = PROJECT_ROOT / "docs" / "best_factor.json"
-    irs = []
-    if factor_path.exists():
-        with open(factor_path) as f:
-            for line in f:
-                line = line.strip()
-                if not line or line == 'null':
-                    continue
-                try:
-                    d = json.loads(line)
-                    if d and 'Information_Ratio_with_cost' in d:
-                        irs.append(d['Information_Ratio_with_cost'])
-                except (json.JSONDecodeError, TypeError, ValueError):
-                    pass
+    from finvl.factors.library import FactorLibrary
+
+    library = FactorLibrary(str(PROJECT_ROOT / "src/finvl/factors/frozen_factors.bin"))
+    irs = [factor.ir for factor in library.factors.values() if factor.category == "evolved"]
 
     fig = go.Figure()
     fig.add_trace(go.Histogram(x=irs, nbinsx=25, marker_color='#7b1fa2', opacity=0.8))
     fig.add_vline(x=1.0, line_dash="dash", line_color="red", annotation_text="IR=1.0")
     fig.add_vline(x=2.0, line_dash="dash", line_color="orange", annotation_text="IR=2.0")
-    fig.update_layout(title=f"因子 Information Ratio 分布 ({len(irs)} factors)",
+    fig.update_layout(title=f"冻结因子开发元数据（非 KDD 金融结果，{len(irs)} factors）",
                       xaxis_title="IR (with cost)", yaxis_title="Count",
                       template="plotly_white", height=350)
     return fig
@@ -103,47 +81,40 @@ def create_factor_ir_chart():
 
 def create_decision_flow_chart():
     fig = go.Figure()
-    # Sankey diagram showing decision flow
     fig.add_trace(go.Sankey(
         node=dict(
             pad=15, thickness=20,
-            label=["OHLCV", "Chart Image", "VLM Analysis", "Factor DSL\n(118 factors)",
-                   "Factor Router\n(top-15)", "Trend Signal", "DecisionPM",
-                   "BUY", "HOLD", "SELL"],
-            color=["#42a5f5", "#66bb6a", "#ab47bc", "#ff7043",
-                   "#26c6da", "#ffa726", "#ec407a",
-                   "#4caf50", "#9e9e9e", "#f44336"]
+            label=["Point-in-time OHLCV/events", "4 structured specialists",
+                   "157-factor binary", "Factor Router\n(top-15)",
+                   "Eligible episodic memory", "Qwen3.5-9B policy",
+                   "BUY / HOLD / SELL", "Matured outcome scalars",
+                   "Frozen Qwen3.5-27B", "OPSD update"],
+            color=["#42a5f5", "#66bb6a", "#ff7043", "#26c6da",
+                   "#ffa726", "#ec407a", "#4caf50", "#9e9e9e",
+                   "#7e57c2", "#5c6bc0"]
         ),
         link=dict(
-            source=[0, 0, 1, 2, 3, 4, 5, 6, 6, 6],
-            target=[1, 3, 2, 6, 4, 6, 6, 7, 8, 9],
-            value=[10, 10, 10, 4, 8, 6, 7, 3, 5, 2],
+            source=[0, 0, 2, 3, 1, 4, 5, 6, 7, 8],
+            target=[1, 3, 3, 5, 5, 5, 6, 7, 8, 9],
+            value=[10, 6, 6, 6, 10, 4, 10, 8, 8, 8],
         )
     ))
-    fig.update_layout(title="决策流程 (Data Flow)", template="plotly_white", height=400)
+    fig.update_layout(title="部署与 post-horizon 更新的数据边界", template="plotly_white", height=400)
     return fig
 
 
 def refresh_results():
-    """Refresh results from latest pipeline run."""
-    results_dir = PROJECT_ROOT / "outputs" / "experiments" / "pipeline_quick"
-    if not results_dir.exists():
-        return "暂无 pipeline_quick 结果，请先运行实验"
-
-    lines = []
-    for ticker_dir in sorted(results_dir.iterdir()):
-        if ticker_dir.is_dir() and ticker_dir.name != "summary.json":
-            for sub in ticker_dir.iterdir():
-                mf = sub / "metrics.json"
-                if mf.exists():
-                    m = json.loads(mf.read_text())
-                    lines.append(f"**{ticker_dir.name}**: SR={m.get('sharpe_ratio',0):.4f}, "
-                                 f"WR={m.get('win_rate',0):.1%}, "
-                                 f"CR={m.get('total_return',0):.2%}, "
-                                 f"MDD={m.get('max_drawdown',0):.2%}")
-    if not lines:
-        return "实验正在运行中..."
-    return "\n\n".join(lines)
+    """Report only the fail-closed KDD factorial status."""
+    status_path = PROJECT_ROOT / "outputs" / "kdd_factorial" / "factorial_status.json"
+    if not status_path.is_file():
+        return "未找到锁定实验状态；当前不能报告金融结果。"
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    summary = status.get("summary", {})
+    return (
+        f"**Expected:** {summary.get('expected_runs', 'unknown')}  \n"
+        f"**Missing:** {summary.get('missing_runs', 'unknown')}  \n"
+        f"**Proxy results used:** {summary.get('proxy_results_used', 'unknown')}"
+    )
 
 
 def build_app():
@@ -158,15 +129,15 @@ def build_app():
                         gr.Plot(create_sr_evolution())
                     with gr.Column(scale=1):
                         gr.Markdown("""
-### 关键指标
-| 指标 | 值 |
-|------|-----|
-| Mean SR | **+0.82** |
-| Win Rate | **53.5%** |
-| Positive Tickers | **5/5** |
-| VLM Parse Rate | **99.7%** |
-| Factors Used | **30/118** |
-| Router top-k | **15** |
+### 当前证据边界
+| 项目 | 状态 |
+|------|------|
+| 157 因子二进制审计 | **PASS** |
+| Router deterministic top-k | **15** |
+| Future-memory exclusion | **PASS** |
+| Qwen3.5 9B/27B smoke | **PASS** |
+| 金融 arm/seed runs | **0/27** |
+| 金融优越性结论 | **WITHHELD** |
 """)
                 gr.Plot(create_ticker_chart())
 
@@ -181,12 +152,11 @@ def build_app():
 ### 因子库统计
 | 指标 | 值 |
 |------|-----|
-| 总因子数 | 157 (大模型自进化挖掘) |
-| 可计算因子 | 118 (75.2%) |
-| 高 IR (≥1.5) | 41 个 |
-| 最高 IR | 3.04 (RESI_ZSCORE_6_5) |
-| DSL 函数 | 45 个 |
-| Top-5 因子 | RESI_ZSCORE_6_5 (3.04), QTLD5_RSI_Delta (2.93), QTLU5_TREND (2.79), MEAN_DEV_RANK (2.75), RSV3_TS_ZSCORE (2.73) |
+| 冻结记录 | 157 |
+| 审计切片有限输出 | 157/157 |
+| 审计切片非恒定输出 | 121/157 |
+| 路由选择 | deterministic top-15 |
+| 发布形式 | content-addressed binary only |
 """)
 
             with gr.Tab("🏗️ 系统架构"):
@@ -198,55 +168,38 @@ def build_app():
 |------|------|------|
 | Deployable student | Qwen3.5-9B | ✅ configured |
 | Frozen hindsight teacher | Qwen3.5-27B | ✅ training only |
-| Factor DSL | 45 函数引擎 | ✅ 118/157 可计算 |
-| Factor Router | Gumbel-Softmax MLP | ✅ 30 epochs trained |
-| DecisionPM | Weighted fusion | ✅ VLM+Factor+Trend |
-| Backtest | Vectorized + costs | ✅ 15bps+5bps+1d delay |
-| OPSD | Self-distillation | ⏳ 脚本就绪 |
+| Structured specialists | Deterministic typed evidence | ✅ no trainable tokens |
+| Factor artifact | 157 frozen expressions | ✅ binary only |
+| Factor Router | factor-state MLP | ✅ recorded top-15 mask |
+| DecisionPM | bounded JSON policy | ✅ 9B only |
+| Portfolio evaluator | synchronized PnL | ✅ fail closed |
+| Financial factorial | 9 arms × 3 seeds | ⏳ 27 runs missing |
 
 ### 可用模型列表
-- **Qwen3.5-9B**（视觉几何、student 与部署决策）
+- **Qwen3.5-9B**（唯一 token student 与部署决策）
 - **Qwen3.5-27B**（冻结 hindsight teacher，仅训练期）
 """)
 
             with gr.Tab("📈 实时结果"):
-                gr.Markdown("### Pipeline Quick 运行结果")
+                gr.Markdown("### KDD fail-closed factorial 状态")
                 result_display = gr.Markdown(refresh_results())
                 refresh_btn = gr.Button("🔄 刷新结果")
                 refresh_btn.click(fn=refresh_results, outputs=result_display)
 
             with gr.Tab("💡 关键发现"):
                 gr.Markdown("""
-### 实验关键发现与结论
+### 已验证结论
 
-#### 发现 1: VLM 方向判断需要量化因子校正
-- **观察**: VLM 对短期回调过度敏感, 频繁输出 bearish (AAPL: 33% sell vs 6% buy)
-- **分析**: 视觉模型擅长模式识别但缺乏统计基础, 容易被噪声干扰
-- **结论**: VLM bias 权重应降低 (0.7→0.4), 量化因子作为主信号源
-- **效果**: SR 从 -0.85 提升到 +0.82
+- 部署路径只有 Qwen3.5-9B 生成 token；Qwen3.5-27B 只在 horizon 闭合后提供冻结教师分布。
+- 157 个因子保留在带内容哈希的二进制工件中；运行时不会暴露源 JSON 清单。
+- Router 使用当前 157 因子状态并复用 rollout 记录的 deterministic top-15 mask。
+- Episodic memory 在相似度搜索前按 `available_date` 排除未来结果。
+- 双模型 smoke test 验证了 JSON 生成、同 completion 蒸馏、有限 JSD/KL 和一步更新。
 
-#### 发现 2: Backtest 实现细节是 alpha 的隐形杀手
-- **观察**: HOLD=清零仓位导致 249 trades/50 days, 交易成本吞噬所有收益
-- **分析**: 金融回测中 HOLD 应保持当前仓位, 只有 BUY/SELL 改变持仓
-- **结论**: 回测逻辑的正确性比模型复杂度更重要
-- **效果**: 单项修复贡献 SR +0.3
+### 尚不能声称
 
-#### 发现 3: 仓位大小决定能否覆盖交易成本
-- **观察**: 5% 仓位 + 40bps 往返成本 = 需要 8% 价格变动才能盈亏平衡
-- **分析**: 日频交易中, 小仓位几乎不可能覆盖成本
-- **结论**: 高 conviction 时使用 20-30% 仓位, 非对称阈值减少交易频率
-- **效果**: SR 从 -0.55 跳升到 +0.51
-
-#### 发现 4: 大模型挖掘的因子是真正的 alpha 来源
-- **观察**: 118 个可计算因子中, 41 个 IR>1.5, 最高 3.04
-- **分析**: 因子共识信号 (positive fraction) 比单一因子更稳健
-- **结论**: DSL 引擎 + Factor Router 是系统的核心竞争力
-- **效果**: 接入因子后 AAPL 从 -0.65 翻正到 +0.46
-
-#### 发现 5: 金融股 vs 科技股的 regime 差异
-- **观察**: JPM SR=1.12, GS SR=1.26 vs AAPL SR=0.46, NVDA SR=0.73
-- **分析**: 金融股趋势更明确, 因子信号噪声比更高; 科技股波动大
-- **结论**: Factor Router 的 regime 适应性是提升科技股表现的关键
+- 27 个锁定 arm/seed 运行目前均缺失，因此没有同步 Qwen3.5 portfolio PnL、置信区间或正向金融结论。
+- 旧 Qwen2.5 原型的单资产或宏平均指标不能作为当前系统的实验结果。
 """)
 
     return app

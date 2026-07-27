@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import platform
+import random
 import subprocess
 import sys
 from datetime import datetime
@@ -15,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
@@ -117,12 +119,25 @@ def main():
     parser = argparse.ArgumentParser(description="FinVL-MAS Experiment Runner")
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("--data", default=None)
+    parser.add_argument("--asset", default=None)
+    parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--output-dir", default="outputs/experiments")
     parser.add_argument("--max-dates", type=int, default=None)
     parser.add_argument("--ablation-suite", action="store_true")
     args = parser.parse_args()
 
     cfg = load_config(args.config)
+    seed = int(args.seed if args.seed is not None else cfg.get("seed", 42))
+    random.seed(seed)
+    np.random.seed(seed)
+    try:
+        import torch
+
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+    except ImportError:
+        pass
 
     exp_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = Path(args.output_dir) / exp_id
@@ -139,6 +154,7 @@ def main():
         "platform": platform.platform(),
         "config_path": args.config,
         "data_path": str(args.data or "default"),
+        "seed": seed,
     }
     try:
         repro["git_commit"] = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(Path(__file__).parent.parent), stderr=subprocess.DEVNULL).decode().strip()
@@ -154,7 +170,15 @@ def main():
         sys.exit(1)
 
     provider = OHLCVProvider(data_path)
-    asset = cfg.get("scenario", {}).get("market", "ASSET").upper()
+    if args.asset:
+        asset = args.asset.upper()
+    elif "ticker" in provider.df.columns:
+        tickers = provider.df["ticker"].dropna().unique()
+        if len(tickers) != 1:
+            raise ValueError("multi-asset experiment data requires --asset")
+        asset = str(tickers[0]).upper()
+    else:
+        asset = Path(data_path).stem.split("_")[0].upper()
     split_cfg = cfg.get("evaluation", {}).get("temporal_split", {})
     test_start = split_cfg.get("test_start", "2017-01-01")
     test_end = split_cfg.get("test_end", "2020-12-31")
@@ -164,6 +188,9 @@ def main():
         test_dates = provider.trading_dates(*provider.date_range, asset=asset)
     if args.max_dates:
         test_dates = test_dates[: args.max_dates]
+    if not test_dates:
+        raise RuntimeError(f"no evaluation dates are available for asset {asset}")
+    evaluation_start, evaluation_end = test_dates[0], test_dates[-1]
 
     orchestrator = AgentOrchestrator(cfg)
     renderer = _build_chart_renderer(cfg, str(chart_dir))
@@ -190,7 +217,7 @@ def main():
         )
     )
 
-    test_df = provider.get_date_range(test_start, test_end)
+    test_df = provider.get_date_range(evaluation_start, evaluation_end, asset=asset)
     result = backtester.run(decisions, test_df)
 
     with open(output_dir / "metrics.json", "w", encoding="utf-8") as f:
@@ -208,6 +235,13 @@ def main():
             "rationale": dec.rationale[:240],
         })
     pd.DataFrame(rows).to_csv(output_dir / "decisions.csv", index=False)
+    if result.returns is not None:
+        pd.DataFrame(
+            {
+                "date": test_df.index[1:],
+                "net_return": result.returns,
+            }
+        ).to_csv(output_dir / "daily_returns.csv", index=False)
 
     print("\nEXPERIMENT RESULTS")
     for k, v in sorted(result.metrics.items()):
@@ -225,6 +259,8 @@ def main():
             args.config,
             "--data",
             data_path,
+            "--asset",
+            asset,
             "--max-dates",
             str(args.max_dates or 50),
             "--output-dir",

@@ -1,7 +1,4 @@
-"""
-Factor Library: loads self-evolved factors from best_factor.json
-and supplements with pandas_ta traditional indicators.
-"""
+"""Load the frozen evolved-factor artifact and deterministic indicators."""
 from __future__ import annotations
 
 import json
@@ -36,7 +33,7 @@ class Factor:
 class FactorLibrary:
     """
     Manages the full factor universe:
-    - Self-evolved factors from best_factor.json (~160)
+    - Self-evolved factors from the content-addressed binary artifact
     - Traditional technical factors via pandas_ta
     - Geometric factors from chart analysis
     """

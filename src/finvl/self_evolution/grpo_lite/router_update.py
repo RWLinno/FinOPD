@@ -6,7 +6,7 @@ for discrete factor selection without a critic network.
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -42,6 +42,7 @@ class GRPOLiteUpdater:
         geometry_embeddings: torch.Tensor,
         regime_onehots: torch.Tensor,
         trajectory_returns: torch.Tensor,
+        selection_mask: Optional[torch.Tensor] = None,
         old_logits: Optional[torch.Tensor] = None,
     ) -> Dict[str, float]:
         """
@@ -52,25 +53,36 @@ class GRPOLiteUpdater:
             geometry_embeddings: (batch, geo_dim)
             regime_onehots: (batch, 4)
             trajectory_returns: (batch,) raw returns J
+            selection_mask: (batch, num_factors) actions recorded during rollout
             old_logits: (batch, num_factors) logits from previous policy
         """
         if self.optimizer is None:
             self.setup(router)
 
         advantages = trajectory_returns - trajectory_returns.mean()
-        std = trajectory_returns.std()
+        std = trajectory_returns.std(unbiased=False)
         if std > 1e-8:
             advantages = advantages / std
 
         router.train()
-        selection, logits = router(geometry_embeddings, regime_onehots, hard=False)
+        logits = router.compute_logits(geometry_embeddings, regime_onehots)
+        if selection_mask is None:
+            selection, _ = router(geometry_embeddings, regime_onehots, hard=True)
+            selection = selection.detach()
+        else:
+            selection = selection_mask.to(logits.device, dtype=logits.dtype)
+        counts = selection.sum(dim=-1)
+        if (counts <= 0).any():
+            raise ValueError("each router action must select at least one factor")
 
         log_probs = torch.log_softmax(logits, dim=-1)
-        selected_log_probs = (log_probs * selection).sum(dim=-1)
+        selected_log_probs = (log_probs * selection).sum(dim=-1) / counts
 
         if old_logits is not None:
             old_log_probs = torch.log_softmax(old_logits, dim=-1)
-            old_selected = (old_log_probs * selection.detach()).sum(dim=-1)
+            old_selected = (
+                old_log_probs * selection.detach()
+            ).sum(dim=-1) / counts
             ratio = (selected_log_probs - old_selected.detach()).exp()
             clipped_ratio = ratio.clamp(1 - self.clip_eps, 1 + self.clip_eps)
             policy_loss = -torch.min(ratio * advantages, clipped_ratio * advantages).mean()

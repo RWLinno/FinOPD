@@ -11,7 +11,7 @@ from typing import Any, Dict, List
 import numpy as np
 
 from finvl.agents.base import AgentOutput, BaseFinAgent
-from finvl.core.types import Action, Conviction, DecisionOutput, Implication
+from finvl.core.types import Action, Conviction, DecisionOutput
 
 logger = logging.getLogger(__name__)
 
@@ -27,20 +27,30 @@ class DecisionPMAgent(BaseFinAgent):
         self.integration_mode = (config or {}).get("integration_mode", "confidence_weighted")
         self._factor_lib = None
         self._top_factors = None
+        self._router = None
+        self._last_factor_ids: List[int] = []
+        self._last_router_features: List[float] = []
+        self._last_router_regime: List[float] = []
+        self._last_router_selected_indices: List[int] = []
+        self._router_factor_names: List[str] = []
 
     def _get_factor_lib(self):
         if self._factor_lib is None:
             try:
                 from finvl.factors.library import FactorLibrary
-                self._factor_lib = FactorLibrary("docs/best_factor.json")
+                self._factor_lib = FactorLibrary()
                 # Select top-k factors by IR
                 sorted_factors = sorted(
                     self._factor_lib.factors.values(),
                     key=lambda f: f.ir, reverse=True
                 )
                 self._top_factors = [f for f in sorted_factors if f.ir >= 1.0][:30]
+                factor_ids = {
+                    name: index
+                    for index, name in enumerate(self._factor_lib.factor_names)
+                }
+                self._factor_id_by_name = factor_ids
                 # Try to load trained router
-                self._router = None
                 try:
                     import torch
                     from finvl.factors.router import FactorRouter
@@ -56,7 +66,13 @@ class DecisionPMAgent(BaseFinAgent):
                         )
                         self._router.load_state_dict(torch.load(router_path, weights_only=False))
                         self._router.eval()
-                        self._all_factors = sorted_factors[:cfg['num_factors']]
+                        factor_names = cfg.get("factor_names", [])
+                        if len(factor_names) != cfg["num_factors"]:
+                            raise ValueError("router checkpoint has no ordered factor manifest")
+                        self._all_factors = [
+                            self._factor_lib.factors[name] for name in factor_names
+                        ]
+                        self._router_factor_names = list(factor_names)
                         logger.info(f"Factor Router loaded (top_k={cfg['top_k']})")
                 except Exception as e:
                     logger.debug(f"Router not available: {e}")
@@ -67,6 +83,10 @@ class DecisionPMAgent(BaseFinAgent):
         return self._top_factors
 
     async def process(self, inputs: Dict[str, Any], memory: Dict[str, Any]) -> AgentOutput:
+        self._last_factor_ids = []
+        self._last_router_features = []
+        self._last_router_regime = []
+        self._last_router_selected_indices = []
         chart_bias = memory.get("chart_bias", "neutral")
         chart_confidence = memory.get("_confidence_chart_bias", 0.5)
 
@@ -87,27 +107,77 @@ class DecisionPMAgent(BaseFinAgent):
         factor_bias = 0.0
         if ohlcv_df is not None and len(ohlcv_df) >= 20:
             close = ohlcv_df["close"].values
-            high = ohlcv_df["high"].values
-            low = ohlcv_df["low"].values
-            volume = ohlcv_df["volume"].values if "volume" in ohlcv_df.columns else np.ones(len(close))
-
             sma20 = close[-20:].mean()
             current = close[-1]
+            if sma20 > 0:
+                trend_bias = float(np.clip((current / sma20 - 1.0) / 0.05, -1.0, 1.0))
 
-            # === Evolved factor signals (from best_factor.json via DSL engine) ===
+            # === Evolved factor signals (from the frozen artifact via DSL engine) ===
             top_factors = self._get_factor_lib()
+            selected_factors = list((top_factors or [])[:20])
+            if self._router is not None and len(ohlcv_df) >= 30:
+                try:
+                    import torch
+
+                    df_for_router = ohlcv_df.copy()
+                    df_for_router.columns = [column.lower() for column in df_for_router.columns]
+                    raw_values = np.array(
+                        [
+                            float(factor.compute(df_for_router).iloc[-1])
+                            for factor in self._all_factors
+                        ],
+                        dtype=np.float32,
+                    )
+                    raw_values[~np.isfinite(raw_values)] = 0.0
+                    median = float(np.median(raw_values))
+                    mad = float(np.median(np.abs(raw_values - median)))
+                    normalized = np.clip(
+                        (raw_values - median) / max(1.4826 * mad, 1e-6),
+                        -5.0,
+                        5.0,
+                    )
+                    geometry = np.zeros(768, dtype=np.float32)
+                    geometry[: len(normalized)] = normalized
+                    daily_returns = np.diff(close[-21:]) / close[-21:-1]
+                    volatility = float(np.std(daily_returns) * np.sqrt(252))
+                    trend = float(close[-1] / close[-20] - 1.0)
+                    if volatility > 0.30:
+                        regime = "volatile"
+                    elif abs(trend) > 0.10:
+                        regime = "trending"
+                    elif volatility < 0.12:
+                        regime = "calm"
+                    else:
+                        regime = "ranging"
+                    from finvl.factors.router import encode_regime
+
+                    regime_onehot = encode_regime(regime)
+                    selected_ids = self._router.get_selected_factor_ids(
+                        torch.from_numpy(geometry).unsqueeze(0),
+                        regime_onehot.unsqueeze(0),
+                    )[0]
+                    self._last_router_features = geometry.astype(float).tolist()
+                    self._last_router_regime = regime_onehot.tolist()
+                    self._last_router_selected_indices = list(selected_ids)
+                    selected_factors = [self._all_factors[index] for index in selected_ids]
+                except Exception as exc:
+                    logger.warning("Router inference failed; using frozen IR order: %s", exc)
+            self._last_factor_ids = [
+                self._factor_id_by_name[factor.name]
+                for factor in selected_factors
+            ]
             factor_values = []
-            if top_factors and len(ohlcv_df) >= 30:
+            if selected_factors and len(ohlcv_df) >= 30:
                 df_for_factors = ohlcv_df.copy()
                 df_for_factors.columns = [c.lower() for c in df_for_factors.columns]
-                for f in top_factors[:20]:
+                for f in selected_factors:
                     try:
                         vals = f.compute(df_for_factors)
                         last_val = vals.iloc[-1] if len(vals) > 0 else 0
                         if np.isfinite(last_val) and last_val != 0:
                             factor_values.append(last_val)
-                    except:
-                        pass
+                    except Exception as exc:
+                        logger.debug("Factor %s failed: %s", f.name, exc)
 
             # Compute factor consensus signal
             if factor_values:

@@ -1,14 +1,13 @@
 """
-Belief Index: FAISS-based vector store for geometry embeddings.
+Belief Index: FAISS-based vector store for point-in-time state signatures.
 Supports incremental writes and capacity constraints.
 """
 from __future__ import annotations
 
 import json
 import logging
-import os
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import numpy as np
 
@@ -63,6 +62,7 @@ class BeliefIndex:
                 "realized_j": belief.realized_j,
                 "asset": belief.asset,
                 "date": belief.date,
+                "available_date": belief.available_date,
             })
             added += 1
 
@@ -71,7 +71,10 @@ class BeliefIndex:
         return added
 
     def query(
-        self, geometry_signature: np.ndarray, top_k: int = 5
+        self,
+        geometry_signature: np.ndarray,
+        top_k: int = 5,
+        as_of_date: str | None = None,
     ) -> List[Tuple[dict, float]]:
         """Query nearest beliefs by geometry signature."""
         self._queries += 1
@@ -79,28 +82,53 @@ class BeliefIndex:
         if self.size == 0:
             return []
 
-        query_vec = geometry_signature.astype(np.float32).reshape(1, -1)
+        raw_query = geometry_signature.astype(np.float32).reshape(-1)
+        if raw_query.size != self.embedding_dim:
+            padded = np.zeros(self.embedding_dim, dtype=np.float32)
+            padded[: min(raw_query.size, self.embedding_dim)] = raw_query[
+                : self.embedding_dim
+            ]
+            raw_query = padded
+        norm = float(np.linalg.norm(raw_query))
+        if norm > 0:
+            raw_query = raw_query / norm
+        query_vec = raw_query.reshape(1, -1)
+        eligible = [
+            index
+            for index, metadata in enumerate(self._metadata)
+            if as_of_date is None
+            or (
+                metadata.get("available_date")
+                and metadata["available_date"] <= as_of_date
+            )
+        ]
+        if not eligible:
+            return []
 
-        if self._index is not None:
+        if self._index is not None and len(eligible) == self.size:
             try:
-                import faiss
                 distances, indices = self._index.search(query_vec, min(top_k, self.size))
                 results = []
                 for dist, idx in zip(distances[0], indices[0]):
                     if idx >= 0 and idx < len(self._metadata):
                         results.append((self._metadata[idx], float(dist)))
-                        self._hits += 1
+                if results:
+                    self._hits += 1
                 return results
             except Exception:
                 pass
 
-        vectors = np.array(self._vectors)
+        vectors = np.array([self._vectors[index] for index in eligible])
         similarities = np.dot(vectors, query_vec.T).flatten()
         top_indices = np.argsort(-similarities)[:top_k]
 
         results = []
-        for idx in top_indices:
-            results.append((self._metadata[idx], float(similarities[idx])))
+        for local_index in top_indices:
+            index = eligible[int(local_index)]
+            results.append(
+                (self._metadata[index], float(similarities[int(local_index)]))
+            )
+        if results:
             self._hits += 1
 
         return results

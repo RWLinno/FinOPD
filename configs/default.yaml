@@ -52,7 +52,7 @@ vlm:
 agents:
   chart_analyst:
     enabled: true
-    use_vlm: true
+    use_vlm: false  # locked KDD path is local/deterministic and requires no API
     use_rule_based: true
   pattern_reasoner:
     enabled: true

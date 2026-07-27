@@ -1,42 +1,54 @@
-# KDD best-paper revision record
+# KDD review-to-evidence revision record
 
-This report is deliberately outside the manuscript.
+This file maps every major review concern to an implementation, manuscript
+change, or an explicit missing-evidence status. No absent experiment is
+represented by a proxy.
 
-## Scientific changes
+| Review concern | Action | Evidence/status |
+| --- | --- | --- |
+| W1 model-weight contamination | Replaced “strict post-cutoff” with “retrospective point-in-time”; withheld financial claims and required a true-forward window. | Addressed in wording; forward evidence missing. |
+| W2 macro-average mislabeled as portfolio | Removed 60.9/1.41/3.30 from the active claims; added synchronized capital-weighted PnL evaluator. | Evaluator implemented; Qwen3.5 PnL missing. |
+| W3 one path/seed and no uncertainty | Locked seeds 42/123/456, 20-day moving-block bootstrap, paired tests, and Holm correction. | Protocol implemented; 27 runs missing. |
+| W4 mechanism not isolated | Added nine-arm OPD × memory × credit × KL × router × execution matrix. | Fail-closed aggregator implemented; runs missing. |
+| W5 central quantities undefined | Aligned utility, five-scalar teacher schema, full-vocabulary JSD/KL, measured reference KL, recorded router mask, state signatures, JSON output bounds, rollback, and memory chronology with code. | Code, tests, and method synchronized. |
+| W6 data/baseline/selection audit | Require run manifests, exact checkpoint, finite per-asset daily returns, common weights/costs/delay, and no development proxies. | Contract implemented; baseline runs missing. |
 
-- Reframed the contribution around a temporal information contract rather than
-  an unsupported first-ever claim.
-- Defined one executable outcome utility with return, drawdown, CVaR, and
-  turnover weights; the same value now controls routing, memory admission, and
-  coalition credit.
-- Replaced the undefined unordered top-k likelihood with the implemented
-  straight-through advantage-weighted surrogate.
-- Distinguished the deployable Qwen3.5-9B student from the training-only frozen
-  Qwen3.5-27B teacher and the round-start 9B reference.
-- Renamed the hindsight ``ceiling'' as a privileged diagnostic policy; it is not
-  claimed to be a mathematical upper bound.
-- Added an information/update contract table and explicitly classified the
-  evaluation as retrospective point-in-time because model-weight contamination
-  cannot be excluded.
+## Architecture corrections
 
-## Artifact changes
+- Four upstream agents are deterministic structured evidence modules. They do
+  not all generate Qwen tokens.
+- Qwen3.5-9B is the sole deployable token policy; Qwen3.5-27B is a frozen
+  post-horizon teacher.
+- Coalition replay records five role contributions, but only the positive
+  DecisionPM credit weight scales the final policy-token loss.
+- Router input is the MAD-normalized current 157-factor state, not a pooled VLM
+  embedding. Online updates reuse the rollout's deterministic top-15 mask.
+- Episodic retrieval uses a deterministic return/volume signature and filters
+  by outcome `available_date` before similarity search.
+- Unsupported RASW, regime-dependent thresholds, adaptive turnover,
+  trend-break protection, encoder compute, and latency claims were removed.
+- Three old figures encoding those unsupported mechanisms/results were removed
+  from the manuscript.
 
-- Removed fixed-return trajectory scoring; outcome utility now uses realized
-  close-to-close returns, T+1 positions, 15 bps cost, 5 bps slippage, drawdown,
-  CVaR, and turnover.
-- Made multi-asset providers require an explicit ticker, preventing duplicate
-  dates from different assets from entering one lookback window.
-- Removed noisy heuristic Shapley and random placeholder teacher logits.
-  Evidence-bearing runs now fail fast unless a deterministic coalition evaluator
-  and the real teacher runtime are present.
-- Retained the content-addressed 157-factor artifact and synchronized portfolio
-  evaluator introduced earlier on the branch.
+## Verified implementation evidence
 
-## Claims intentionally not added
+- Frozen artifact: 157 records; 157 finite on the audit slice; 121 non-constant;
+  content-addressed binary only.
+- Router: ordered manifest restored from checkpoint and exactly 15 factor IDs
+  selected in smoke evaluation.
+- Memory: future outcome episodes are excluded; hit rate counts successful
+  queries rather than returned neighbors.
+- Trainer: real rollout → utility → same-horizon coalition replay → positive
+  credit → 9B update → recorded-mask router update → measured KL → accept/revert
+  → memory admission.
+- Factorial evaluator: 27 expected arm/seed runs; empty audit reports 27 missing
+  and `proxy_results_used=false`.
 
-- No fabricated multi-seed, confidence-interval, factorial-ablation, or
-  portfolio-PnL result was inserted.
-- Existing 60.9/1.41/3.30 numbers remain labeled as macro-averaged per-asset
-  summaries, not synchronized portfolio metrics.
-- The paper does not claim a live, strict post-cutoff, or contamination-free
-  evaluation.
+## Intentionally unresolved
+
+- No synchronized Qwen3.5 portfolio PnL or positive financial result exists in
+  the repository yet.
+- No held-out factorial arm, multi-seed effect estimate, block-bootstrap
+  interval, or Holm-adjusted comparison can be reported yet.
+- The paper is non-anonymous by explicit project instruction; this does not
+  resolve a venue rule if KDD ultimately requires double-blind submission.

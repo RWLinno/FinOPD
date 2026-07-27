@@ -1,107 +1,62 @@
 \section{Reproducibility and Protocol Details}
 \label{sec:appendix_details}
 
-\subsection{Agent Roles and Prompt Contract}
+\subsection{Specialist and Policy Contract}
 
-The four evidence specialists and DecisionPM exchange typed messages through decision-local Gated Shared Memory. DecisionPM writes the fifth proposal; the constrained allocation head then applies the selective-execution controls that produce $\mathbf w_t$. This coordination state is reset after each decision and is distinct from Time-Safe Episodic Memory, which admits only matured episodes after horizon closure.
-% 中文翻译：四个证据专门化智能体与 DecisionPM 通过决策局部的 Gated Shared Memory 交换类型化消息。DecisionPM 写入第五个决策建议，受约束配置头随后应用选择性执行控制并生成 $\mathbf w_t$。该协调状态在每次决策后重置，与 Time-Safe Episodic Memory 不同；后者只在结果窗口闭合后接纳已经成熟的情节。
+The reproducible decision path has four structured specialists and one token policy. ChartAnalyst extracts deterministic OHLCV geometry; PatternReasoner interprets those typed patterns; EventAnalyst consumes only supplied point-in-time events (empty in the OHLCV-only runs); and RiskController produces exposure constraints. Their decision-local memory is cleared after every date. A deterministic specialist proposal and complete attributed trace are then serialized into the Qwen3.5-9B prompt. Qwen3.5-9B is the only component that emits trainable policy tokens.
 
-\begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=2pt]
-    \item \textbf{ChartAnalyst} converts structured chart geometry into directional evidence with provenance and confidence.
-    % 中文翻译（条目）：ChartAnalyst 把结构化图形几何转化为带有来源和置信度的方向证据。
-    \item \textbf{PatternReasoner} reconciles patterns across daily, weekly, and monthly horizons and exposes conflicts.
-    % 中文翻译（条目）：PatternReasoner 协调日、周、月多个周期的形态，并显式暴露冲突。
-    \item \textbf{EventAnalyst} contextualizes point-in-time news, earnings, and filing signals.
-    % 中文翻译（条目）：EventAnalyst 对时点可得的新闻、财报和公告信号进行语境化分析。
-    \item \textbf{RiskController} checks drawdown, volatility, and concentration constraints and may veto exposure.
-    % 中文翻译（条目）：RiskController 检查回撤、波动率与集中度约束，并可以否决风险暴露。
-    \item \textbf{DecisionPM} fuses the typed evidence into action, position size, and risk controls.
-    % 中文翻译（条目）：DecisionPM 把类型化证据融合为动作、仓位大小和风险控制。
-\end{enumerate}
+The student snapshot contains asset, date, current price, one- and five-day return, 20-day annualized volatility, volume, specialist action/confidence/rationale, the attributed trace, and at most five outcome-matured episode summaries. The output must contain \texttt{action}, \texttt{confidence}, \texttt{position\_size\_pct}, \texttt{conviction}, \texttt{rationale}, \texttt{key\_evidence}, and \texttt{risks}. Thinking is disabled for deterministic JSON generation. The parser clips confidence to $[0,1]$ and exposure to $[0,0.30]$, forces zero exposure for hold, and uses the specialist proposal if parsing fails.
 
-\begin{tcolorbox}[
-  enhanced,
-  breakable,
-  colback=FSecond!3,
-  colframe=FSecond!55,
-  boxrule=0.5pt,
-  arc=0.8mm,
-  left=1mm,right=1mm,top=0.8mm,bottom=0.8mm,
-  title={Abridged reasoning prompt contract},
-  fonttitle=\bfseries\footnotesize
-]
-\footnotesize
-\textbf{Student request.} Read only the point-in-time payload: chart geometry, routed factor values and provenance, event evidence, retrieved matured episodes, current risk state, and regime. Produce a concise evidence trace before the structured decision.
-% 中文翻译：学生只能读取时点可得负载，包括图形几何、带来源的路由因子值、事件证据、已成熟检索情节、当前风险状态和市场状态，并在结构化决策前输出简洁证据链。
+After the outcome horizon closes, the Qwen3.5-27B prompt prepends a canonical JSON object containing only \texttt{utility}, \texttt{cumulative\_return}, \texttt{mdd}, \texttt{cvar\_loss}, and \texttt{turnover}. The teacher is frozen and evaluated on the exact student-generated completion. It never receives a raw future price path, future chart, or future OHLCV array.
 
-\textbf{Teacher-only extension.} After horizon $H$ closes, additionally read an estimated hindsight summary of cost-adjusted return, drawdown, CVaR, and turnover. Do not receive or reconstruct raw future OHLCV arrays, price paths, or future charts.
-% 中文翻译：教师仅在结果窗口 $H$ 闭合后额外读取成本调整收益、回撤、CVaR 与换手率的估计事后摘要，不得接收或重建未来原始 OHLCV 数组、价格路径或图表。
+\subsection{Frozen Factor Artifact}
 
-\textbf{Output contract.} Return typed fields for \emph{evidence}, \emph{confidence}, \emph{proposed action}, \emph{risk constraint}, and \emph{uncertainty}; the decision manager must identify conflicts before selecting \texttt{BUY}, \texttt{SELL}, or \texttt{HOLD}.
-% 中文翻译：输出必须包含证据、置信度、建议动作、风险约束和不确定性等类型化字段；Decision Manager 必须先识别冲突，再选择 BUY、SELL 或 HOLD。
+Alpha-Factor Evolution is completed before OPD. The reproduction branch packages 157 ordered executable records in \path{src/finvl/factors/frozen_factors.bin}; neither a JSON factor manifest nor a factor-serving API is distributed. The loader verifies artifact version, count, order, and content hash before compiling expressions in the constrained DSL. The checkpoint stores the same ordered factor names, preventing a valid weight tensor from being applied to a permuted library. The audited artifact hash is \texttt{51c338c93163876f\allowbreak d0a01f8919993e2c\allowbreak fa464032bdced8b2\allowbreak fc55687530c1e550}.
 
-\textbf{Information boundary.} The teacher-only field is absent from every student and deployment payload. The rationale must cite supplied evidence rather than unseen market data.
-% 中文翻译：所有学生与部署负载都不包含教师专用字段；决策理由必须引用已提供证据，而不能引用未见市场数据。
-\end{tcolorbox}
-% 中文翻译：上框给出精简的推理提示契约。学生只能读取时点可得的图形几何、路由因子、事件证据、已成熟记忆、风险状态与市场状态，并在结构化决策前生成简洁证据链。教师仅在 $H$ 窗口闭合后额外读取由成本调整收益、回撤、CVaR 与换手率构成的估计事后摘要，且不能接收或重建原始未来价格路径。输出必须包含证据、置信度、建议动作、风险约束与不确定性；教师字段在学生和部署输入中始终不存在。
+The executability audit evaluates all records on a 500-bar OHLCV slice, sanitizes non-finite arithmetic, and asserts a finite vector for each record. All 157 pass; 121 vary on this slice. A constant result is not treated as a globally useless factor because some expressions require optional fields absent from OHLCV-only data. These counts are software evidence, not a claim of alpha profitability.
 
-\subsection{Frozen Factor Library}
+\subsection{Hyperparameters}
 
-Alpha-Factor Evolution is completed before OPD. The resulting manifest contains 157 admitted executable records; after transaction costs, mean $|\mathrm{IR}|$ is 1.1918, median is 1.1097, and the maximum is 3.0401. Among them, 87 satisfy $|\mathrm{IR}|\geq1$. The router may change selection weights during OPD, but the manifest hash, expressions, and record count remain fixed. This separation prevents the policy-training stage from being mistaken for continued factor mining.
-% 中文翻译：Alpha-Factor Evolution 在 OPD 之前完成。最终清单包含 157 条已准入的可执行记录；计入交易成本后，平均 $|\mathrm{IR}|$ 为 1.1918，中位数为 1.1097，最大值为 3.0401，其中 87 条满足 $|\mathrm{IR}|\geq1$。OPD 期间路由器可以改变选择权重，但清单哈希、表达式内容和记录数量保持不变。这一分离避免把策略训练阶段误解为继续进行因子挖掘。
+\begin{table}[h]
+\centering
+\small
+\caption{Active Qwen3.5 reproduction settings.}
+\label{tab:hyperparams}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lll}
+\toprule
+Component & Parameter & Value \\
+\midrule
+Student & backbone / LoRA rank & Qwen3.5-9B / 16 \\
+Student & target modules & q, v, o projections \\
+Teacher & frozen backbone & Qwen3.5-27B \\
+OPD & $\beta$ / token-KL cap / ref. budget & 0.5 / 5.0 / 0.1 \\
+OPD & learning rate / horizon / rounds & $2\times10^{-5}$ / 20 / 8 \\
+Credit & sampled permutations & 8 \\
+Router & input / hidden width / top-$k$ & 768+4 / 256 / 15 \\
+Router & online LR / entropy coefficient & $10^{-4}$ / 0.01 \\
+Memory & capacity / retrieval / admission & 10,000 / 5 / 80th pct. \\
+Utility & $(R,\mathrm{MDD},\mathrm{CVaR},\mathrm{TO})$ & $(1,0.5,0.5,0.1)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection{Hyperparameters and Compute}
+We do not report accelerator-hours or latency for the migrated system because no complete, auditable Qwen3.5 run log is present. Earlier numbers for a visual encoder and Qwen2.5 pipeline do not measure this implementation.
 
-\input{tables/setting}
+\subsection{Locked Run Artifacts}
 
-\input{tables/efficiency}
+For arm $a$ and seed $s$, the evaluator reads \path{RUNS/a/seed_s/run_manifest.json}. The manifest must declare the exact arm, seed, test split, and checkpoint. Relative checkpoint paths resolve against that run directory. Each asset directory must contain \path{daily_returns.csv} with unique in-window dates and finite \path{net_return}. Any mismatch marks the entire run missing.
 
-The complete pipeline uses approximately 42 accelerator-hours: 8 for the visual-geometric encoder, 2 for router pretraining, and 32 for eight OPD and memory-evolution rounds. This accounting excludes CPU-only deterministic backtesting and reports no provider-specific billing information.
-% 中文翻译：完整流程约使用 42 个加速器小时：视觉几何编码器 8 小时、路由器预训练 2 小时、八轮 OPD 与记忆进化 32 小时。该统计不包含仅使用 CPU 的确定性回测，也不报告特定服务商的计费信息。
+For a complete run, asset series are inner-aligned by date and combined with the declared capital weights. Portfolio return, equity, drawdown, cumulative return, annualized Sharpe, maximum drawdown, and Calmar are recomputed from this synchronized series. The evaluator writes both asset and portfolio daily PnL, a metrics JSON, a fixed-seed 20-day moving-block Sharpe interval, paired block $p$-values against the full arm, and Holm-adjusted values. With \texttt{--strict}, any missing run returns a nonzero exit code.
 
-%\FloatBarrierr
-\section{Extended Experimental Analysis}
-\label{sec:appendix_analysis}
-
-\subsection{Exact Diagnostic Results}
-
-Tables~\ref{tab:regime}--\ref{tab:counterfactual} preserve the exact values summarized by Figures~\ref{fig:results} and~\ref{fig:system}. They are separated from the primary held-out comparison because they use temporal slices, regime partitions, or learning-phase diagnostic windows.
-% 中文翻译：表 5--表 8 保留图 4 与图 5 所概括的精确数值。由于这些结果使用时间切片、状态分区或学习阶段诊断窗口，因此与主要留出测试比较分开呈现。
-
-\input{tables/regime_results}
-\input{tables/ablation}
-\input{tables/evolution_dynamics}
-\input{tables/counterfactual}
-
-%\FloatBarrierr
-\subsection{Sensitivity and Diagnostic Boundaries}
-\label{sec:appendix_additional}
-
-Table~\ref{tab:overall} reports asset-averaged CR and Calmar, whose ratio does not recover either a portfolio MDD or the mean asset-level MDD. We therefore do not derive an aggregate drawdown from those averages. Learning-phase MDD is reported only for the matched diagnostic interventions in Tables~\ref{tab:ablation} and~\ref{tab:counterfactual}.
-% 中文翻译：表 1 报告按资产平均的累计收益与 Calmar，二者之比既不能恢复组合最大回撤，也不能恢复逐资产最大回撤的平均值。因此，本文不再由这两个平均量推导聚合回撤。学习阶段的最大回撤只在表 6 和表 8 的同协议诊断干预中报告。
-
-\input{tables/sensitivity}
-
-The validation sweep in Table~\ref{tab:sensitivity} selects an edge threshold of 0.15 and factor top-$k$ of 15 before final testing. Directional SR is unchanged across position-size caps because that control scales exposure rather than the sign of an action; drawdown rises as the cap increases. The edge threshold exhibits the expected bias--activity trade-off, with both aggressive and overly conservative settings reducing validation SR.
-% 中文翻译：表 9 的验证集扫描在最终测试前选定 0.15 的优势阈值和 15 的因子 top-$k$。不同仓位上限下方向性 Sharpe 不变，因为该控制只缩放风险暴露而不改变动作方向；随着仓位上限提高，回撤增加。优势阈值呈现预期的偏差--活跃度权衡：过于激进或过于保守的设置都会降低验证集 Sharpe。
-
-\subsection{Illustrative Decision Trace}
-\label{sec:case_study}
-
-We trace one anonymized asset-day from the held-out test window. ChartAnalyst reported bearish geometry with confidence 0.80; PatternReasoner was neutral at 0.42; EventAnalyst supplied no strong event signal (neutral, 0.10); and RiskController judged risk moderate and allowed the proposal to proceed.
-% 中文翻译：我们追踪留出测试窗口中的一个匿名资产日。ChartAnalyst 以 0.80 的置信度报告看跌几何形态；PatternReasoner 以 0.42 的置信度保持中性；EventAnalyst 没有提供强事件信号（中性，0.10）；RiskController 判断风险适中并允许方案继续。
-
-DecisionPM combined these messages into a score of $-0.384$ and a risk-adjusted score of $-0.307$, crossing the sell-side threshold and assigning 12.6\% exposure. Gated Shared Memory marked a chart--factor disagreement, so the manager preserved the higher-confidence chart evidence while recording the conflict. The example illustrates typed arbitration and risk-scaled sizing; it is explanatory rather than a claim of representativeness.
-% 中文翻译：DecisionPM 将这些消息融合为 $-0.384$ 的原始得分和 $-0.307$ 的风险调整得分，越过卖出阈值并配置 12.6\% 的风险暴露。Gated Shared Memory 标记了图形--因子分歧，因此管理器保留置信度更高的图形证据，同时记录冲突。该案例用于解释类型化仲裁与按风险缩放的仓位，并不声称具有统计代表性。
-
-%\FloatBarrierr
 \section{Expanded Limitations and Ethical Discussion}
 \label{sec:limitations}
 
-\paragraph{Scope and uncertainty.}
-The evaluation covers four liquid U.S. equities, daily decisions, one 17-month test period, and one selected training run. Deterministic decoding removes test-time sampling noise, but it does not quantify optimization variance or provide statistical confidence intervals across independent market histories. The regime results contain only the regimes realized in this period, and the joint evolution trace does not isolate the causal contribution of OPD and episodic memory. Broader universes, repeated training runs, multiple non-overlapping market cycles, and a factorial evolution ablation are needed before claiming general market robustness.
-% 中文翻译：评估覆盖四只高流动性美国股票、日频决策、一个 17 个月测试期和一次选定训练运行。确定性解码能够消除测试时采样噪声，但不能量化优化过程方差，也不能提供跨独立市场历史的统计置信区间。状态结果只包含这一时期实际出现的市场状态，联合进化轨迹也没有隔离 OPD 与情节记忆各自的因果贡献。在宣称一般性市场稳健性之前，还需要更广泛的股票池、重复训练运行、多个互不重叠的市场周期以及针对进化轨道的析因消融。
+\paragraph{Incomplete financial evidence.}
+The implementation audits do not establish profitable trading. The locked matrix currently lacks all 27 required arm/seed manifests, so there is no synchronized Qwen3.5 portfolio result, confidence interval, or causal mechanism comparison to report. Earlier archived metrics used a different backbone and cannot be relabeled as results of this system.
 
-\paragraph{Information boundaries and reproducibility.}
-The teacher depends on a designed hindsight summary and utility, so misspecification can transfer undesirable preferences even when the temporal boundary is valid. The reference KL guard limits drift but does not guarantee safety under structural breaks. Reproduction also requires point-in-time market inputs, transaction-cost conventions, and versioned factor manifests; changing any of them changes the estimand.
-% 中文翻译：教师依赖人工设计的事后摘要与效用，因此即使时间边界有效，设定错误仍可能传递不理想的偏好。参考策略 KL 约束能够限制漂移，但无法保证在结构突变下的安全性。复现还需要时点一致的市场输入、交易成本约定与版本化因子清单；改变其中任何一项都会改变被估计对象。
+\paragraph{Temporal validity.}
+The proposed retrospective window begins before Qwen3.5 was released. Point-in-time prompts control runtime leakage but cannot rule out knowledge encoded in model weights. A true-forward evaluation after the complete model/data cutoff, plus no-text and de-identified-ticker controls, is required for a stronger temporal claim.
+
+\paragraph{Model and utility risk.}
+The teacher depends on a designed five-scalar hindsight summary and utility, so misspecification can transfer undesirable preferences even when the information boundary is correct. Reference KL limits local adapter drift but does not guarantee safety under structural breaks. This research prototype is not investment advice; deployment requires licensed point-in-time data, human approval, exposure limits, and market-impact, liquidity, and operational-risk testing.

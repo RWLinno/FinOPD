@@ -5,7 +5,7 @@ from the belief store to inject as few-shot priors.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -25,7 +25,7 @@ class BeliefRetrieval:
         self.top_k = top_k
 
     def retrieve(
-        self, geometry_signature: np.ndarray
+        self, geometry_signature: np.ndarray, as_of_date: str | None = None
     ) -> List[Dict[str, Any]]:
         """
         Retrieve relevant beliefs for current market state.
@@ -34,7 +34,9 @@ class BeliefRetrieval:
         if self.belief_index.size == 0:
             return []
 
-        results = self.belief_index.query(geometry_signature, self.top_k)
+        results = self.belief_index.query(
+            geometry_signature, self.top_k, as_of_date=as_of_date
+        )
 
         priors = []
         for metadata, similarity in results:
@@ -49,13 +51,16 @@ class BeliefRetrieval:
         return priors
 
     def inject_into_memory(
-        self, memory, geometry_signature: np.ndarray
+        self,
+        memory,
+        geometry_signature: np.ndarray,
+        as_of_date: str | None = None,
     ) -> int:
         """
         Inject retrieved beliefs into shared memory as few-shot priors.
         Returns number of beliefs injected.
         """
-        priors = self.retrieve(geometry_signature)
+        priors = self.retrieve(geometry_signature, as_of_date=as_of_date)
 
         if not priors:
             return 0

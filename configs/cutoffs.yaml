@@ -1,5 +1,7 @@
 # Model pretraining cutoff dates for evaluation rigor
 model_cutoffs:
+  qwen3.5-9b: "2026-02"
+  qwen3.5-27b: "2026-02"
   qwen2.5-vl-7b: "2024-03"
   gpt-4o-mini: "2024-10"
   deepseek-v3: "2024-12"

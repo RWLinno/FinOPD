@@ -2,6 +2,7 @@
 data/raw/
 data/chart_geometry/charts/
 outputs/
+.models/
 logs/
 wandb/
 __pycache__/
@@ -19,5 +20,9 @@ run_*.log
 *.fdb_latexmk
 *.fls
 *.log
+KDD27_FinOPD_sub/main.bbl
+KDD27_FinOPD_sub/main.blg
+KDD27_FinOPD_sub/main.out
+KDD27_FinOPD_sub/main.pdf
 # Private mutable factor-research manifests are never distributed.
 docs/best_factor.json

@@ -4,6 +4,9 @@ protocol:
   split: test
   test_start: "2025-01-01"
   test_end: "2026-05-31"
+  assets: [AAPL, GOOGL, NVDA, JPM]
+  initial_capital: 1000000
+  capital_weights: {AAPL: 0.25, GOOGL: 0.25, NVDA: 0.25, JPM: 0.25}
   seeds: [42, 123, 456]
   transaction_cost_bps: 15
   slippage_bps: 5

@@ -23,7 +23,7 @@ python scripts/convert_to_swift.py \
 # Step 2: Train with ms-swift
 echo "[2/2] Starting LoRA training..."
 swift sft \
-    --model /Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct \
+    --model "${FINOPD_STUDENT_MODEL:-.models/Qwen3.5-9B}" \
     --dataset data/chart_geometry/swift_train.jsonl \
     --output_dir outputs/vlm_lora/ \
     --lora_rank 16 \

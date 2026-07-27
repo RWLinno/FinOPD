@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import yaml
 
@@ -34,7 +34,7 @@ class CutoffAwareEvaluator:
             return yaml.safe_load(f)
 
     def filter_dates(
-        self, dates: List[str], model_name: str = "qwen2.5-vl-7b"
+        self, dates: List[str], model_name: str = "qwen3.5-9b"
     ) -> List[str]:
         """Filter dates to only include those after model cutoff."""
         model_cutoffs = self.cutoffs.get("model_cutoffs", {})

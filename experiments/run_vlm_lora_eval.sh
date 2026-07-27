@@ -12,7 +12,7 @@ echo "=== VLM LoRA Evaluation ==="
 echo "Time: $(date '+%Y-%m-%d %H:%M:%S')"
 
 python scripts/eval_vlm_lora.py \
-    --model /Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct \
+    --model "${FINOPD_STUDENT_MODEL:-.models/Qwen3.5-9B}" \
     --lora-path outputs/vlm_lora/ \
     --test-data data/chart_geometry/train.jsonl \
     --output outputs/vlm_lora_eval.json \
