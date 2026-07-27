@@ -1,0 +1,66 @@
+\section{Additional Experimental Details}
+\label{sec:appendix_details}
+
+\subsection{Factor Library Composition}
+The factor analysis pool contains 197 evolved candidates expanded from a 157-expression seed set, organized into two groups. The deployed router uses a decorrelated subset of roughly 160 candidates after admission and redundancy filtering. The first group consists of self-evolved alpha factors mined through iterative research cycles, with information ratios (after transaction costs) ranging from 0.17 to 6.56 (mean $|\mathrm{IR}|{=}1.50$ for the evolved library vs.\ 1.19 for the seeds). Representative high-IR factors include residual momentum variants (RESI\_ZSCORE\_6\_5, IR=3.04), swing-point momentum composites (SWING\_POINT\_MOMENTUM\_R\_SQR, IR=2.56), and quantile-delta RSI interactions (QTLD5\_RSI\_Delta\_60\_7, IR=2.93). A separate US cross-sectional mining pass produces 50 additional factors fit on the 2019--2024 training window. The second group supplements standard technical indicators computed via pandas\_ta.
+
+\subsection{Agent Role Specifications}
+
+The five specialist agents operate as follows:
+\begin{enumerate}
+    \item \textbf{ChartAnalyst}: Interprets structured ChartGeometry output, identifying actionable geometric configurations and their historical reliability.
+    \item \textbf{PatternReasoner}: Performs multi-timeframe pattern synthesis across daily, weekly, and monthly horizons, evaluating alignment or conflict.
+    \item \textbf{EventAnalyst}: Processes news sentiment, earnings surprises, and filing signals, contextualizing them against the current geometric and factor state.
+    \item \textbf{RiskController}: Monitors portfolio-level risk metrics (VaR, drawdown trajectory, correlation regime) and can veto or scale down proposed positions.
+    \item \textbf{DecisionPM}: Synthesizes inputs from all agents through shared memory, producing final position size, entry/exit levels, and stop-loss parameters.
+\end{enumerate}
+
+\subsection{Hyperparameter Settings}
+
+\input{tables/setting}
+
+\subsection{Computational Budget}
+For anonymity, we report compute in aggregate accelerator-hours rather than naming the provider, node, or account-level cost logs. The visual-geometric encoder requires approximately 8 accelerator-hours, router pre-training requires approximately 2 accelerator-hours, and the 8-iteration self-evolution phase requires approximately 32 accelerator-hours, for a total of 42 accelerator-hours. Deterministic backtest evaluation runs on CPU.
+
+\subsection{Decision Case Study}
+\label{sec:case_study}
+We trace one anonymized asset-day from the post-cutoff evaluation to expose the decision pipeline's internal mechanics. The committee produced a \emph{sell} decision through the following chain:
+
+\begin{itemize}
+    \item ChartAnalyst read the structured geometry as \emph{bearish} (confidence 0.80).
+    \item PatternReasoner returned \emph{neutral} (0.42).
+    \item EventAnalyst contributed no strong signal (\emph{neutral}, 0.10).
+    \item RiskController rated risk \emph{moderate} with a \texttt{proceed} recommendation.
+\end{itemize}
+
+\noindent The DecisionPM fused these into a weighted score of $-0.384$ (risk-adjusted $-0.307$), crossing the short-side conviction threshold and opening a 12.6\% position. Shared memory flagged a \emph{chart-vs-factor disagreement}; the manager resolved it in favor of the higher-confidence chart signal.
+
+This trace illustrates three design properties: (i) the geometry channel carries the dominant signal when confidence is high, (ii) disagreements are surfaced and arbitrated rather than averaged, and (iii) position size scales with risk-adjusted conviction rather than being binary. Across the 17-month test window (January 2025--May 2026, covering GOOGL, NVDA, AAPL, and JPM), explicit disagreements occur on 27.4\% of asset-days (Fig.~\ref{fig:agent}), and the system abstains on 62.4\% of days---the committee is selective rather than perpetually active.
+
+
+\subsection{Portfolio Drawdown Analysis}
+\label{sec:full_results}
+
+The main tables report Calmar ratio, which encodes maximum drawdown as Calmar $=$ CR/MDD. Over the 17-month test window (January 2025--May 2026), the deployed portfolio achieves CR=60.9\% with Calmar=3.30, implying a maximum drawdown of approximately 18.5\%. Buy\&Hold reaches CR=50.0\% and Calmar=1.63 over the same period, implying a larger drawdown of approximately 30.7\%. \textsc{FinOPD} therefore occupies a favorable region: it captures stronger absolute return than passive exposure while earning more return per unit of drawdown, consistent with a strategy that stays invested when it holds an edge and abstains otherwise.
+
+\subsection{Sensitivity and Efficiency}
+\label{sec:appendix_additional}
+
+\input{tables/sensitivity}
+
+\paragraph{Hyperparameter Sensitivity.} Table~\ref{tab:sensitivity} reports real re-runs over the regime-adaptive policy's two knobs: the volatility-conditioned holding period and the volatility breakpoints. Performance stays stable across a broad neighborhood, and every setting exceeds the strongest baseline, indicating the advantage is structural rather than the product of point-tuning.
+
+\input{tables/efficiency}
+
+\paragraph{Computational Cost.} The complete 8-iteration pipeline requires approximately 42 accelerator-hours total. Inference latency is approximately 8.2s per asset per day, well within daily-frequency requirements.
+
+\subsection{Limitations and Future Work}
+\label{sec:limitations}
+
+\paragraph{Parametric drift under regime change.} Token-level JSD matching under high-variance financial rewards requires careful hyperparameter tuning. In prolonged non-stationary regimes (e.g., a sustained bear market exceeding the training distribution), the parametric self-distillation track may collapse toward the non-parametric track alone. The alignment guard and adversarial refresh mitigate but do not eliminate this failure mode.
+
+\paragraph{Belief store capacity trade-off.} The fixed-capacity eviction policy forces forgetting. If market structure shifts gradually, stale beliefs are evicted before their predictive content fully decays; if structure shifts abruptly, retained beliefs may be irrelevant. Adaptive capacity scheduling conditioned on detected regime transitions is a direct extension.
+
+\paragraph{Factor library scale.} At 197 evolved factors the library is substantially larger than prior academic work but remains modest relative to industrial pools ($>$10,000 factors). The current router requires retraining to incorporate new factors; a dynamic registration mechanism that hot-swaps factors without full retraining is future work.
+
+\paragraph{Asset and frequency coverage.} Evaluation covers daily-frequency trading on four liquid US equities over 17 months. Extension to broader universes (e.g., Russell 1000), intraday frequencies, or alternative asset classes (fixed income, derivatives) would require architectural changes to handle different reward timescales, liquidity regimes, and data modalities.

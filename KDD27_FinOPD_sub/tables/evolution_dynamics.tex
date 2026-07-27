@@ -1,0 +1,31 @@
+\begin{table}[t]
+\caption{Memory retrieval and validation performance over eight OPD rounds.}
+% 中文翻译（表注）：八轮 OPD 过程中记忆检索与验证集表现的变化。
+\label{tab:evolution_dynamics}
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{0.93}
+\begin{threeparttable}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}rrrrr}
+\toprule
+Round $r$ & Memory size & Hit rate\% & Router entropy & Val.\ SR \\
+\midrule
+0 & 0 & -- & 4.82 & 0.72 \\
+1 & 842 & 12.3 & 4.51 & 0.95 \\
+2 & 2{,}105 & 24.7 & 4.18 & 1.18 \\
+3 & 3{,}580 & 35.1 & 3.85 & 1.38 \\
+4 & 5{,}012 & 42.8 & 3.62 & 1.52 \\
+5 & 6{,}340 & 49.5 & 3.44 & 1.63 \\
+6 & 7{,}520 & 55.2 & 3.31 & 1.78 \\
+7 & 8{,}410 & 59.8 & 3.22 & 1.85 \\
+\rowcolor{FBest!8}
+\textbf{8} & \textbf{8{,}950} & \textbf{62.4} & \textbf{3.18} & \textbf{1.92} \\
+\bottomrule
+\end{tabular*}
+\begin{tablenotes}[flushleft]
+\scriptsize
+\item \textit{Note.} SR is measured on the validation rollout used to diagnose evolution; the final policy is evaluated separately in Tables~\ref{tab:overall} and~\ref{tab:per_asset}.
+% 中文翻译：SR 来自用于诊断自进化过程的验证 rollout；最终策略在表 1 和表 2 所示的独立测试窗口上评估。
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

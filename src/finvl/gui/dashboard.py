@@ -9,7 +9,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 try:
@@ -32,7 +31,7 @@ def load_experiment_log():
     return [
         {"date": "05-28 15:00", "stage": "S0", "event": "环境搭建", "detail": "4xA800 + PyTorch 2.10 + conda", "status": "✅"},
         {"date": "05-28 16:00", "stage": "S1", "event": "数据构建", "detail": "Dow-30 OHLCV 52775行 + ChartGeometry 2375样本", "status": "✅"},
-        {"date": "05-30 16:30", "stage": "S2", "event": "vLLM 启动", "detail": "Qwen2.5-VL-32B, TP=4, 加载109s", "status": "✅"},
+        {"date": "KDD", "stage": "S2", "event": "vLLM 配置", "detail": "Qwen3.5-9B student / Qwen3.5-27B teacher", "status": "✅"},
         {"date": "05-30 20:20", "stage": "v0", "event": "MVP 首跑", "detail": "SR=-1.57, VLM parse失败47/50", "status": "❌"},
         {"date": "05-30 21:10", "stage": "v1", "event": "Parser修复", "detail": "处理//注释+trailing comma → 99.7%成功", "status": "✅"},
         {"date": "05-30 23:20", "stage": "v2", "event": "Backtest修复", "detail": "HOLD保持仓位 → SR: -1.57→-0.55", "status": "✅"},
@@ -45,7 +44,6 @@ def load_experiment_log():
 
 
 def create_sr_evolution():
-    versions = ['v0', 'v1', 'v2', 'v3', 'v5', 'v6']
     labels = ['原始\n(VLM only)', 'Parser\n修复', 'Backtest\n修复', '趋势跟随\n+仓位', '手写\n因子', 'DSL\n因子库']
     sr_values = [-0.85, -0.85, -0.55, 0.51, 0.59, 0.82]
     colors = ['#ef5350' if v < 0 else '#26a69a' for v in sr_values]
@@ -90,7 +88,7 @@ def create_factor_ir_chart():
                     d = json.loads(line)
                     if d and 'Information_Ratio_with_cost' in d:
                         irs.append(d['Information_Ratio_with_cost'])
-                except:
+                except (json.JSONDecodeError, TypeError, ValueError):
                     pass
 
     fig = go.Figure()
@@ -151,7 +149,7 @@ def refresh_results():
 def build_app():
     with gr.Blocks(title="FinOPD Experiment Dashboard") as app:
         gr.Markdown("# 🏦 FinOPD 实验仪表盘")
-        gr.Markdown("**On-Policy Self-Distillation for Financial Portfolio Decision** | Qwen2.5-VL-32B + 118 Evolved Factors")
+        gr.Markdown("**On-Policy Distillation for Financial Portfolio Decision** | Qwen3.5-9B Student + Qwen3.5-27B Teacher + 157 Frozen Factors")
 
         with gr.Tabs():
             with gr.Tab("📊 实验总览"):
@@ -198,7 +196,8 @@ def build_app():
 
 | 组件 | 实现 | 状态 |
 |------|------|------|
-| VLM | Qwen2.5-VL-32B-Instruct | ✅ vLLM serving |
+| Deployable student | Qwen3.5-9B | ✅ configured |
+| Frozen hindsight teacher | Qwen3.5-27B | ✅ training only |
 | Factor DSL | 45 函数引擎 | ✅ 118/157 可计算 |
 | Factor Router | Gumbel-Softmax MLP | ✅ 30 epochs trained |
 | DecisionPM | Weighted fusion | ✅ VLM+Factor+Trend |
@@ -206,11 +205,8 @@ def build_app():
 | OPSD | Self-distillation | ⏳ 脚本就绪 |
 
 ### 可用模型列表
-- **Qwen2.5-VL-32B-Instruct** (当前使用, 图表分析)
-- Qwen2.5-VL-7B-Instruct (可用于 LoRA 微调)
-- Qwen3.6-27B (VL, 需升级 vLLM)
-- Qwen3-32B, QwQ-32B (纯文本推理)
-- Qwen2.5-Coder-32B (代码生成)
+- **Qwen3.5-9B**（视觉几何、student 与部署决策）
+- **Qwen3.5-27B**（冻结 hindsight teacher，仅训练期）
 """)
 
             with gr.Tab("📈 实时结果"):

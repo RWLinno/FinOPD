@@ -39,7 +39,7 @@ geometry:
 
 vlm:
   backend: "openai"
-  model: "opd_lora"
+  model: "Qwen/Qwen3.5-9B"
   base_url: "http://localhost:8000/v1"
   api_key: "EMPTY"
   temperature: 0.1

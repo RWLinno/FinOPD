@@ -11,10 +11,11 @@ opsd:
 
   teacher:
     freeze_weights: true
+    backbone: "Qwen/Qwen3.5-27B"
     hindsight_prefix: "[HINDSIGHT]"
 
   student:
-    backbone: "/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct"
+    backbone: "Qwen/Qwen3.5-9B"
     lora_rank: 16
     lora_target_modules: ["q_proj", "v_proj", "o_proj"]
     learning_rate: 2.0e-5

@@ -13,12 +13,10 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import numpy as np
-import torch
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "src"))
 
-from finvl.self_evolution.opsd.jsd import opsd_loss
 from finvl.self_evolution.opsd.teacher import OPSDTeacher
 from finvl.self_evolution.opsd.rollout import StudentRollout, Trajectory
 from finvl.self_evolution.credit.shapley import ShapleyCredit
@@ -78,6 +76,7 @@ class OPSDTrainer:
     def train(
         self,
         model_path: str,
+        teacher_model_path: str,
         lora_path: str,
         data_provider,
         assets: List[str],
@@ -89,7 +88,7 @@ class OPSDTrainer:
         output = Path(output_dir)
         output.mkdir(parents=True, exist_ok=True)
 
-        teacher = OPSDTeacher(model_path, lora_path)
+        teacher = OPSDTeacher(teacher_model_path, lora_path)
         teacher.load()
 
         for iteration in range(self.iterations):
@@ -151,7 +150,8 @@ class OPSDTrainer:
 def main():
     parser = argparse.ArgumentParser(description="OPSD Self-Evolution Training")
     parser.add_argument("--config", default="configs/opsd.yaml")
-    parser.add_argument("--model", default="/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct")
+    parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    parser.add_argument("--teacher-model", default="Qwen/Qwen3.5-27B")
     parser.add_argument("--lora-path", default="outputs/vlm_lora/")
     parser.add_argument("--assets", nargs="+", default=["AAPL"])
     parser.add_argument("--iterations", type=int, default=None)
@@ -173,6 +173,7 @@ def main():
 
     trainer.train(
         model_path=args.model,
+        teacher_model_path=args.teacher_model,
         lora_path=args.lora_path,
         data_provider=provider,
         assets=args.assets,

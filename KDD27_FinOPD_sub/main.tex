@@ -1,0 +1,197 @@
+\documentclass[sigconf,review]{acmart}
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+% Review-stage placeholders preserve the ACM permission block. Replace the
+% ISBN and DOI with the values supplied by ACM after acceptance.
+
+\setcopyright{acmlicensed}
+\copyrightyear{2027}
+\acmYear{2027}
+\acmDOI{XXXXXXX.XXXXXXX}
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[KDD '27]{The ACM SIGKDD Conference on Knowledge Discovery and Data Mining}{August 2027}{San Jose, CA, USA}
+
+%%
+%%  Uncomment \acmBooktitle if the title of the proceedings is different
+%%  from ``Proceedings of ...''!
+%%
+%%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%%  June 03--05, 2018, Woodstock, NY}
+\acmISBN{978-1-4503-XXXX-X/2027/08}
+
+%
+% Submission ID.
+% Use this when submitting an article to a sponsored event. You'll
+% receive a unique submission ID from the organizers
+% of the event, and this ID should be used as the parameter to this command.
+% \acmSubmissionID{<OpenReview submission ID>}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+    %\usepackage[nonatbib]{main}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{colortbl}       % row/cell coloring in tables (\rowcolor)
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\emergencystretch=2em     % reduce narrow-column overfull boxes without changing margins
+%\usepackage{amssymb}          % Math symbols
+%\usepackage{amsmath}
+\usepackage{ragged2e}
+\usepackage[most]{tcolorbox}
+\usepackage{subcaption}
+\usepackage[outline]{contour}
+% Tables and formatting packages
+\usepackage{multirow}         % Multirow elements in tables
+\usepackage{makecell}         % Flexible tabular cell formatting
+\usepackage{tabularx}         % Tables with adjustable-width columns
+\usepackage{threeparttable}   % Tables with notes
+\usepackage{enumitem}
+\usepackage{bm}
+\usepackage{algorithm}        % Floating environment for 
+\usepackage{algorithmic} 
+\usepackage{adjustbox}
+\usepackage{placeins}
+\usepackage{adjustbox}
+\usepackage{graphicx}       % graphics
+\graphicspath{{figures/}{media/}}     % organize your images and other figures under media/ folder
+
+\definecolor{lightblue}{rgb}{0.2, 0.6, 0.9}
+\definecolor{lightred}{rgb}{0.9, 0.4, 0.4}
+\definecolor{FBest}{RGB}{4,130,53}
+\definecolor{FSecond}{RGB}{30,100,180}
+\definecolor{lightyellow}{rgb}{0.8, 0.8, 0.35}
+\definecolor{lightpurple}{rgb}{0.7, 0.6, 0.8}
+\definecolor{lightorange}{rgb}{1.0, 0.5, 0.0}
+\definecolor{darkblue}{RGB}{0,0,139}
+\title{\textsc{FinOPD}: On-Policy Distillation for Self-Evolving Financial Multi-Agent Systems}
+
+% Keep the native ACM author cards in two rows (4 + 3).
+%\settopmatter{authorsperrow=4,printacmref=ture,printccs=true}
+
+\settopmatter{authorsperrow=4,printacmref=false,printccs=true}
+
+
+% Allow the two long addresses to wrap inside their native author cards.
+\makeatletter
+\patchcmd{\@mkauthors@iii}
+  {\mathchardef\UrlBreakPenalty=10000}
+  {\mathchardef\UrlBreakPenalty=100}{}{}
+\patchcmd{\@mkauthors@iii}
+  {\mathchardef\UrlBreakPenalty=10000}
+  {\mathchardef\UrlBreakPenalty=100}{}{}
+\makeatother
+
+% OpenReview TL;DR (30 words; entered in the form, not rendered in the PDF):
+% FinOPD uses delayed, risk-adjusted outcomes from current-policy financial
+% trajectories to distill a multi-agent decision policy, while time-safe memory,
+% frozen factor tools, and selective execution guard deployment against
+% hindsight leakage.
+
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+% IMPORTANT: add \department{...} for every author exactly as recorded in the
+% current OpenReview profile before uploading the single-blind PDF.
+\author{Weilin Ruan}
+\email{rwlinno@gmail.com}
+\affiliation{%
+  \institution{The Chinese University of Hong Kong}
+  \country{Hong Kong}
+}
+
+\author{Yiyao Peng}
+\email{harukamoringa0929@gmail.com}
+\affiliation{%
+  \institution{The Hong Kong University of Science and Technology}
+  \country{Hong Kong}
+}
+
+\author{Ziyu Zhou}
+\email{zziyuzhou@gmail.com}
+\affiliation{%
+  \institution{The Hong Kong University of Science and Technology}
+  \country{Hong Kong}
+}
+
+\author{Songning Lai}
+\email{lais0328eee@gmail.com}
+\affiliation{%
+  \institution{JoinQuant}
+  \country{China}
+}
+
+\author{Fan Liu}
+\email{51265900013@stu.ecnu.edu.cn}
+\affiliation{%
+  \institution{East China Normal University}
+  \country{China}
+}
+
+\author{Yuxuan Liang}
+\email{yuxliang@outlook.com}
+\affiliation{%
+  \institution{The Hong Kong University of Science and Technology (Guangzhou)}
+  \country{China}
+}
+
+\author{James Cheng}
+\email{jcheng@cse.cuhk.edu.hk}
+\affiliation{%
+  \institution{The Chinese University of Hong Kong}
+  \country{Hong Kong}
+}
+
+\renewcommand{\shortauthors}{Ruan et al.}
+
+\begin{document}
+
+\input{sections/00_abstract}
+
+% ACM Computing Classification System concepts selected for the paper's
+% methodological contribution and application setting.
+% \ccsdesc[500]{Information systems~Data mining}
+% \ccsdesc[500]{Computing methodologies~Multi-agent systems}
+% \ccsdesc[300]{Computing methodologies~Machine learning}
+
+\keywords{financial agent systems, on-policy distillation, self-evolving agents}
+
+%% A "teaser" image appears between the author and affiliation
+%% information and the body of the document, and typically spans the
+%% page.
+
+% \received{20 February 2007}
+% \received[revised]{12 March 2009}
+% \received[accepted]{5 June 2009}
+
+\maketitle
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/02b_problem}
+\input{sections/03_method}
+\input{sections/04_experiments}
+\input{sections/05_conclusion}
+\input{sections/06_policy}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{main}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

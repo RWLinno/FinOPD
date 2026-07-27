@@ -1,0 +1,42 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Sensitivity on the validation setting. The default edge threshold and factor top-$k$ balance aggressiveness and routing noise.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{2pt}
+\begin{threeparttable}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+Parameter & Value & SR$\uparrow$ & MDD\%$\downarrow$ & Stability \\
+\midrule
+\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}Position\\size $p_{\max}$\end{tabular}}
+& $p_{\max}=0.10$ & 1.28 & 0.1 & 0.98 \\
+& $p_{\max}=0.20$ & 1.28 & 0.3 & 0.96 \\
+& $\mathbf{p_{\max}=0.30}$ & \textbf{1.28} & \textbf{0.4} & \textbf{0.94} \\
+& $p_{\max}=0.40$ & 1.28 & 0.6 & 0.91 \\
+& $p_{\max}=0.50$ & 1.28 & 0.7 & 0.87 \\
+\midrule
+\multirow{5}{*}{\begin{tabular}[c]{@{}l@{}}Edge threshold\\$\theta^{+}_{\mathrm{edge}}$\end{tabular}}
+& $0.05$ (aggressive) & $-$0.21 & 6.1 & 0.68 \\
+& $0.10$ & 0.69 & 3.1 & 0.82 \\
+& $\mathbf{0.15}$ & \textbf{1.28} & \textbf{0.4} & \textbf{0.94} \\
+& $0.25$ & 0.91 & 0.3 & 0.96 \\
+& $0.40$ (conservative) & 0.42 & 0.1 & 0.99 \\
+\midrule
+\multirow{4}{*}{\begin{tabular}[c]{@{}l@{}}Factor\\top-$k$\end{tabular}}
+& $k=5$ & 0.95 & 0.6 & 0.90 \\
+& $k=10$ & 1.12 & 0.5 & 0.92 \\
+& $\mathbf{k=15}$ & \textbf{1.28} & \textbf{0.4} & \textbf{0.94} \\
+& $k=25$ & 1.08 & 0.5 & 0.91 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{tablenotes}
+\footnotesize
+\item SR is insensitive to position size, while MDD scales with exposure. Bold marks the default selected before test evaluation.
+\end{tablenotes}
+\end{threeparttable}
+\label{tab:sensitivity}
+\end{table}

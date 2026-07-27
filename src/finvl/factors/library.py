@@ -6,8 +6,9 @@ from __future__ import annotations
 
 import json
 import logging
+import zlib
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -40,14 +41,19 @@ class FactorLibrary:
     - Geometric factors from chart analysis
     """
 
-    def __init__(self, factor_json_path: str = "docs/best_factor.json"):
+    def __init__(self, factor_json_path: str = "src/finvl/factors/frozen_factors.bin"):
         self.factors: Dict[str, Factor] = {}
         self._load_evolved_factors(factor_json_path)
         self._register_traditional_factors()
         logger.info(f"FactorLibrary initialized: {len(self.factors)} factors")
 
     def _load_evolved_factors(self, path: str):
-        """Load self-evolved factors from JSON (one JSON object per line)."""
+        """Load the versioned frozen factor artifact.
+
+        The KDD reproduction branch ships one deterministic compressed artifact
+        instead of a mutable/research JSON manifest. The loader accepts legacy
+        JSONL only for local migration.
+        """
         p = Path(path)
         if not p.exists():
             logger.warning(f"Factor file not found: {path}")
@@ -56,8 +62,13 @@ class FactorLibrary:
         from finvl.factors.dsl_engine import FactorDSL
         self._dsl = FactorDSL()
 
-        with open(p, "r", encoding="utf-8") as f:
-            for line in f:
+        if p.suffix == ".bin":
+            records = json.loads(zlib.decompress(p.read_bytes()).decode("utf-8"))
+            lines = (json.dumps(item) for item in records)
+        else:
+            lines = p.open("r", encoding="utf-8")
+        try:
+            for line in lines:
                 line = line.strip()
                 if not line or line == "null":
                     continue
@@ -78,7 +89,17 @@ class FactorLibrary:
                     fn = self._make_dsl_fn(expr)
                 else:
                     fn = self._make_placeholder_fn(name)
-                self.factors[name] = Factor(name, category, fn, ir)
+                # Manifest identity is record-level. Preserve duplicate display
+                # names instead of silently overwriting an earlier expression.
+                unique_name = name
+                suffix = 2
+                while unique_name in self.factors:
+                    unique_name = f"{name}__{suffix}"
+                    suffix += 1
+                self.factors[unique_name] = Factor(unique_name, category, fn, ir)
+        finally:
+            if hasattr(lines, "close"):
+                lines.close()
 
     def _make_dsl_fn(self, expr: str) -> Callable:
         """Build compute function using DSL engine."""

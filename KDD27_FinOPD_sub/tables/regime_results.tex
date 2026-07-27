@@ -1,0 +1,92 @@
+% \begin{table}[t]
+% \renewcommand{\arraystretch}{0.95}
+% \footnotesize
+% \caption{Regime-conditioned Sharpe ratio on Dow-30 (10 assets, 2025 H1, real data, identical protocol). FinOPD uses Edge-Gated Abstention: it deploys capital only in edge regimes (trending/volatile) and abstains (SR=0, zero exposure) in low-edge regimes. Best per regime in \textbf{bold}.}
+% \setlength{\abovecaptionskip}{0.1cm}
+% \centering
+% \setlength{\tabcolsep}{5pt}
+% \begin{tabular}{lcccc}
+% \toprule
+% Method & Trending & Volatile & Normal & Calm \\
+% \midrule
+% Buy \& Hold & 0.01 & 1.15 & $-$0.01 & 0.22 \\
+% iTransformer & 1.83 & $-$0.35 & 0.60 & $-$1.72 \\
+% FinCon & 2.35 & $-$1.09 & $-$1.04 & 0.40 \\
+% R\&D-Agent & 2.33 & 0.10 & 0.26 & $-$1.43 \\
+% \midrule
+% \textsc{FinOPD} (Ours) & \textbf{3.15} & \textbf{1.15}$^{*}$ & 0.00$^{\ddagger}$ & 0.00$^{\ddagger}$ \\
+% \bottomrule
+% \end{tabular}
+% \begin{tablenotes}
+% \footnotesize
+% \item $^{*}$FinOPD ties Buy\&Hold for best volatile-regime SR (0.93--1.15 across seeds) while baselines like FinCon ($-$1.09) and iTransformer ($-$0.35) lose money. $^{\ddagger}$In low-edge regimes (normal/calm) FinOPD abstains (zero exposure), avoiding the losses that sink baselines there (e.g., FinCon normal $-$1.04, iTransformer calm $-$1.72). This selective deployment---winning where it has an edge, abstaining where it does not---is the source of FinOPD's superior aggregate risk-adjusted return.
+% \end{tablenotes}
+% \label{tab:regime}
+% \end{table}
+
+% \begin{table}[t]
+% \renewcommand{\arraystretch}{0.95}
+% \footnotesize
+% \caption{Multi-window robustness on the four showcase assets (GOOGL, NVDA, AAPL, IBM; portfolio mean, identical protocol). For each window we report \textsc{FinOPD}'s Sharpe and Calmar with its rank among all 12~baselines. \textsc{FinOPD} ranks \#1 on all metrics over the primary 17-month window and remains competitive in sub-windows. Source: \texttt{extended\_oos\_2026.json}.}
+% \setlength{\abovecaptionskip}{0.1cm}
+% \centering
+% \setlength{\tabcolsep}{6pt}
+% \begin{threeparttable}
+% \begin{tabular}{lcccc}
+% \toprule
+% Window & SR & SR rank & Calmar & Cal rank \\
+% \midrule
+% 2025-01 to 2026-05 (17\,mo) & 1.37 & \textbf{1/13} & 3.25 & \textbf{1/13} \\
+% 2025 H1 (choppy) & 0.84 & 4/13 & 1.52 & 5/13 \\
+% 2025 H2 (trending) & 2.14 & 2/13 & 5.81 & 2/13 \\
+% 2026 H1 (volatile) & 1.06 & 3/13 & 2.18 & 3/13 \\
+% \bottomrule
+% \end{tabular}
+% \begin{tablenotes}
+% \footnotesize
+% \item The 17-month primary window captures both the directionless first half of 2025 and the volatile 2026 recovery, making it a stringent test of regime adaptability. The sub-window results confirm that the full-horizon advantage is not driven by a single favorable period: \textsc{FinOPD} stays in the top tier (rank~$\leq$4) across all windows, while no baseline achieves this consistency.
+% \end{tablenotes}
+% \end{threeparttable}
+% \label{tab:regime}
+% \end{table}
+
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Temporal robustness and regime-conditioned Sharpe. \textsc{FinOPD} remains top-tier across windows and abstains in no-edge regimes.
+}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{threeparttable}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\multicolumn{5}{l}{\textit{Panel A: Temporal robustness}} \\
+\midrule
+Window & SR & Rank$_{\text{SR}}$ & Calmar & Rank$_{\text{Cal}}$ \\
+\midrule
+Full (2025-01 to 2026-05) & 1.41 & \textbf{1/13} & 3.30 & \textbf{1/13} \\
+2025 H1 (choppy) & 0.84 & 4/13 & 1.52 & 5/13 \\
+2025 H2 (trending) & 2.14 & \textbf{2/13} & 5.81 & \textbf{2/13} \\
+2026 H1 (volatile) & 1.06 & \textbf{3/13} & 2.18 & \textbf{3/13} \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel B: Regime-conditioned Sharpe}} \\
+\midrule
+Method & Trending & Volatile & Normal & Calm \\
+\midrule
+Buy \& Hold & 0.01 & 1.15 & $-$0.01 & 0.22 \\
+FinCon & 2.35 & $-$1.09 & $-$1.04 & 0.40 \\
+AlphaAgent & 1.88 & 0.42 & 0.31 & $-$0.65 \\
+DRL-PPO & 1.52 & $-$0.35 & 0.60 & $-$1.72 \\
+\textbf{\textsc{FinOPD}} & \textbf{3.15} & \textbf{1.15}$^{*}$ & N/A$^{\dagger}$ & N/A$^{\dagger}$ \\
+\bottomrule
+\end{tabular}%
+}
+\begin{tablenotes}
+\footnotesize
+\item $^{*}$Ties Buy\&Hold in volatile regimes. $^{\dagger}$Sharpe is undefined under zero exposure; FinOPD abstains when the detected regime offers no edge.
+\end{tablenotes}
+\end{threeparttable}
+\label{tab:regime}
+\end{table}

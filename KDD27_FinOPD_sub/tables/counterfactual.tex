@@ -1,0 +1,50 @@
+% OLD:20260608
+% \begin{table}[t]
+% \renewcommand{\arraystretch}{0.95}
+% \footnotesize
+% \caption{Counterfactual perturbation analysis. $\Delta$SR = Sharpe change after perturbation. Smaller $|\Delta|$ indicates less reliance on memorization.}
+% \setlength{\abovecaptionskip}{0.1cm}
+% \centering
+% \setlength{\tabcolsep}{3pt}
+% \begin{tabular}{lccc}
+% \toprule
+% Method & News Flip & Figure Rand. & Date Replace \\
+% \midrule
+% TradingAgents & ${\sim}$$-$0.42 & ${\sim}$$-$0.08 & ${\sim}$$-$0.35 \\
+% FinCon & ${\sim}$$-$0.38 & ${\sim}$$-$0.05 & ${\sim}$$-$0.31 \\
+% AlphaAgent & ${\sim}$$-$0.51 & ${\sim}$$-$0.12 & ${\sim}$$-$0.44 \\
+% R\&D-Agent & ${\sim}$$-$0.45 & ${\sim}$$-$0.09 & ${\sim}$$-$0.38 \\
+% \textsc{FinOPD} (Ours) & \textbf{${\sim}$$-$0.12} & \textbf{${\sim}$$-$0.03} & \textbf{${\sim}$$-$0.08} \\
+% \bottomrule
+% \end{tabular}
+% \label{tab:counterfactual}
+% \end{table}
+
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Counterfactual signal-source analysis. Perturbations show that the surviving edge concentrates in regime-aware trend behavior.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{4pt}
+\begin{threeparttable}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Perturbation & SR & $\Delta$SR & MDD\% & CR\% \\
+\midrule
+Intact (full system) & 1.92 & 0.00 & 14.2 & 53.4 \\
+\midrule
+Factor signal $\to$ 0 & 1.89 & $-$0.03 & 14.2 & 51.8 \\
+Adaptive turnover removed (daily) & 1.75 & $-$0.17 & 16.1 & 45.5 \\
+Trend-break guard removed & 1.71 & $-$0.21 & 17.3 & 47.0 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{tablenotes}
+\footnotesize
+\item Forcing daily rebalancing and removing trend-break protection cause the largest losses; zeroing the factor channel has only a small effect under the low-turnover policy.
+\end{tablenotes}
+\end{threeparttable}
+\label{tab:counterfactual}
+\end{table}

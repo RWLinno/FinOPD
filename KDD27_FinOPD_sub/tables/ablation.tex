@@ -1,0 +1,31 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Component ablation on the full-year diagnostic window. Adaptive turnover and trend-break guarding account for the largest Sharpe drops.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{2pt}
+\begin{threeparttable}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{clccccc}
+\toprule
+ID & Configuration & SR$\uparrow$ & $\Delta$SR & MDD\%$\downarrow$ & Calmar$\uparrow$ & Trades \\
+\midrule
+A1 & Full \textsc{FinOPD} & 1.92 & 0.00 & 14.2 & 3.76 & 2.0 \\
+\midrule
+\multicolumn{2}{l}{\textit{Hindsight teacher (upper bound)}} & \textit{2.96} & \textit{+1.04} & \textit{10.1} & \textit{9.88} & -- \\
+\midrule
+A7 & w/o Trend-break guard & 1.71 & $-$0.21 & 17.3 & 2.56 & 2.2 \\
+A9 & w/o Adaptive turnover (daily) & 1.75 & $-$0.17 & 16.1 & 2.83 & 8.5 \\
+A2 & w/o Factor signals & 1.89 & $-$0.03 & 14.2 & 3.65 & 2.2 \\
+A4 & w/o RASW (fixed weights) & 1.92 & 0.00 & 14.2 & 3.76 & 2.0 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{tablenotes}
+\footnotesize
+\item The hindsight teacher estimates the privileged-PnL action-space ceiling.% Near-null rows are retained to show which modules are subsumed by the low-turnover policy.
+\end{tablenotes}
+\end{threeparttable}
+\label{tab:ablation}
+\end{table}

@@ -1,0 +1,24 @@
+# Locked held-out mechanism matrix. Every arm uses the same checkpoint seed,
+# dates, costs, slippage, execution delay, data snapshot and capital weights.
+protocol:
+  split: test
+  test_start: "2025-01-01"
+  test_end: "2026-05-31"
+  seeds: [42, 123, 456]
+  transaction_cost_bps: 15
+  slippage_bps: 5
+  execution_delay_days: 1
+  bootstrap_block_days: 20
+  bootstrap_samples: 2000
+  multiple_comparison: holm
+
+arms:
+  full: {opd: true, memory: true, credit: shapley, reference_kl: true, router: learned, execution_guard: true}
+  no_opd: {opd: false, memory: true, credit: shapley, reference_kl: true, router: learned, execution_guard: true}
+  vanilla_gkd: {opd: gkd, memory: true, credit: uniform, reference_kl: false, router: learned, execution_guard: true}
+  no_memory: {opd: true, memory: false, credit: shapley, reference_kl: true, router: learned, execution_guard: true}
+  no_opd_memory: {opd: false, memory: false, credit: shapley, reference_kl: true, router: learned, execution_guard: true}
+  uniform_credit: {opd: true, memory: true, credit: uniform, reference_kl: true, router: learned, execution_guard: true}
+  no_reference_kl: {opd: true, memory: true, credit: shapley, reference_kl: false, router: learned, execution_guard: true}
+  fixed_router: {opd: true, memory: true, credit: shapley, reference_kl: true, router: fixed, execution_guard: true}
+  no_execution_guard: {opd: true, memory: true, credit: shapley, reference_kl: true, router: learned, execution_guard: false}

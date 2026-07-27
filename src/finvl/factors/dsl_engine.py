@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict
 
 import numpy as np
 import pandas as pd
@@ -29,9 +29,9 @@ class FactorDSL:
             if isinstance(result, (int, float, bool)):
                 return pd.Series(float(result), index=df.index)
             if isinstance(result, np.ndarray):
-                return pd.Series(result, index=df.index).fillna(0.0)
+                return pd.Series(result, index=df.index).replace([np.inf, -np.inf], np.nan).fillna(0.0)
             if isinstance(result, pd.Series):
-                return result.fillna(0.0)
+                return result.replace([np.inf, -np.inf], np.nan).fillna(0.0)
             return pd.Series(0.0, index=df.index)
         except Exception as e:
             logger.debug(f"Factor eval failed: {e}")
@@ -300,9 +300,12 @@ class FactorDSL:
 
     @staticmethod
     def _atr(high, low, close, period=14):
-        h, l, c = np.asarray(high, float), np.asarray(low, float), np.asarray(close, float)
+        h, low_values, c = np.asarray(high, float), np.asarray(low, float), np.asarray(close, float)
         prev_c = np.concatenate([[c[0]], c[:-1]])
-        tr = np.maximum(h - l, np.maximum(np.abs(h - prev_c), np.abs(l - prev_c)))
+        tr = np.maximum(
+            h - low_values,
+            np.maximum(np.abs(h - prev_c), np.abs(low_values - prev_c)),
+        )
         return pd.Series(tr).rolling(period, min_periods=1).mean().values
 
     @staticmethod

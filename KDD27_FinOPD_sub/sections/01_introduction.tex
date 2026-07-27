@@ -1,0 +1,46 @@
+\section{Introduction}
+\label{sec:intro}
+
+Financial markets are a demanding real-world testbed for autonomous decision-making: errors are not merely incorrect labels, but realized losses after transaction costs, drawdowns, liquidity frictions, and regime shifts. A trading policy must synthesize price dynamics, fundamentals, news, chart structure, and portfolio risk before deciding whether and how much capital to commit. Financial language models established domain understanding and instruction following~\cite{wu2023bloomberggpt,liu2023fingpt}, while surveys trace the transition toward tool-using, memory-augmented agents~\cite{li2023large,zhao2024revolutionizing,wang2024survey}. Recent benchmarks move beyond static question answering to sequential trading, financial-chart comprehension, execution-grounded safety, and reproducible execution assumptions~\cite{stockbench2025,finchartbench2025,finvault2026,yao2026execution}. Together, these advances make finance a consequential setting for agents that must act, learn, and remain auditable under non-stationarity.
+% 中文翻译：金融市场是检验自主决策能力的高难度真实场景：错误并非只意味着分类标签不正确，而是在交易成本、回撤、流动性摩擦和市场状态变化之后形成真实损失。交易策略必须综合价格动态、基本面、新闻、图形结构和组合风险，再决定是否投入资本以及投入多少。金融语言模型奠定了领域理解与指令遵循能力，相关综述呈现出该领域向工具调用和记忆增强型智能体发展的趋势。近期基准进一步从静态问答扩展到序列交易、金融图表理解、执行落地安全和可复现的执行假设。这些进展共同使金融成为研究智能体如何在非平稳环境中行动、学习并保持可审计性的关键场景。
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\columnwidth]{figures/FinOPD_motivation.pdf}
+% \caption{Motivation for closed-loop financial self-evolution. Existing systems strengthen analysis through specialist roles, tools, memory, and factor discovery, yet realized outcomes commonly affect later decisions through non-parametric feedback. \textsc{FinOPD} instead learns from post-horizon estimated hindsight on current-policy trajectories while preserving a point-in-time student at deployment.}
+% % 中文翻译（图注）：闭环金融自进化的研究动机。现有系统通过专家角色、工具、记忆与因子发现增强分析能力，但已实现结果通常只通过非参数反馈影响后续决策。FinOPD 则在当前策略生成的轨迹上利用结果窗口结束后的估计事后信息进行学习，同时保证部署学生只使用时点可得信息。
+\caption{\textsc{FinOPD} closes the financial-agent learning loop by distilling post-horizon estimated hindsight on current-policy trajectories without exposing deployment to future.}
+% 中文翻译（图注）：FinOPD 在当前策略轨迹上蒸馏结果窗口结束后的估计事后信息，
+% 在不向部署策略暴露未来信息的前提下闭合金融智能体学习循环。
+\Description{Schematic comparison of non-parametric financial-agent adaptation and the closed-loop FinOPD learning process.}
+\vspace{-2mm}
+\label{fig:teaser}
+\end{figure}
+
+Financial agents have progressed along complementary fronts. Role-specialized systems coordinate technical, fundamental, sentiment, and risk perspectives through debate or hierarchical management~\cite{tradingagents2025,fincon2024,hedgeagents2025,finteam2025}. Multimodal and tool-augmented agents connect language reasoning to charts, market data, and executable analytics~\cite{finagent2024}; memory-centric agents preserve observations and reflections~\cite{yu2023finmem,reflexion2023}; and automated research systems generate and screen alpha factors~\cite{rdagent2025,alphaagent2025,factorminer2026,hubble2026}. Recent self-improving designs also feed evaluations into domain knowledge or bounded, human-auditable rule policies~\cite{quantagent2024,sharp2026}. These systems broaden what an agent can observe, organize, and revise, but adaptation remains mediated by external knowledge, prompts or rubrics, retrieved episodes, tools, or factor repositories. The action policy is not directly distilled from dense feedback on its own outcome-matured trajectories, so portfolio-level utility reaches it only indirectly.
+% 中文翻译：金融智能体已经沿多条互补路线取得进展。角色专门化系统通过辩论或层级管理协调技术面、基本面、情绪和风险视角；多模态与工具增强型智能体把语言推理连接到图表、市场数据和可执行分析；记忆型智能体保存历史观察与反思；自动化研究系统则生成并筛选 Alpha 因子。近期的自我改进设计还会把评估结果反馈到领域知识或有边界、可由人审计的规则策略中。这些系统扩展了智能体能够观察、组织和修订的内容，但适应过程仍由外部知识、提示词或规则、检索情节、工具或因子库来承载。动作策略并未根据自身产生且结果已经成熟的轨迹上的稠密反馈直接蒸馏，因此组合级效用仍只能间接影响它。
+
+Closing this loop is not ordinary supervised fine-tuning. Financial feedback is delayed: no oracle action exists when a trade is placed, and utility becomes observable only after an evaluation horizon closes. The trajectories are also endogenous to the current policy, so a static teacher corpus misses deployment states and errors---the mismatch that motivates on-policy distillation~\cite{gkd2024,seed2026}. Recent OPD variants address unstable or misleading dense transfer with proximal teachers or verifier-based gates~\cite{topd2026,rgopd2026}. In a multi-agent decision, the terminal portfolio outcome is shared even though specialists contribute unequally. Policy parameters, executable factors, and episodic records should also evolve on different clocks: factors must remain versioned and auditable, whereas an episode cannot be retrieved before its outcome is available. Leakage and reproducibility studies reinforce this strict temporal boundary~\cite{profitmirage2025,nguyen2026reliable,yao2026execution}. Together, delayed supervision, endogenous data, shared credit, and asynchronous knowledge states define the learning problem addressed here.
+% 中文翻译：闭合这一循环并不是普通的监督微调。金融反馈具有延迟性：交易执行时不存在可用的标准答案动作，其效用只有在评估窗口结束后才能观察。训练轨迹又由当前策略内生产生，因此静态教师语料无法覆盖部署时实际遇到的状态与错误；这正是 on-policy distillation 所要缓解的分布失配。近期 OPD 方法通过近端教师或基于验证器的门控来处理稠密迁移中的不稳定或误导性信号。在多智能体决策中，最终组合结果由所有智能体共享，但不同专家的贡献并不相同。策略参数、可执行因子和情节记录也应按不同时间尺度演化：因子必须保持版本化与可审计，情节则不能在其结果可用之前进入检索。信息泄漏与可复现性研究进一步说明了严格时间边界的必要性。延迟监督、内生数据、共享信用和异步知识状态共同构成了本文要解决的学习问题。
+
+Closed-loop learning becomes well-defined once access to matured outcomes is separated from the time at which each knowledge state may change. We instantiate this separation in \textsc{FinOPD}, a staged framework centered on On-Policy Distillation (OPD). Before OPD, Alpha-Factor Evolution mines, validates, versions, and freezes a library of 157 executable factors. During OPD, the current student generates point-in-time trajectories; only after their horizons close does a separate frozen teacher receive an estimated hindsight summary. Approximate marginal agent credit then weights token-level JSD and clipped teacher--student KL, while a frozen round-start reference guards policy drift. In parallel, only matured high-utility episodes enter time-safe memory, and regime-aware selective execution converts the resulting evidence into exposure or abstention. The chronology closes the learning loop without exposing the deployed student to future prices, charts, or raw OHLCV paths.
+% 中文翻译：我们的核心洞见是：只要把“谁可以访问成熟结果”与“每种知识状态何时允许改变”分离，闭环学习就能够得到清晰定义。FinOPD 将这一原则实现为一个以 On-Policy Distillation（OPD）为核心的分阶段框架。OPD 开始前，Alpha-Factor Evolution 挖掘、验证、版本化并冻结包含 157 个可执行因子的库。OPD 期间，当前学生先生成只依赖时点信息的轨迹；只有相应结果窗口结束后，一个独立冻结教师才会接收估计的事后摘要。近似边际智能体信用随后对 token 级 JSD 和裁剪后的教师--学生 KL 加权，冻结的 round-start reference 则约束策略漂移。与此同时，只有结果已经成熟且效用较高的情节才能进入时间安全记忆，regime-aware selective execution 再把联合证据转换为风险暴露或弃权。该时间顺序在闭合学习循环的同时，不向部署学生暴露未来价格、图表或原始 OHLCV 路径。
+Our contributions are threefold:
+% 中文翻译：本文的贡献包括以下三点：
+\begin{itemize}[leftmargin=*,nosep]
+\item We formulate self-evolution in financial multi-agent systems as learning from delayed portfolio outcomes under a strict point-in-time boundary, and identify endogenous current-policy data, shared agent credit, and asynchronously updated knowledge as its defining challenges.
+% 中文翻译：我们把金融多智能体系统的自进化形式化为严格时点信息边界下的延迟组合结果学习问题，并将当前策略内生数据、多智能体共享信用和异步知识更新确定为其核心挑战。
+\item We propose \textsc{FinOPD}, which combines current-policy distillation with a separate hindsight-informed frozen teacher, stabilized token-level alignment, a frozen library of 150+ evolved factors, time-safe episodic memory, and selective execution in one temporally ordered framework.
+% 中文翻译：我们提出 FinOPD，在统一且具有明确时间顺序的框架中结合当前策略蒸馏、独立的事后信息辅助冻结教师、稳定化 token 级对齐、冻结的 150+ 进化因子库、时间安全情节记忆和选择性执行。
+\item We evaluate \textsc{FinOPD} on four U.S. large-cap equities over a held-out 17-month window against 12 baselines under a common cost and execution protocol. It ranks first in macro-averaged per-asset cumulative return, Sharpe ratio, and Calmar ratio; we explicitly separate these descriptive summaries from synchronized portfolio metrics.
+% 中文翻译：我们在四只美国大盘股和一个留出的 17 个月窗口上评估 FinOPD，并在统一成本与执行协议下与 12 个基线比较。FinOPD 在聚合累计收益、Sharpe ratio 和 Calmar ratio 上均排名第一，同时通过消融、反事实与时间分析检验性能增益的来源和稳定性。
+\end{itemize}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/FinOPD_framework.pdf}
+\caption{Architecture of \textsc{FinOPD}. Alpha-Factor Evolution freezes a symbolic library before OPD; geometry- and regime-conditioned routing then supplies a compact factor subset to the five-agent chain. Once outcomes mature, OPD updates the current student and router, while time-safe episodic memory admits finalized experience.}
+% 中文翻译（图注）：FinOPD 的整体架构。Alpha-Factor Evolution 在 OPD 之前冻结符号因子库；图形与状态条件化路由随后向五智能体链提供紧凑因子子集；结果成熟后，OPD 更新当前学生与路由器，同时由时间安全的情节记忆接纳最终经验。
+\Description{Pipeline diagram showing visual-geometric encoding, factor routing, multi-agent coordination, on-policy distillation, and non-parametric episodic memory.}
+\label{fig:architecture}
+\end{figure*}

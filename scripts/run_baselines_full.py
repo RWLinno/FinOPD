@@ -143,7 +143,18 @@ def main():
     parser.add_argument("--output-dir", default="outputs/baselines/")
     parser.add_argument("--seeds", nargs="+", type=int, default=[42, 123, 456])
     parser.add_argument("--config", default="configs/default.yaml")
+    parser.add_argument(
+        "--allow-development-proxies",
+        action="store_true",
+        help="run non-paper proxy baselines for smoke testing only",
+    )
     args = parser.parse_args()
+
+    if not args.allow_development_proxies:
+        raise SystemExit(
+            "Refusing to generate paper results: this file contains development proxies. "
+            "Pass --allow-development-proxies only for smoke tests, or use cited baseline implementations."
+        )
 
     cfg = load_config(args.config)
     output_dir = Path(args.output_dir)

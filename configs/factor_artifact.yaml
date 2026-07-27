@@ -1,0 +1,4 @@
+artifact: src/finvl/factors/frozen_factors.bin
+records: 157
+sha256: 51c338c93163876fd0a01f8919993e2cfa464032bdced8b2fc55687530c1e550
+format: zlib-json-v1

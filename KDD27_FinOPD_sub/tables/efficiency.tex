@@ -1,0 +1,33 @@
+\begin{table}[t]
+\renewcommand{\arraystretch}{0.95}
+\footnotesize
+\caption{Efficiency and learning-layer contribution. Costs are anonymized accelerator-hours; latency is per asset-day at inference.}
+\setlength{\abovecaptionskip}{0.1cm}
+\centering
+\setlength{\tabcolsep}{2pt}
+\begin{threeparttable}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Method & \begin{tabular}[c]{@{}c@{}}Train\\(accel-h)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Infer\\(s/asset)\end{tabular} & \begin{tabular}[c]{@{}c@{}}Sample\\Eff.\end{tabular} & \begin{tabular}[c]{@{}c@{}}Diag.\\SR$\uparrow$\end{tabular} \\
+\midrule
+PatchTST & 4 & 0.1 & -- & 0.97 \\
+iTransformer & 6 & 0.1 & -- & 1.36 \\
+TradingAgents & 0 & 45.0 & -- & 1.67 \\
+FinCon & 0 & 38.0 & -- & 1.72 \\
+R\&D-Agent & 12 & 52.0 & 500 iter & $-$0.19 \\
+AlphaAgent & 8 & 25.0 & 200 iter & 1.77 \\
+\midrule
+\textsc{FinOPD} (Ours) & 42 & 8.2 & 8 iter & \textbf{1.81} \\
+\quad w/o Belief & 38 & 8.1 & 8 iter & 1.39 \\
+\quad w/o OPD & 10 & 8.3 & -- & 0.95 \\
+\bottomrule
+\end{tabular}%
+}
+\begin{tablenotes}
+\footnotesize
+\item Diagnostic SR is measured on the learning-phase diagnostic window and isolates the contribution of belief retrieval and OPD.
+\end{tablenotes}
+\end{threeparttable}
+\label{tab:efficiency}
+\end{table}

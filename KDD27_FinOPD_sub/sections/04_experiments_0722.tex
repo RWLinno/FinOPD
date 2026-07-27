@@ -1,0 +1,117 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Setup}
+
+\paragraph{Data.} We evaluate on US equities with strict temporal separation. The asset universe is drawn from the Dow-30; per-asset analysis focuses on four representative large-cap names spanning technology (GOOGL, NVDA), consumer technology (AAPL), and financials (JPM), with portfolio-level results aggregated over this showcase set. The primary test window covers January 2025 through May 2026---17 months (${\sim}350$ trading days), after the training and self-evolution periods used by our system. Training and self-evolution rollout use 2019-01 to 2022-12, and validation uses 2023. All portfolio metrics incorporate realistic friction: 15\,bps round-trip transaction costs, 5\,bps slippage, and a mandatory 1-day execution delay between signal generation and order filling.
+
+
+\paragraph{Baselines.} We compare against 12 methods organized in four categories, all evaluated under one identical protocol (same window, same friction, daily decision frequency, same trade-level metric computation): (i)~\emph{Market}: Buy\&Hold, Momentum; (ii)~\emph{Classical Quant}: SMA Cross, MACD, Mean-Reversion, RF-Ensemble; (iii)~\emph{Deep Learning}: LSTM, DRL-PPO; (iv)~\emph{LLM Multi-Agent}: TradingAgents~\cite{tradingagents2025}, FinCon~\cite{fincon2024}, R\&D-Agent~\cite{rdagent2025}, AlphaAgent~\cite{alphaagent2025}. No method benefits from a different protocol.
+
+\paragraph{Implementation.} The system uses two LoRA-adapted backbones: the Visual-Geometric Encoder adapts \textbf{Qwen2.5-VL-7B}~\cite{qwen25vl2024} (rank 16) to map candlestick charts to structured \texttt{ChartGeometry} JSON, while the on-policy self-distillation uses \textbf{Qwen3.5-9B}~\cite{qwen35_2026} (rank 16) for the agents' reasoning and decision tokens. Self-evolution runs for 8 iterations with a 60-day rolling window, $K{=}20$ day forward returns for PnL computation, JSD interpolation $\beta{=}0.5$, per-token KL cap $c{=}5.0$, Shapley subset samples $m{=}8$, and alignment budget $\epsilon{=}0.1$. The Geometry-Conditioned Factor Router selects top-$k{=}15$ from a library of 160 alpha factors (information ratios up to 3.04 after cost), and the belief store has capacity $C_{\max}{=}10{,}000$ with 80th-percentile admission. Evaluation executes the resulting decision policy deterministically, so every metric is reproducible from a fixed configuration; all ablations toggle a single component and re-run the same deterministic backtest. We report aggregate accelerator-hours in Table~\ref{tab:efficiency} and omit provider-specific cost logs for anonymity.
+
+
+\paragraph{Evaluation Metrics.} We report three portfolio metrics: Cumulative Return (CR), Sharpe Ratio (SR), and Calmar Ratio (CR/MDD). The Calmar ratio normalizes return by maximum drawdown, capturing downside risk without a separate drawdown column. We deliberately exclude trade-level win rate: it is incomparable across strategies of different trade frequency, where a buy-and-hold position makes a single trade and trivially scores 100\%.
+
+\subsection{Main Results}
+
+\input{tables/overall_results}
+
+\paragraph{Portfolio-Level Performance.} Table~\ref{tab:overall} reports results aggregated over the four showcase assets on the 17-month primary window (Jan 2025--May 2026). \textsc{FinOPD} ranks first on all aggregated metrics: cumulative return of 60.9\%, Sharpe of 1.41, Calmar of 3.30, and average per-asset rank of 1.4. The strongest baselines each occupy a narrower niche---Buy\&Hold has high full-exposure return during the broad bull market, while AlphaAgent obtains the best non-\textsc{FinOPD} Calmar---but no baseline is competitive across all metrics. \textsc{FinOPD}'s lead on Calmar indicates that the return advantage is not purchased through disproportionate drawdown exposure. This advantage is consistent with the regime-adaptive low-turnover policy (Section~\ref{sec:rasw}): holding positions over the multi-day horizon where hindsight PnL carries signal avoids the transaction-cost erosion that daily-rebalanced strategies suffer.
+
+\input{tables/main_results}
+
+\paragraph{Per-Asset Heterogeneity.} Table~\ref{tab:per_asset} breaks down performance by asset. \textsc{FinOPD} leads 9 of the 12 asset-metric cells: it dominates all three metrics on NVDA, leads both cumulative return and Sharpe on GOOGL and AAPL, and obtains the best Calmar on JPM while tying the best Sharpe. The exceptions are informative rather than damaging. AlphaAgent achieves a higher Calmar on GOOGL through a lower-drawdown breakout profile, and Mean-Reversion edges Calmar on AAPL in range-bound phases; in both cases, however, \textsc{FinOPD} delivers substantially higher cumulative return. The decisive pattern is consistency: \textsc{FinOPD} is the only method that remains near the top across all four assets rather than excelling on one and collapsing on another.
+
+
+\subsection{Multi-Window Robustness}
+
+\input{tables/regime_results}
+
+\paragraph{Stability Across Windows.} Table~\ref{tab:regime} reports \textsc{FinOPD}'s risk-adjusted performance and rank across multiple evaluation windows. \textsc{FinOPD} holds the top Sharpe rank over the full 17-month out-of-sample window and stays mid-field or better in every sub-window. The regime-adaptive holding period rescues choppy market phases: by lengthening the holding horizon in calm regimes and shortening it only when realized volatility spikes, the system avoids cost-driven losses that daily rebalancing incurs in directionless markets. This behavior follows directly from aligning turnover with the horizon at which the privileged PnL signal is informative.
+
+\subsection{Ablation Study}
+
+\input{tables/ablation}
+
+\paragraph{Component Necessity.} Table~\ref{tab:ablation} validates each design decision by toggling the component and re-running the backtest on the diagnostic window. The two largest contributors to risk-adjusted return are the regime-adaptive turnover policy (A9, $\Delta$SR$=-$0.17: removing it forces daily rebalancing, raising the trade count from 2 to 8.5 and inflating drawdown through transaction-cost accumulation) and the trend-break guard (A7, $\Delta$SR$=-$0.21). The hindsight teacher row quantifies the privileged-PnL action-space ceiling at Sharpe 2.96; \textsc{FinOPD} reaches 1.92, leaving headroom without making the deployed policy depend on hindsight information. Two near-null results appear transparently: removing the factor channel (A2) costs only 0.03 Sharpe, and the regime-adaptive weighting (A4) is largely subsumed by the adaptive-turnover and guard mechanisms.
+
+\paragraph{Dual-Track Complementarity.} The non-parametric belief store and on-policy self-distillation address complementary failure modes. The parametric track adapts the model's global reasoning for novel states; the belief store preserves concrete winning patterns that gradient averaging dilutes. Neither alone matches the full system---consistent with the premise that slow global adaptation and fast local recall are complementary rather than redundant.
+
+\subsection{Evolution Trajectory}
+
+\input{tables/evolution_dynamics}
+
+\paragraph{Evolution Dynamics.} Table~\ref{tab:evolution_dynamics} provides an iteration-by-iteration view of the self-evolution process. Three trends stand out. First, the belief store grows sub-linearly (842 entries at iteration 1, 8{,}950 at iteration 8) because the admission threshold filters low-quality trajectories. Second, retrieval hit rate increases steadily from 12.3\% to 62.4\%, indicating the store accumulates useful patterns rather than indiscriminately storing trajectories. Third, router entropy decreases from 4.82 to 3.18, reflecting increasing specialization: the router converges from near-uniform selection toward concentrated, state-dependent factor preferences. Diminishing $\Delta$SR per iteration (from $+$0.20 at iteration 3 to $+$0.07 at iteration 8) suggests that the self-evolution loop is approaching a local plateau.
+
+
+% \begin{figure*}[t]
+% \centering
+% \includegraphics[width=0.49\linewidth]{figures/fig_multiwindow.png}
+% \hfill
+% \includegraphics[width=0.49\linewidth]{figures/fig_ablation.png}
+% % \caption{Left: multi-window robustness---\textsc{FinOPD} portfolio Sharpe across four evaluation windows, with the dashed line marking the strongest baseline's full-year Sharpe (\#1 over the full year and over the longest out-of-sample window). Right: real component ablation---change in portfolio Sharpe when each component is removed and the backtest re-run. Both panels are generated directly from the reproducible result JSONs.}
+% \caption{Multi-window robustness and component ablation. \textsc{FinOPD} stays top-tier across windows, and adaptive turnover plus trend-break guarding explain most of the ablation loss.}
+% % \Description{Two-panel result figure: the left panel plots FinOPD Sharpe across evaluation windows against the strongest baseline line; the right panel shows Sharpe drops after removing key components.}
+% \label{fig:results}
+% \end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_multiwindow_ablation.png}
+\caption{Temporal robustness and component ablation. \textsc{FinOPD} remains top-tier across post-cutoff windows; the diagnostic ablation localizes most Sharpe loss to trend-break guarding and adaptive turnover.}
+% 中文翻译：时间稳健性与组件消融。\textsc{FinOPD} 在 post-cutoff 的多个窗口中保持第一梯队；诊断消融显示，Sharpe 的主要损失来自移除趋势断裂保护和自适应换手机制。
+\Description{Two-panel result figure. The left panel reports FinOPD Sharpe and rank across four post-cutoff windows. The right panel compares full FinOPD, ablations, and the hindsight teacher ceiling.}
+\label{fig:results}
+\end{figure*}
+
+\paragraph{Sustained Improvement Across Iterations.} Table~\ref{tab:evolution_dynamics} tracks validation performance across 8 self-evolution iterations. Sharpe rises from 0.72 at iteration 0 (the MVP system without self-evolution) to 1.92 at iteration 8, indicating that the learning layer changes the policy rather than merely replaying a fixed prompt strategy. Iterations 1--3 show the steepest gains as the system learns from high-information initial trajectories; later iterations yield diminishing but still positive returns as the policy approaches a local optimum.
+
+\paragraph{Leakage Control.} The evolution table is a diagnostic of the training loop, not the main test evidence. The deployed policy is evaluated separately on the post-training January 2025--May 2026 window in Tables~\ref{tab:overall}--\ref{tab:per_asset}, while Table~\ref{tab:counterfactual} perturbs signal channels to distinguish regime-aware trend behavior from brittle memorization.
+
+
+\subsection{Counterfactual Perturbation}
+
+\input{tables/counterfactual}
+
+\paragraph{Reasoning Versus Memorization.} Table~\ref{tab:counterfactual} reports the change in portfolio Sharpe when individual signal channels of \textsc{FinOPD} are perturbed. The dominant channel is regime-adaptive turnover: forcing daily rebalancing costs 0.17 Sharpe and raises drawdown, confirming that the privileged-PnL signal is informative only at the multi-day horizon and is otherwise consumed by transaction costs. The trend-break guard contributes a further 0.21 Sharpe. Zeroing the factor channel changes the result only marginally ($-$0.03 SR) under the low-turnover policy, localizing the surviving edge in geometric trend and regime signals rather than memorized factor magnitudes. This decomposition isolates where the system's edge originates rather than attributing it to opaque end-to-end behavior.
+
+\subsection{System Analysis}
+
+% \begin{figure*}[t]
+% \centering
+% \includegraphics[width=0.32\linewidth]{figures/fig_opd_training.png}
+% \hfill
+% \includegraphics[width=0.32\linewidth]{figures/fig_teacher_student.png}
+% \hfill
+% \includegraphics[width=0.32\linewidth]{figures/fig_factor_dist.png}
+% \caption{System diagnostics. Self-distillation converges stably, the hindsight teacher defines a profitable upper-bound policy, and factor evolution shifts the information-ratio distribution rightward.}
+% % \Description{Three-panel diagnostic figure showing distillation loss and token accuracy, teacher-student Sharpe headroom, and the information-ratio distribution before and after factor evolution.}
+% \label{fig:system}
+% \end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_system_diagnostics.png}
+\caption{System diagnostics. Self-distillation converges stably, the hindsight teacher leaves measurable headroom, and factor evolution shifts the information-ratio distribution rightward.}
+% 中文翻译：系统诊断。自蒸馏稳定收敛，事后教师仍保留可测的性能上界空间，因子进化将信息比率分布整体右移。
+\Description{Three-panel diagnostic figure showing distillation loss and token accuracy, teacher-student Sharpe headroom over iterations, and the factor information-ratio distribution before and after evolution.}
+\label{fig:system}
+\end{figure*}
+
+\paragraph{Self-Distillation Convergence.} The OPD training curve (Fig.~\ref{fig:system}, left) confirms stable optimization: conditioning the teacher on hindsight risk-adjusted PnL yields a well-posed distillation target, with the student's JSD loss decreasing monotonically and the held-out evaluation loss tracking training loss throughout. LoRA adaptation keeps the run lightweight relative to full-parameter finetuning.
+
+\paragraph{Factor Evolution.} The factor-evolution pipeline expands the seed library (157 expressions, mean $|\mathrm{IR}|{=}1.19$) into 197 de-correlated factors with a higher mean $|\mathrm{IR}|$ of 1.50 and a fatter right tail (Fig.~\ref{fig:system}, right). A separate US cross-sectional mining pass produces 50 factors fit on the 2019--2024 training window; consistent with the small-universe breadth limitation, only a minority survive the $|\mathrm{IR}|{\geq}1$ admission threshold out of sample, motivating the use of the evolved library for the deployed signal blend.
+
+\paragraph{Multi-Agent Coordination.} Across 1{,}000 real daily decisions (Fig.~\ref{fig:agent}), the five-agent committee reaches explicit disagreement between chart and factor views on 27.4\% of days, which the decision manager resolves through gated shared memory rather than naive voting. The resulting action mix is selective---62.4\% hold, 35.8\% buy, 1.8\% sell---reflecting edge-gated abstention that commits capital only when conviction clears the regime-dependent threshold.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_agent_trace.png}
+\caption{Multi-agent decision traces. Across 1{,}000 asset-days, the committee mostly abstains, surfaces chart--factor disagreement, and acts only when conviction clears the regime gate.}
+% 中文翻译：多智能体决策轨迹。在 1,000 个资产日中，委员会大多选择弃权，同时显式暴露图形信号与因子信号的分歧，并且只有当置信度越过 regime 门控阈值时才行动。
+\Description{Three-panel decision-trace figure showing action mix, chart-factor disagreement rate, and an edge-gated abstention threshold over one thousand asset-days.}
+\label{fig:agent}
+\end{figure*}
+
+Additional sensitivity and efficiency analyses are provided in Appendix~\ref{sec:appendix_additional}.

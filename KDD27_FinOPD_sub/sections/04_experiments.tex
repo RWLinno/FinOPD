@@ -1,0 +1,111 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Protocol}
+
+\paragraph{Evaluation universe and temporal separation.}
+We study four U.S. large-cap equities (GOOGL, NVDA, AAPL, and JPM). The held-out test window spans January 2025 through May 2026 (17 months, approximately 350 trading days). OPD rollouts use 2019--2022 data and model selection uses 2023; factor research and every policy update are completed before the test begins. At each test date, the deployed student receives only point-in-time inputs. Estimated hindsight is constructed only after its outcome horizon closes and is available to the frozen teacher during training, never to the deployed policy. Every backtest applies 15\,bps round-trip cost, 5\,bps slippage, and a one-day delay between signal and execution.
+% 中文翻译：我们研究四只美国大盘股（GOOGL、NVDA、AAPL 和 JPM）。留出的测试窗口为 2025 年 1 月至 2026 年 5 月，共 17 个月、约 350 个交易日。OPD rollout 使用 2019--2022 年数据，模型选择使用 2023 年数据；因子研究和全部策略更新都在测试开始前完成。在每个测试时点，部署学生只能接收当时可得的信息。估计的事后信息仅在结果窗口闭合后构造，并且只在训练时提供给冻结教师，部署策略从不接收。所有回测统一计入 15 个基点的双边交易成本、5 个基点滑点，以及信号到执行之间的一天延迟。
+
+\paragraph{Baselines.}
+We compare with 12 methods under the same assets, dates, costs, delay, and daily decision schedule: Buy \& Hold and Momentum; SMA Cross, MACD, Mean-Reversion, and RF-Ensemble; LSTM~\cite{hochreiter1997long} and DRL-PPO~\cite{schulman2017proximal}; and the financial LLM-agent systems TradingAgents~\cite{tradingagents2025}, FinCon~\cite{fincon2024}, R\&D-Agent(Q)~\cite{rdagent2025}, and AlphaAgent~\cite{alphaagent2025}. All four agentic baselines and \textsc{FinOPD}'s decision agents use the same backbone and receive the same point-in-time inputs.
+%only their published coordination, memory, and adaptation mechanisms differ. This range separates gains over passive exposure, conventional signals, learned sequence policies, and recent agentic trading pipelines without confounding agentic comparisons by model scale.
+% 中文翻译：我们在相同股票、日期、成本、执行延迟和日频决策计划下比较 12 个方法：Buy \& Hold 与 Momentum；SMA Cross、MACD、Mean-Reversion 与 RF-Ensemble；LSTM 和 DRL-PPO；以及金融 LLM 智能体系统 TradingAgents、FinCon、R\&D-Agent(Q) 与 AlphaAgent。这样的基线范围能够区分相对于被动持仓、传统信号、学习型序列策略和近期智能体交易流程的增益。
+
+\paragraph{Implementation.}
+The Visual-Geometric Encoder, student, and five decision agents use Qwen3.5-9B~\cite{qwen35_2026} with rank-16 LoRA; the post-horizon frozen teacher uses Qwen3.5-27B and is absent at deployment. OPD runs for eight 60-day rollouts with horizon $H{=}20$. We use $\beta{=}0.5$, $\lambda_{\mathrm{tok}}{=}0.1$, token-KL cap $c{=}5.0$, and frozen-reference budget $\mathcal K_{\mathrm{ref}}{\leq}\epsilon{=}0.1$. Agent credit uses $B{=}8$ sampled permutations. The router selects 15 tools from the frozen 157-factor library, and time-safe episodic memory stores at most 10{,}000 matured episodes.
+% 中文翻译：Visual-Geometric Encoder、学生与五个决策智能体在 Qwen3.5-9B 上采用 rank-16 LoRA；冻结的 Qwen3.5-27B 教师仅在结果窗口闭合后的训练阶段使用，部署时不加载。OPD 运行八个 60 天 rollout，结果窗口为 $H{=}20$。我们设置 $\beta{=}0.5$、$\lambda_{\mathrm{tok}}{=}0.1$、token-KL 裁剪上限 $c{=}5.0$，以及 $\mathcal K_{\mathrm{ref}}{\leq}\epsilon{=}0.1$ 的冻结参考策略预算。智能体信用使用 $B{=}8$ 个采样排列。路由器从冻结的 157 因子库中选择 15 个工具，时间安全情节记忆最多保存 10,000 个已经成熟的情节。
+
+\paragraph{Metrics and reporting.}
+We report cumulative return (CR), Sharpe ratio (SR)~\cite{sharpe1994sharpe}, and Calmar ratio. Table~\ref{tab:overall} is a macro-average of independently computed per-asset metrics, not a portfolio risk ratio. The artifact also provides a synchronized daily-PnL evaluator with explicit capital, cash, and weights, plus a fixed-seed 20-day moving-block-bootstrap interval; zero-variance Sharpe is N/A. Trade-level win rate is omitted because it is not comparable across strategies with different turnover. We evaluate one selected checkpoint with deterministic policy and router decoding, which removes test-time sampling noise but does not estimate optimization variance or uncertainty across market histories. We therefore treat identical-protocol comparisons, temporal slices, and mechanism interventions as descriptive evidence rather than confidence intervals.
+% 中文翻译：我们报告累计收益、Sharpe 和 Calmar。由于不同策略的换手率不同，逐交易胜率不具可比性，因此不予报告。本文对一个已选定 checkpoint 采用确定性的策略与路由器解码，这能够消除测试时采样噪声，但不能估计优化过程方差，也不能衡量跨市场历史的不确定性。因此，同协议比较、时间切片与机制干预被视为描述性证据，而不是置信区间。
+
+\subsection{Main Results}
+
+\input{tables/overall_results}
+
+\paragraph{Macro-averaged per-asset performance.}
+Table~\ref{tab:overall} gives the primary comparison. \textsc{FinOPD} reaches 60.9\% CR, 1.41 SR, and 3.30 Calmar, improving over the strongest baseline in each column by 10.9 return points, 0.40 SR, and 0.93 Calmar, respectively. Its average rank is 1.4 across the 12 asset--metric cells, versus 4.0 for the nearest baseline. Thus, the descriptive macro-average is not driven by one risk metric or one asset; it must not be interpreted as the Sharpe or Calmar of a jointly capitalized portfolio.
+% 中文翻译：表 1 给出主要比较。FinOPD 达到 60.9\% 的累计收益、1.41 的 Sharpe 和 3.30 的 Calmar；相对于每列最强基线，分别提高 10.9 个收益百分点、0.40 的 Sharpe 和 0.93 的 Calmar。它在 12 个“股票--指标”单元中的平均排名为 1.4，而最近的基线为 4.0。因此，聚合优势并非由单一风险指标或单一股票造成。
+
+\input{tables/main_results}
+
+\paragraph{Asset-level heterogeneity.}
+Table~\ref{tab:per_asset} makes the boundary of that claim explicit. \textsc{FinOPD} is best or tied best in 9 of 12 cells: it leads every metric on NVDA, CR and SR on GOOGL and AAPL, and Calmar on JPM while tying the best JPM SR. It does not dominate every setting. AlphaAgent has higher GOOGL Calmar (8.29 versus 6.50), Mean-Reversion has higher AAPL Calmar (3.14 versus 2.79), and Buy \& Hold has higher JPM return (22.9\% versus 15.8\%). The advantage is therefore cross-asset consistency, not universal cell-wise dominance.
+% 中文翻译：表 2 明确了这一结论的边界。FinOPD 在 12 个单元中有 9 个取得最佳或并列最佳结果：它在 NVDA 的全部指标上领先，在 GOOGL 与 AAPL 的累计收益和 Sharpe 上领先，并在 JPM 上取得最佳 Calmar、同时并列最佳 Sharpe。它并非在所有设置中都占优：AlphaAgent 的 GOOGL Calmar 更高（8.29 对 6.50），Mean-Reversion 的 AAPL Calmar 更高（3.14 对 2.79），Buy \& Hold 的 JPM 收益更高（22.9\% 对 15.8\%）。因此，FinOPD 的优势是跨股票的一致性，而非对每个单元的绝对统治。
+
+\subsection{Temporal and Regime Robustness}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_multiwindow_ablation.pdf}
+\caption{Temporal robustness and local attribution. \textsc{FinOPD} is first overall and top-four in every slice (left). Among the focused interventions, trend-break protection and adaptive turnover produce the largest local SR changes (right); the hindsight-teacher ceiling is not deployable.}
+% 中文翻译（图注）：时间稳健性与局部归因。FinOPD 在完整窗口中排名第一，并在每个时间切片中保持前四（左）。在重点干预中，趋势断裂保护与自适应换手产生最大的局部 Sharpe 变化（右）；事后教师上界不可部署。
+\Description{Two-panel figure. The left panel shows FinOPD Sharpe ratios and ranks over the full test window and three temporal slices. The right panel shows the diagnostic Sharpe ratios of the intact system and three focused component interventions, together with the frozen hindsight-teacher ceiling.}
+\label{fig:results}
+\end{figure*}
+
+\paragraph{Robustness across time and regimes.}
+\textsc{FinOPD} ranks first over the full window and never falls below fourth across the three temporal slices: SR is 0.84 in 2025 H1, 2.14 in 2025 H2, and 1.06 in 2026 YTD (Fig.~\ref{fig:results}, left). The absolute SR varies by regime, yet the rank remains competitive---fourth, second, and third of 13---in all three slices. Panel B of Table~\ref{tab:regime} supplies a complementary stress test. The policy is strongest in trending periods (SR 3.15), ties Buy \& Hold in volatile periods (1.15), and takes zero exposure in the normal and calm segments selected by the regime gate. Together, the slice ranks and conditional exposure support regime-dependent selectivity, not uniform superiority in every market state.
+% 中文翻译：FinOPD 在完整窗口中排名第一，并且在三个时间子窗口中从未低于第四名：2025 年上半年 Sharpe 为 0.84，2025 年下半年为 2.14，2026 年迄今为 1.06（图 4 左）。绝对 Sharpe 会随市场状态变化，但三个切片中的排名始终具有竞争力，分别为 13 个方法中的第四、第二和第三。表 5 的 Panel B 提供互补的压力测试。策略在趋势状态下表现最强（Sharpe 3.15），在高波动状态下与 Buy \& Hold 持平（1.15），并在状态门控判定为 normal 和 calm 的区段中保持零风险暴露。时间切片排名与条件化风险暴露共同支持“依状态选择性执行”，而不是在每一种市场状态下都统一领先。
+
+\subsection{Mechanism Ablation}
+
+\paragraph{What matters locally.}
+The diagnostic ablation (Fig.~\ref{fig:results}, right; Table~\ref{tab:ablation}) uses a learning-phase window and is therefore not numerically comparable to the held-out SR of 1.41. Removing the trend-break guard causes the largest loss ($\Delta$SR $=-0.21$) and raises MDD from 14.2\% to 17.3\%. Replacing adaptive turnover with daily turnover loses 0.17 SR, raises MDD to 16.1\%, and increases the trade count from 2.0 to 8.5; zeroing factor signals produces the smaller local change of $-0.03$ SR. The paired degradation in SR and drawdown identifies protection and activity control, rather than raw trading frequency, as the principal measured drivers in this diagnostic window. The frozen teacher reaches SR 2.96 only with post-horizon estimated hindsight; its 1.04 gap over the student measures training headroom, not deployable superiority.
+% 中文翻译：该消融（图 4 右；表 6）使用学习阶段诊断窗口，因此不能与留出测试上的 1.41 Sharpe 直接进行数值比较。移除趋势断裂保护造成最大损失（$\Delta$SR $=-0.21$），并将最大回撤从 14.2\% 提高到 17.3\%。用日频换手替代自适应换手使 Sharpe 下降 0.17、最大回撤升至 16.1\%，交易次数从 2.0 增加到 8.5；将因子信号置零只产生 $-0.03$ 的较小局部变化。Sharpe 与回撤同时恶化，说明在该诊断窗口中，保护机制和交易活跃度控制才是主要测得驱动因素，而不是原始交易频率。冻结教师只有在获得窗口闭合后的估计事后信息时才达到 2.96 Sharpe；它相对学生的 1.04 差距衡量训练改进空间，而非可部署优势。
+
+\subsection{Dual-Track Evolution Diagnostics}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_system_diagnostics.pdf}
+\caption{System diagnostics. (a) OPD convergence. (b) Validation SR and memory hit rate over eight rounds; the teacher is reference-only. (c) Post-cost $|\mathrm{IR}|$ distribution of the frozen 157-factor library.}
+% 中文翻译（图注）：系统诊断。(a) OPD 收敛。(b) 八轮进化中的验证集 Sharpe 与记忆命中率；教师仅作参考。(c) 冻结的 157 因子库在计入成本后的 $|\mathrm{IR}|$ 分布。
+\Description{Three aligned panels showing OPD train and evaluation loss with token accuracy, student validation Sharpe and episodic-memory hit rate over eight evolution rounds, and the post-cost absolute information-ratio distribution of the frozen factor library.}
+\label{fig:system}
+\end{figure*}
+
+\paragraph{Parametric optimization and episodic accumulation.}
+The recorded OPD loss falls from 0.97 to 0.039 and then stabilizes; held-out evaluation markers track the training curve while token accuracy plateaus near 0.984 (Fig.~\ref{fig:system}a). Across the same eight rounds, validation SR increases monotonically from 0.72 to 1.92, episodic-memory hit rate rises from 12.3\% to 62.4\%, and router entropy falls from 4.82 to 3.18 (Fig.~\ref{fig:system}b and Table~\ref{tab:evolution_dynamics}). The joint trajectory is consistent with a policy that fits matured supervision while retrieval becomes more available and routing more selective. Because the trace does not factorially isolate OPD from memory, it is process evidence for dual-track co-evolution rather than a causal decomposition.
+% 中文翻译：记录的 OPD 损失从 0.97 降至 0.039 后趋于稳定；留出评估点跟随训练曲线，token 准确率则在约 0.984 附近进入平台（图 5a）。在同样的八轮中，验证集 Sharpe 从 0.72 单调增加到 1.92，情节记忆命中率从 12.3\% 提高到 62.4\%，路由器熵从 4.82 降至 3.18（图 5b 与表 7）。这一联合轨迹与如下过程一致：策略拟合已成熟监督信号的同时，检索覆盖率提高、路由选择性增强。由于该轨迹没有对 OPD 与记忆进行析因隔离，它是双轨共同进化的过程证据，而不是因果分解。
+
+\paragraph{Frozen factor evidence.}
+Pre-OPD LLM mining yields 157 executable expressions with mean $|\mathrm{IR}|{=}1.19$, median $1.11$, and maximum $3.04$ after cost; 87 satisfy $|\mathrm{IR}|\geq1$ (Fig.~\ref{fig:system}c). The library is frozen before any OPD rollout. These statistics audit the quality and chronology of the non-parametric tool track; they neither imply that factor values improve during OPD nor attribute the portfolio gain to the factor library alone.
+The packaged artifact preserves all 157 record identities (including duplicate display names), is content-addressed by SHA-256, and produces finite outputs for all records in an OHLCV execution audit; 121 are non-constant on the audited 500-bar AAPL slice, while factors requiring unavailable optional fields correctly collapse to constants.
+% 中文翻译：OPD 之前的 LLM 挖掘得到 157 个可执行表达式，计入成本后的平均 $|\mathrm{IR}|$ 为 1.19、中位数为 1.11、最大值为 3.04，其中 87 个满足 $|\mathrm{IR}|\geq1$（图 5c）。因子库在任何 OPD rollout 开始前即被冻结。这些统计用于审计非参数工具轨道的质量与时间顺序；它们既不表示因子值在 OPD 期间继续改善，也不把组合收益单独归因于因子库。
+
+\subsection{Boundary Analysis and Agent Coordination}
+
+\paragraph{Where the measured edge resides.}
+Table~\ref{tab:counterfactual} reinforces the ablation with return and drawdown. Zeroing factors changes CR/SR by $-1.6/-0.03$ points; daily turnover by $-7.9/-0.17$; and removing trend-break protection by $-6.4/-0.21$, while raising MDD by 3.1 points. The configuration is thus most sensitive to turnover and trend protection, not factor-signal magnitude.
+% 中文翻译：表 8 用收益与回撤再次支持消融结论。将因子置零使累计收益/Sharpe 分别变化 $-1.6/-0.03$ 个点，日频换手对应 $-7.9/-0.17$，移除趋势断裂保护对应 $-6.4/-0.21$，同时最大回撤增加 3.1 个点。因此，当前配置对换手与趋势保护最敏感，而不是对因子信号幅度最敏感。
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{fig_agent_trace.pdf}
+\caption{Decision trace over 1{,}000 asset-days: actions (a), chart--factor conflicts (b), and regime-aware abstention (c).}
+% 中文翻译（图注）：1,000 个资产日上的决策轨迹：动作比例 (a)、图形--因子冲突 (b) 与状态感知弃权区间 (c)。
+\Description{Three-panel figure showing action shares, chart-factor agreement and conflict shares, and the exact abstention intervals for trend or volatile regimes and normal or calm regimes.}
+\label{fig:agent}
+\end{figure}
+
+\paragraph{Observable coordination behavior.}
+Across 1{,}000 asset-days, the policy holds on 62.4\%, buys on 35.8\%, and sells on 1.8\%; chart and factor evidence conflict on 27.4\% of decisions (Fig.~\ref{fig:agent}a,b). Abstention spans $[-0.25,0.15]$ in trend or volatile regimes and $[-0.70,0.60]$ otherwise (Fig.~\ref{fig:agent}c). This agrees with the daily-turnover intervention, but marginal conflict and action rates cannot identify which disagreements trigger trades or establish causality.
+% 中文翻译：在 1,000 个资产日中，持有/买入/卖出比例为 62.4/35.8/1.8\%，图形与因子证据在 27.4\% 的决策上冲突（图 6a、b）。趋势或高波动状态下的弃权区间为 $[-0.25,0.15]$，其他状态为 $[-0.70,0.60]$（图 6c）。这与日频换手干预一致，但冲突率与动作率只是边际汇总，不能判断哪些分歧触发交易，也不能建立因果关系。
+
+\paragraph{Triangulating the measured mechanism.}
+Temporal slices test period concentration, interventions test local sensitivity, and traces test selectivity. They show top-four ranks across time, the largest local losses under protection and turnover changes, and actions on fewer than two fifths of asset-days. This rejects a simple ``trade more'' account but cannot separate OPD from memory.
+% 中文翻译：时间切片检验结果是否集中在单一时期，干预检验局部敏感性，决策轨迹检验选择性。三者表明：跨时间排名保持前四，保护与换手变化造成最大局部损失，且策略只在不到五分之二的资产日采取买卖动作。这排除了“交易越多收益越高”的简单解释，但仍不能分离 OPD 与记忆的贡献。
+
+\paragraph{Asymmetric action semantics.}
+The 35.8\% buy versus 1.8\% sell shares indicate a long-oriented policy, not symmetric churn. Wider dead zones explain frequent holds, but regime--action cross-tabs are needed; selectivity is not treated as an independent return source.
+% 中文翻译：35.8\% 的买入比例与 1.8\% 的卖出比例说明策略偏多头，而非对称频繁交易。更宽的弃权区间可以解释频繁持有，但仍需要状态--动作交叉统计；本文不把选择性视为独立收益来源。
+
+\paragraph{Operational footprint.}
+Training uses 42 accelerator-hours: 8 for the encoder, 2 for router pretraining, and 32 for eight evolution rounds (Table~\ref{tab:efficiency}). Four-asset serial inference takes 32.8 seconds before I/O, supporting daily feasibility but not compute superiority.
+% 中文翻译：训练共使用 42 个加速器小时：编码器 8 小时、路由器预训练 2 小时、八轮进化 32 小时（表 4）。四只股票串行推理在输入输出之前需 32.8 秒，这支持日频可行性，但不证明计算优势。
+
+\paragraph{Sensitivity and failure boundaries.}
+Table~\ref{tab:sensitivity} is non-monotonic. Edge threshold 0.15 gives SR 1.28; thresholds 0.05 and 0.40 give $-0.21$ and 0.42, respectively. Router top-$k{=}15$ also gives SR 1.28, versus 0.95, 1.12, and 1.08 for $k{=}5,10,$ and 25. Objective-specific exceptions give a second boundary: on JPM, \textsc{FinOPD} has lower CR than Buy \& Hold (15.8\% versus 22.9\%) but higher Calmar (1.35 versus 0.92), while competitors retain higher Calmar on GOOGL and AAPL. As the validation position cap grows, SR stays at 1.28, but MDD rises from 0.1\% to 0.7\% and stability falls from 0.98 to 0.87. Thus, weaker evidence, more factors, or more exposure does not monotonically improve the risk--return profile. These validation sweeps justify the setting and bound the claim to risk-adjusted consistency, not extra test gains or universal dominance.
+% 中文翻译：表 9 的验证结果不是单调的。优势阈值 0.15 的 Sharpe 为 1.28，阈值 0.05 和 0.40 时分别为 $-0.21$ 和 0.42。路由 top-$k{=}15$ 的 Sharpe 同样为 1.28；$k{=}5,10,25$ 时分别为 0.95、1.12 和 1.08。不同评价目标给出第二重边界：在 JPM 上，FinOPD 的累计收益低于 Buy \& Hold（15.8\% 对 22.9\%），但 Calmar 更高（1.35 对 0.92）；在 GOOGL 和 AAPL 上，其他方法仍保持更高的 Calmar。随着验证集仓位上限提高，Sharpe 保持 1.28，但最大回撤从 0.1\% 上升到 0.7\%，稳定性从 0.98 降到 0.87。因此，更弱证据、更多因子或更大风险暴露都不会单调改善风险收益表现。这些验证扫描支持所选设置，并把结论限定为风险调整后的一致性，而不是额外测试收益或普遍占优。

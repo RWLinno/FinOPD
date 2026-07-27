@@ -83,7 +83,7 @@ def compute_metrics(predictions: List[Dict], ground_truths: List[Dict]) -> Dict[
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate VLM LoRA on ChartGeometry")
-    parser.add_argument("--model", default="/Knowin/foundation/weilinruan/hf_models/Qwen/Qwen2.5-VL-32B-Instruct")
+    parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     parser.add_argument("--lora-path", default="outputs/vlm_lora/")
     parser.add_argument("--test-data", default="data/chart_geometry/train.jsonl")
     parser.add_argument("--output", default="outputs/vlm_lora_eval.json")
@@ -91,7 +91,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        from swift.llm import InferEngine, PtEngine, RequestConfig
+        from swift.llm import PtEngine, RequestConfig
     except ImportError:
         logger.error("ms-swift not installed. Run: pip install ms-swift[all]")
         sys.exit(1)

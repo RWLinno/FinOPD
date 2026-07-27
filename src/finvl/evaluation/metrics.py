@@ -5,10 +5,9 @@ Computes Sharpe ratio, IC, max drawdown, and other standard quantitative metrics
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Dict, Optional
 
 import numpy as np
-import pandas as pd
 
 
 def sharpe_ratio(
@@ -17,7 +16,10 @@ def sharpe_ratio(
     """Annualized Sharpe ratio."""
     excess = returns - risk_free_rate / annualization
     if len(excess) < 2 or np.std(excess) < 1e-12:
-        return 0.0
+        # A zero-variance return stream has no defined reward-to-variability
+        # ratio.  Returning zero silently turns abstention into measured
+        # performance and was the source of misleading regime-table entries.
+        return float("nan")
     return float(np.mean(excess) / np.std(excess) * np.sqrt(annualization))
 
 

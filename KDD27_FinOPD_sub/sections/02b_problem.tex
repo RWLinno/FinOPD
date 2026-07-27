@@ -1,0 +1,24 @@
+\section{Preliminaries}
+\label{sec:problem}
+
+\subsection{Financial Multi-Agent Decision Problem}
+
+Consider $N$ assets over trading days $t=1,\ldots,T$. At decision time $t$, the system observes only point-in-time context $o_t=(I_t,\mathbf X_t,d_t)$: chart $I_t$, OHLCV window $\mathbf X_t$, and text $d_t$. Four evidence specialists receive role-specific $o_t^i\subseteq o_t$, active factors $F_t$, and time-safe episodes; the Decision Manager emits a fifth, joint proposal. A constrained allocation head maps this chain and regime $\rho_t$ to $\mathbf w_t\in\mathcal W_t$ and a rationale, where $\mathcal W_t$ encodes exposure limits and includes $\mathbf0$ for abstention. The trajectory $\tau=(o_1,\mathbf w_1,\ldots,o_T,\mathbf w_T)$ includes costs, slippage, and one-day execution delay.
+% 中文翻译：考虑 $T$ 个交易日上的 $N$ 个资产。在决策时点 $t$，系统只能观察时点可得上下文 $o_t=(I_t,\mathbf X_t,d_t)$，包括图表、OHLCV 窗口和文本。四个证据专门化智能体接收角色对应的观察、激活因子与时间安全情节，Decision Manager 再输出第五个联合建议。受约束配置头把这条消息链与市场状态映射为 $\mathbf w_t\in\mathcal W_t$ 及决策理由；该集合编码暴露限制并包含用于弃权的零配置。交易轨迹统一计入成本、滑点和一天执行延迟。
+After an evaluation horizon $H$ closes, the action yields a matured outcome vector
+\begin{equation}
+\boldsymbol\xi_t^H=
+\left(R_{t,\mathrm{net}}^H,\operatorname{MDD}_t^H,
+\operatorname{CVaR}_t^H,\operatorname{TO}_t^H\right),
+\label{eq:outcome_vector}
+\end{equation}
+covering net return, drawdown, tail risk, and turnover. A scalar utility $U_t^H$ is used for training gates and memory admission, while the vector is compressed into the estimated hindsight summary supplied to the post-horizon frozen teacher. The objective is to improve expected cost- and risk-adjusted portfolio utility while respecting drawdown and cross-regime robustness constraints. Directional accuracy is therefore diagnostic rather than the optimization target.
+% 中文翻译：成熟结果向量同时覆盖净收益、回撤、尾部风险和换手率。标量效用 $U_t^H$ 用于训练门控与记忆准入，该向量则被压缩为估计的事后摘要，仅在结果窗口闭合后提供给冻结教师。优化目标是提高考虑成本和风险后的组合效用，并满足回撤与跨状态稳健性约束；方向准确率只作为诊断指标，而不是优化目标。
+
+\subsection{Financial Self-Evolution}
+
+Adapting On-Policy Distillation (OPD) from reasoning and agentic tasks~\cite{selfdistilledreasoner2026,rgopd2026,seed2026} to financial multi-agent decisions creates three coupled challenges. First, finance has no contemporaneous ground-truth solution: useful supervision arrives only after returns and risks mature, yet the deployed policy must never observe future information. Second, the training distribution is endogenous. The current student creates the states, disagreements, and mistakes on which it should improve, while multiple agents share delayed credit and unconstrained updates can drift from deployable behavior. Third, financial knowledge evolves at different timescales. Policy parameters encode reusable reasoning, episodic memory preserves state-specific outcomes, and symbolic factors provide executable tools that should not be repeatedly rewritten into model weights.
+% 中文翻译：把推理与智能体任务中的 OPD 迁移到金融多智能体决策会产生三个耦合挑战。第一，金融不存在同时可得的真实最优动作，监督只有在收益与风险成熟后才出现，但部署策略不能观察未来。第二，训练分布由当前学生自身产生，多个智能体共享延迟信用，而且无约束更新可能偏离可部署行为。第三，金融知识以不同时间尺度演化：策略参数吸收可复用推理，情节记忆保留状态相关结果，符号因子则作为可执行工具保留在模型权重之外。
+
+\textsc{FinOPD} addresses these challenges with a staged dual-track design. Before OPD, Alpha-Factor Evolution constructs a versioned library from 157 valid mined expressions and freezes its contents. During OPD, the current student generates trajectories, a separate frozen teacher receives only an estimated hindsight summary, and token-level distillation is controlled by agent credit and a reference-policy KL guard. After outcomes mature, time-safe episodes enter non-parametric memory. The decision layer then turns these evolving knowledge sources into cost-aware actions through regime-aware selective execution.
+% 中文翻译：FinOPD 采用分阶段双轨设计解决上述问题。在 OPD 之前，Alpha-Factor Evolution 从 157 条有效挖掘结果构建版本化因子库并冻结其内容。OPD 期间，当前学生生成轨迹，独立冻结教师只接收估计的事后摘要，智能体信用与参考策略 KL 约束共同控制 token 级蒸馏。结果成熟后，时间安全的情节进入非参数记忆，决策层再通过状态感知的选择性执行把这些知识转化为考虑成本的动作。

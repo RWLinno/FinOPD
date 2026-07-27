@@ -13,4 +13,11 @@ run_*.log
 /tmp/
 *.safetensors
 *.bin
+!src/finvl/factors/frozen_factors.bin
 *.pt
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+# Private mutable factor-research manifests are never distributed.
+docs/best_factor.json
